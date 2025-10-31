@@ -1,11 +1,9 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./global.css";
-// import App from "./App.tsx";
-import { Header } from "./components/Header/Header";
+import {RouterProvider} from "react-router-dom";
+import routers from "./routes/routers.tsx";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <Header />
-  </StrictMode>
+
+createRoot(document.getElementById("root") as HTMLElement).render(
+  <RouterProvider router={routers} />
 );
