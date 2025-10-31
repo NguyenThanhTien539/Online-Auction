@@ -1,5 +1,5 @@
 // const { Pool } = require("pg");
-const knex = require("knex");
+import knex from "knex";
 
 // module.exports.connectDatabase = async () => {
 //   try {
@@ -17,7 +17,7 @@ const knex = require("knex");
 //   }
 // };
 
-let db;
+let db : any;
 try {
   db = knex({
     client: process.env.DB_CLIENT,
@@ -26,7 +26,7 @@ try {
       host: process.env.DB_HOST,
       database: process.env.DB_NAME,
       password: process.env.DB_PASSWORD,
-      port: process.env.DB_PORT,
+      port : Number(process.env.DB_PORT),
     },
     pool: { min: 0, max: 10 },
   });
@@ -35,4 +35,4 @@ try {
   console.log("ERROR when connecting to database!!!!");
 }
 
-module.exports = db;
+export default db;
