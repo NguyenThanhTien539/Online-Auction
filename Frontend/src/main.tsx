@@ -1,9 +1,12 @@
 import { createRoot } from "react-dom/client";
 import "./global.css";
-import {RouterProvider} from "react-router-dom";
-import routers from "./routes/routers.tsx";
-
+import { RouterProvider } from "react-router-dom";
+import { Header } from "./components/Header/Header";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
-  <RouterProvider router={routers} />
+  <Header />
+
+  // <MainContent/>
+
+  // <Footer/>
 );
