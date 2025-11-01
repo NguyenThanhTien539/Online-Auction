@@ -1,12 +1,11 @@
 import {createBrowserRouter} from "react-router-dom";
-import MainLayout from "../layouts/MainLayout.tsx";
-import Home from "../pages/Home.tsx";
-
+import Home from "../views/client/pages/Home";
+import Default from "../views/client/layouts/Default";
 
 const routers = createBrowserRouter([
     {
         path : "/",
-        element : <MainLayout/>,
+        element : <Default/>,
         children: [
             {
                 path: "/",

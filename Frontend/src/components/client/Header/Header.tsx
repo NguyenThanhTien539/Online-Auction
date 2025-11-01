@@ -1,4 +1,4 @@
-import logo from "../../assets/react.svg";
+import logo from "../../../assets/react.svg";
 import { HeaderMenu } from "./HeaderMenu";
 import { HeaderAccount } from "./HeaderAccount";
 export const Header = () => {
