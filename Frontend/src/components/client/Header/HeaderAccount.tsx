@@ -6,7 +6,10 @@ export const HeaderAccount = () => {
           Sign in
         </a>
         <span className="text-white">/</span>
-        <a href="#" className="text-white-900 font-bold hover:text-gray-300">
+        <a
+          href="accounts/register"
+          className="text-white-900 font-bold hover:text-gray-300"
+        >
           Sign up
         </a>
       </div>
