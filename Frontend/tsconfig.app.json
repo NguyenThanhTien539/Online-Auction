@@ -22,7 +22,13 @@
     "noUnusedParameters": false,
     "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    // Short paths 
+    "baseUrl" : ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
   },
   "include": ["src"]
 }
