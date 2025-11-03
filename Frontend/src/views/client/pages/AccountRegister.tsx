@@ -82,19 +82,20 @@ function AccountRegister() {
         };
 
         console.log(finalData);
-        navigate(`/accounts/verify?email=${email}`);
+        // navigate(`/accounts/verify?email=${email}`);
 
-        // fetch("http://localhost:5000/api/accounts/register", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify(finalData),
-        // })
-        //   .then((res) => res.json())
-        //   .then((data) => {
-        //     if (data.error == "success") {
-        //       navigate(`/accounts/otp?email=${email}`);
-        //     }
-        //   });
+        fetch("http://localhost:5000/accounts/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalData),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.error == "success") {
+              // navigate(`/accounts/otp?email=${email}`);
+              console.log(data.message);
+            }
+          });
       });
   }, []);
   return (

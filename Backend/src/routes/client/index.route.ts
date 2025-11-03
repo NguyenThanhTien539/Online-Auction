@@ -1,9 +1,9 @@
 import express from "express";
 const route = express.Router();
 
-import homeRoute from "./home.route.ts";
-route.use("/", homeRoute);
+import accountRoute from "./account.route.ts";
+// route.use("/", accountRoute);
 
-
+route.use("/accounts", accountRoute);
 
 export default route;

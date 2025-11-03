@@ -31,7 +31,7 @@ function AccountVerify() {
         <form
           id="registerVerify"
           action=""
-          className="relative z-20 bg-white w-[550px] min-h-[400px]   "
+          className="relative z-20 bg-white w-[550px] min-h-[400px] rounded-4xl"
         >
           <div className=" text-center font-bold font-sans text-[30px] p-[20px]">
             <h1>Nhập mã OTP</h1>
