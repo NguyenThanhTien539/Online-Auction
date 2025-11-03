@@ -1,5 +1,6 @@
 import  {useState} from "react";
-import cat from "../assets/react.svg";
+import cat from "@/assets/logos/react.svg";
+import {Link} from "react-router-dom";
 
 
 
@@ -47,8 +48,8 @@ function NavbarAlpha () {
 
                     {/* button */}
                     <div className = "hidden justify-end md:flex md:absolute md:right-15 lg:static max-w-[250px]w-fit m-4 p-4 ml-0">
-                        <a href = "#" className="bg-neutral-300 m-2 p-2 rounded-2xl text-blue-500 text-xl font-bold hover:text-white">Sign in</a>
-                        <a href = "#" className="bg-neutral-300 m-2 p-2 rounded-2xl text-blue-500 text-xl font-bold hover:text-white">Sign up</a>
+                        <Link to = "/accounts/login" className="bg-neutral-300 m-2 p-2 rounded-2xl text-blue-500 text-xl font-bold hover:text-white">Sign in</Link>
+                        <Link to = "/accounts/register" className="bg-neutral-300 m-2 p-2 rounded-2xl text-blue-500 text-xl font-bold hover:text-white">Sign up</Link>
 
                     </div>
 

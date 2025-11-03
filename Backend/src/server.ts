@@ -1,11 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-
-
 dotenv.config();
-
-
-
 
 import clientRoutes from "./routes/client/index.route.ts";
 
