@@ -29,7 +29,7 @@ function AccountLogin() {
 
   return (
     <>
-      <div className="relative min-h-screen flex items-center justify-center">
+      <div className="relative min-h-screen flex items-center justify-center ">
         <img
           src={bg}
           alt="background"
@@ -49,7 +49,7 @@ function AccountLogin() {
           </div>
           <div className="flex flex-col gap-4 mt-[25px]">
             <div>
-              <label className="block font-medium text-[14px] mb-[5px]">
+              <label className="block font-[500] text-[14px] mb-[5px]">
                 Email*
               </label>
               <input
@@ -61,7 +61,7 @@ function AccountLogin() {
               <div id="emailError" className="text-sm text-red"></div>
             </div>
             <div>
-              <label className="block font-medium text-[14px] mb-[5px]">
+              <label className="block font-[500] text-[14px] mb-[5px]">
                 Mật khẩu*
               </label>
               <input
@@ -75,17 +75,17 @@ function AccountLogin() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input type="checkbox" className="w-5 h-5" />
-                <span className="ml-2.5">Nhớ mật khẩu</span>
+                <input type="checkbox" className="w-[20px] h-[20px]" />
+                <span className="ml-[10px]">Nhớ mật khẩu</span>
               </div>
               <span className="text-blue-500 cursor-pointer">
                 Quên mật khẩu
               </span>
             </div>
 
-            <div className="text-center mt-0.5">
+            <div className="text-center mt-[2px]">
               <button
-                className=" bg-blue-500 border border-[#DEDEDE] rounded-lg w-[100px] h-10 font-bold text-[16px] text-white cursor-pointer"
+                className=" bg-blue-500 border border-[#DEDEDE] rounded-lg w-[100px] h-[40px] font-[700] text-[16px] text-white cursor-pointer"
                 type="submit"
               >
                 Đăng nhập
