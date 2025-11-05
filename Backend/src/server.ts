@@ -8,18 +8,22 @@ import adminRoutes from "./routes/admin/index.route.ts";
 
 import variableConfig from "./config/variable.config.ts";
 
+import cors from "cors";
+
 const app = express();
 const port = 5000;
 
 // Middlewares
 app.use(express.json());
+app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
+var pathAdmin: String = variableConfig.pathAdmin; //set global variable for admin routes
 
-
-var pathAdmin : String = variableConfig.pathAdmin;//set global variable for admin routes
-
-
-
-console.log(pathAdmin); 
+console.log(pathAdmin);
 app.use("/", clientRoutes);
 app.use(`${pathAdmin}/`, adminRoutes);
 

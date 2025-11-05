@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bg from "@/assets/images/bg-account.svg";
+import bg from "@/assets/images/bg-account.svg"
 import { useEffect } from "react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
@@ -82,19 +82,20 @@ function AccountRegister() {
         };
 
         console.log(finalData);
-        navigate(`/accounts/verify?email=${email}`);
+        // navigate(`/accounts/verify?email=${email}`);
 
-        // fetch("http://localhost:5000/api/accounts/register", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify(finalData),
-        // })
-        //   .then((res) => res.json())
-        //   .then((data) => {
-        //     if (data.error == "success") {
-        //       navigate(`/accounts/otp?email=${email}`);
-        //     }
-        //   });
+        fetch("http://localhost:5000/accounts/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalData),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.code == "error") {
+              // navigate(`/accounts/otp?email=${email}`);
+              console.log(data.message);
+            }
+          });
       });
   }, []);
   return (
@@ -103,7 +104,7 @@ function AccountRegister() {
         <img
           src={bg}
           alt="hình nền"
-          className="absolute inset-0 w-full h-full object-cover brightness-125"
+          className="absolute inset-0 w-full h-full object-cover"
         />
 
         <form
