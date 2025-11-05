@@ -1,12 +1,17 @@
 import {Outlet} from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
-
+import Breadcrumbs from "@/components/layout/Breadcrumb";
 
 function MainLayout() {
     return (
         <div className = "min-h-screen w-full flex flex-col">
             <Navbar/>
+            
             <main className = "flex-1 pt-[100px]">
+                <div className = "ml-[50px]">
+                    <Breadcrumbs/>
+                </div>
+                
                 <Outlet/>
             </main>
         </div>  

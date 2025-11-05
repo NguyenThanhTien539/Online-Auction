@@ -24,7 +24,7 @@ function NavigationMenu({
       {...props}
     >
       {children}
-      {viewport && <NavigationMenuViewport />}
+      {/* {viewport && <NavigationMenuViewport />} */}
     </NavigationMenuPrimitive.Root>
   )
 }
@@ -74,10 +74,10 @@ function NavigationMenuTrigger({
       {...props}
     >
       {children}{" "}
-      <ChevronDownIcon
+      {/* <ChevronDownIcon
         className="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"
         aria-hidden="true"
-      />
+      /> */}
     </NavigationMenuPrimitive.Trigger>
   )
 }
@@ -102,14 +102,17 @@ function NavigationMenuContent({
   )
 }
 
+type  navigationMenuViewportProps = React.ComponentProps<typeof NavigationMenuPrimitive.Viewport> & {
+  outerClassName?: string
+}
 function NavigationMenuViewport({
-  className,
+  className, outerClassName,
   ...props
-}: React.ComponentProps<typeof NavigationMenuPrimitive.Viewport>) {
+}: navigationMenuViewportProps) {
   return (
     <div
       className={cn(
-        "absolute top-full left-0 isolate z-50 flex justify-center"
+        "absolute top-full left-0 z-50 flex justify-center", outerClassName
       )}
     >
       <NavigationMenuPrimitive.Viewport

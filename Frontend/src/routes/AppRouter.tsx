@@ -4,7 +4,7 @@ import MainLayout from "@/layouts/MainLayout";
 import AccountRegister from "@/features/auth/pages/AccountRegister";
 import AccountVerify from "@/features/auth/pages/AccountVerify";
 import AccountLogin from "@/features/auth/pages/AccountLogin";
-
+import Test from "@/ztest/Test"
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -14,8 +14,14 @@ const routers = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
+
     ],
   },
+  {
+    path: "/test",
+    element: <Test/>
+  }
+  ,
   {
     path: "/accounts",
     children: [
@@ -33,6 +39,10 @@ const routers = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/test",
+    element: <Test/>
+  }
 ]);
 
 export default routers;

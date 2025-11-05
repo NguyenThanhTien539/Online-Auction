@@ -1,7 +1,7 @@
 import  {useState} from "react";
-import cat from "@/assets/logos/react.svg";
+import auction from "@/assets/logos/auction-logo.svg";
 import {Link} from "react-router-dom";
-
+import CatagoriseButton from "@/components/common/CategoriesMenu";
 
 
 
@@ -13,7 +13,7 @@ interface ListItemProps {
 
 
 
-function NavbarAlpha () {
+function Navbar () {
     const [open, setOpen] = useState(false);
     const navbarItems = [{link: "#", option: "Home"}, {link: "#", option: "About"}, {link: "#", option: "Payment"},
         {link: "#", option: "Contact"}
@@ -22,17 +22,22 @@ function NavbarAlpha () {
         // Header section
    
         <header className = "fixed w-full z-100">
-            <div className = "bg-gray-600/50 w-full h-[70px] lg:h-20 flex relative backdrop-blur-2xl">
+            <div className = "bg-white/50 w-full h-[70px] lg:h-20 flex relative backdrop-blur-2xl shadow-md shadow-gray-900/5">
                 {/*Responsize Block */}
                 <div className = "container ml-3 flex items-center ">
 
                     {/* Logo */}
                     <div className = "flex w-fit max-w-full h-full p-2 justify-center">
                         <a href = "# b" className = "0 w-full flex items-center pl-2.5">
-                            <img src = {cat} alt = "logo" className = "flex  h-[80%] my-auto object-cover ring-2 rounded-[50%] hover:rotate-30 transition-all duration-300"></img>
-                            <span className = "text-2xl mx-2 font-bold w-full text-blue-500 hover:text-blue-300 transition-all duration-300">Miracle1412</span>
+                            <img src = {auction} alt = "logo" className = "flex  h-[90%] my-auto object-cover rounded-[50%] hover:rotate-30 transition-all duration-300"></img>
+                            <span className = "text-2xl mx-2 font-bold w-full text-blue-500 hover:text-blue-300 transition-all duration-300">
+                                Miracle
+                            </span>
                         </a>
                     </div>
+                    
+                    <CatagoriseButton />
+                    
                     {/* List center content */}
                     <div className = {`absolute right-4 top-[110%] w-full max-w-[300px] py-3 z-40 rounded-2xl justify-center items-center font-semibold text-2xl mx-2 \
                         ${open ? "top-[110%] opacity-100 visible bg-gray-700" : "top-[150%] opacity-0 "} transition-opacity duration-3000 \ 
@@ -70,11 +75,11 @@ function NavbarAlpha () {
 
     );
 }
-export default NavbarAlpha;
+export default Navbar;
 
 function ListItem ({index, children, link} : ListItemProps) {
     return (
-        <li key = {index} className = "flex lg:inline-flex text-amber-300 text-xl m-2 p-1 my-3 hover:text-white">
+        <li key = {index} className = "flex lg:inline-flex text-amber-300 text-xl m-2 p-1 my-3 hover:text-green-500">
             <a href = {link} title = {children}>{children}</a>
         </li>
     );
