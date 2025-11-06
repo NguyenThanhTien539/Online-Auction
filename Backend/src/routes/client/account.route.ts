@@ -15,6 +15,12 @@ route.post(
   accountController.registerVerifyPost
 );
 
+route.post(
+  "/forgot-password",
+  // accountValidate.registerVerifyPost,
+  accountController.forgotPasswordPost
+);
+
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
 export default route;

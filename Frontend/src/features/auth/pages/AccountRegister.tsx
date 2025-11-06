@@ -107,7 +107,7 @@ function AccountRegister() {
 
             if (data.code == "existedOTP") {
               console.log(data.message);
-              navigate(`/accounts/verify?email=${email}`);
+              navigate(`/accounts/verify?email=${email}&type=register`);
             }
           });
       });
