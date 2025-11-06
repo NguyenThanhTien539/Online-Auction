@@ -1,14 +1,12 @@
 import express from "express";
-import dotenv from "dotenv";
-dotenv.config();
+import cors from "cors";
+
 
 import clientRoutes from "./routes/client/index.route.ts";
 
 import adminRoutes from "./routes/admin/index.route.ts";
 
 import variableConfig from "./config/variable.config.ts";
-
-import cors from "cors";
 
 const app = express();
 const port = 5000;
@@ -23,7 +21,6 @@ app.use(
 );
 var pathAdmin: String = variableConfig.pathAdmin; //set global variable for admin routes
 
-console.log(pathAdmin);
 app.use("/", clientRoutes);
 app.use(`${pathAdmin}/`, adminRoutes);
 

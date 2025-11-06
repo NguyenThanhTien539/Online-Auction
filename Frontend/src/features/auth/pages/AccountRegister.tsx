@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bg from "@/assets/images/bg-account.svg"
+import bg from "@/assets/images/bg-account.svg";
 import { useEffect } from "react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
@@ -68,6 +68,13 @@ function AccountRegister() {
           errorContainer: "#passwordError",
         }
       )
+      .addField(
+        "#agree",
+        [{ rule: "required", errorMessage: "Vui lòng đồng ý với điều khoản" }],
+        {
+          errorContainer: "#agreeError",
+        }
+      )
       .onSuccess((event: any) => {
         const fullName = event.target.fullName.value;
         const email = event.target.email.value;
@@ -81,8 +88,6 @@ function AccountRegister() {
           address: address,
         };
 
-        console.log(finalData);
-        // navigate(`/accounts/verify?email=${email}`);
 
         fetch("http://localhost:5000/accounts/register", {
           method: "POST",
@@ -92,8 +97,17 @@ function AccountRegister() {
           .then((res) => res.json())
           .then((data) => {
             if (data.code == "error") {
-              // navigate(`/accounts/otp?email=${email}`);
               console.log(data.message);
+            }
+
+            if (data.code == "success") {
+              localStorage.setItem("registerForm", JSON.stringify(finalData));
+              navigate(`/accounts/verify?email=${email}&type=register`);
+            }
+
+            if (data.code == "existedOTP") {
+              console.log(data.message);
+              navigate(`/accounts/verify?email=${email}`);
             }
           });
       });
@@ -121,7 +135,10 @@ function AccountRegister() {
 
           <div className="flex flex-col gap-4 mt-[25px]">
             <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
+              <label
+                htmlFor="fullName"
+                className="block font-[500] text-[14px] mb-[5px]"
+              >
                 Họ Tên*
               </label>
               <input
@@ -134,7 +151,10 @@ function AccountRegister() {
             </div>
 
             <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
+              <label
+                htmlFor="email"
+                className="block font-[500] text-[14px] mb-[5px]"
+              >
                 Email*
               </label>
               <input
@@ -147,7 +167,10 @@ function AccountRegister() {
             </div>
 
             <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
+              <label
+                htmlFor="address"
+                className="block font-[500] text-[14px] mb-[5px]"
+              >
                 Địa chỉ*
               </label>
               <input
@@ -160,7 +183,10 @@ function AccountRegister() {
             </div>
 
             <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
+              <label
+                htmlFor="password"
+                className="block font-[500] text-[14px] mb-[5px]"
+              >
                 Mật khẩu*
               </label>
               <input
@@ -172,9 +198,15 @@ function AccountRegister() {
               <div id="passwordError" className="text-sm text-red"></div>
             </div>
             {/* checkbox */}
-            <div className="flex items-center gap-2 mt-[3px] ml-[3.5px]">
-              <input type="checkbox" className="w-4 h-4" />
-              <label>Tôi đồng ý với điều khoản</label>
+            <div>
+              <label className="flex items-center gap-2 mt-[3px] ml-[3.5px]">
+                <input id="agree" type="checkbox" className="w-4 h-4" />
+                <span>Tôi đồng ý với điều khoản</span>
+              </label>
+              <div
+                id="agreeError"
+                className="text-sm text-red ml-[28px] mt-[2px]"
+              ></div>
             </div>
 
             <div className="text-center mt-[2px]">

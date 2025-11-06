@@ -16,6 +16,7 @@ export const registerPost = (
       "string.empty": "Vui lòng nhập email của bạn!",
       "string.email": "Email không đúng định dạng!",
     }),
+    address: Joi.string().allow(""),
     password: Joi.string()
       .required()
       .min(8)
@@ -62,6 +63,29 @@ export const registerPost = (
   next();
 };
 
+export const registerVerifyPost = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const schema = Joi.object({
+    otp: Joi.string().required().messages({
+      "string.empty": "Vui lòng nhập mã otp!",
+    }),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    const errorMessage = error.details[0].message;
+    return res.json({
+      code: "error",
+      message: errorMessage,
+    });
+  }
+
+  next();
+};
+
 export const loginPost = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
     email: Joi.string().email().required().messages({
@@ -84,5 +108,3 @@ export const loginPost = (req: Request, res: Response, next: NextFunction) => {
 
   next();
 };
-
-

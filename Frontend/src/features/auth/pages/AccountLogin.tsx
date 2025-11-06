@@ -23,7 +23,26 @@ function AccountLogin() {
         const email = event.target.email.value;
         const password = event.target.password.value;
 
-        console.log(email, password);
+        const dataFinal = {
+          email: email,
+          password: password,
+        };
+
+        fetch("http://localhost:5000/accounts/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataFinal),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.code == "error") {
+              console.log(data.message);
+            }
+
+            if (data.code == "success") {
+              navigate(`/`);
+            }
+          });
       });
   }, []);
 
@@ -95,7 +114,7 @@ function AccountLogin() {
             <div className="text-center text-[14px]">
               Bạn chưa có tài khoản?
               <span
-                className="pl-1 text-blue-500 underline cursor-pointer hover:text-blue-700"
+                className="pl-1 text-blue-500 cursor-pointer hover:text-blue-700"
                 onClick={() => {
                   navigate("/accounts/register");
                 }}

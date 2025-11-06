@@ -9,6 +9,12 @@ route.post(
   accountController.registerPost
 );
 
+route.post(
+  "/verify-register",
+  // accountValidate.registerVerifyPost,
+  accountController.registerVerifyPost
+);
+
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
 export default route;

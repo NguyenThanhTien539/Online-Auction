@@ -1,22 +1,53 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import JustValidate from "just-validate";
 import bg from "@/assets/images/bg-account.svg";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+const params = new URLSearchParams(window.location.search);
+const verifyType = params.get("type");
 
 function AccountVerify() {
   const navigate = useNavigate();
   useEffect(() => {
     const validate = new JustValidate("#registerVerify");
-    validate.addField(
-      "#otp",
-      [
-        {
-          rule: "required",
-          errorMessage: "Vui lòng nhập mã OTP!",
-        },
-      ],
-      { errorContainer: "#otpError" }
-    );
+    validate
+      .addField(
+        "#otp",
+        [
+          {
+            rule: "required",
+            errorMessage: "Vui lòng nhập mã OTP!",
+          },
+        ],
+        { errorContainer: "#otpError" }
+      )
+      .onSuccess((event: any) => {
+        const otp = event.target.otp.value;
+
+        if (verifyType == "register") {
+          const finalData = JSON.parse(
+            localStorage.getItem("registerForm") || "{}"
+          );
+          finalData.otp = otp;
+          console.log(finalData);
+          fetch("http://localhost:5000/accounts/verify-register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(finalData),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.code == "error") {
+                console.log(data.message);
+              }
+
+              if (data.code == "success") {
+                localStorage.removeItem("registerForm");
+                navigate(`/accounts/login`);
+              }
+            });
+        }
+      });
   }, []);
 
   return (
