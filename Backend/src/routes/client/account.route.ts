@@ -3,6 +3,7 @@ import * as accountValidate from "../../validates/client/account.validate.ts";
 import express from "express";
 const route = express.Router();
 
+// This route is /
 route.post(
   "/register",
   accountValidate.registerPost,
@@ -10,5 +11,7 @@ route.post(
 );
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
+
+route.post("/refresh-token", accountController.refreshToken);
 
 export default route;

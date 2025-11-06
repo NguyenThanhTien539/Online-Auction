@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 
-export const registerPost = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+
+export const registerPost = (req: Request,  res: Response,  next: NextFunction) => {
   const schema = Joi.object({
     fullName: Joi.string().min(5).max(50).required().messages({
       "string.empty": "Vui lòng nhập họ tên!",
@@ -84,5 +81,10 @@ export const loginPost = (req: Request, res: Response, next: NextFunction) => {
 
   next();
 };
+
+
+
+
+
 
 

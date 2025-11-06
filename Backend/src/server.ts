@@ -1,6 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
+
+
 dotenv.config();
+
+
 
 import clientRoutes from "./routes/client/index.route.ts";
 
@@ -15,12 +19,13 @@ const port = 5000;
 
 // Middlewares
 app.use(express.json());
-app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173",
   })
 );
+
+
 var pathAdmin: String = variableConfig.pathAdmin; //set global variable for admin routes
 
 console.log(pathAdmin);
