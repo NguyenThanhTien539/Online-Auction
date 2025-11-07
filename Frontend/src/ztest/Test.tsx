@@ -18,6 +18,7 @@ import {
 
 import OTPForm from "@/components/common/OTPForm"
 import {toast, Toaster} from "sonner"
+import Pagination from "@/components/common/Pagination"
 
 
 function Test(){
@@ -38,11 +39,24 @@ function Test(){
         CLick me
       </button>
 
-      
+
+      <TestPagination/>
       
 
     </div>
   );
 }
 
+function TestPagination(){
+
+  const [currentPage, setPage] = useState<number>(1);
+  useEffect (()=>{
+    console.log(currentPage);
+  },[currentPage]);
+  return(
+    <div>
+      <Pagination numberOfPages = {10} currentPage = {currentPage} controlPage = {setPage} />
+    </div>
+  )
+}
 export default Test;

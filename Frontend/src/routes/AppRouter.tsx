@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
-import Home from "@/pages/home/Home";
+import Home from "@/pages/home/HomePage";
 import MainLayout from "@/layouts/MainLayout";
-import AccountRegister from "@/pages/auth/AccountRegister";
-import AccountVerify from "@/pages/auth/AccountVerify";
-import AccountLogin from "@/pages/auth/AccountLogin";
+import AccountRegister from "@/pages/auth/AccountRegisterPage";
+import AccountVerify from "@/pages/auth/AccountVerifyPage";
+import AccountLogin from "@/pages/auth/AccountLoginPage";
 import Test from "@/ztest/Test"
-import ForgotPassword from "@/pages/auth/ForgotPassword";
-import AllCategoriesPage from "@/components/common/AllCategories";
+import ForgotPassword from "@/pages/auth/ForgotPasswordPage";
+import AllCategoriesPage from "@/pages/client/AllCategoriesPage";
 const routers = createBrowserRouter([
   {
     path: "/",
