@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bg from "@/assets/images/bg-account.svg";
+import bg from "@/assets/images/bg-account.jpg";
 import { useEffect } from "react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
-
+import {toast} from "sonner";
 function AccountRegister() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -98,15 +98,21 @@ function AccountRegister() {
           .then((data) => {
             if (data.code == "error") {
               console.log(data.message);
+              toast.error("Có lỗi xảy ra. Vui lòng thử lại")
             }
 
             if (data.code == "success") {
+              localStorage.clear();
               localStorage.setItem("registerForm", JSON.stringify(finalData));
               navigate(`/accounts/verify?email=${email}&type=register`);
+              
             }
-
-            if (data.code == "existedOTP") {
+            
+            // Mục này nên sửa lại
+            if (data.code == "existedOTP") { 
               console.log(data.message);
+              localStorage.clear();
+              localStorage.setItem("registerForm", JSON.stringify(finalData));
               navigate(`/accounts/verify?email=${email}&type=register`);
             }
           });

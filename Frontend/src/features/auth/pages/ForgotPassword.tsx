@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bg from "@/assets/images/bg-account.svg";
+import bg from "@/assets/images/bg-account.jpg";
 import { useNavigate } from "react-router-dom";
 import JustValidate from "just-validate";
 import { useEffect } from "react";
-
+import {toast} from "sonner";
 function ForgotPassword() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -35,6 +35,7 @@ function ForgotPassword() {
           .then((data) => {
             if (data.code == "error") {
               console.log(data.message);
+          
             }
 
             if (data.code == "success") {

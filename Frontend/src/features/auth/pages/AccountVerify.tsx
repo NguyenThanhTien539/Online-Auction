@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import JustValidate from "just-validate";
-import bg from "@/assets/images/bg-account.svg";
+import bg from "@/assets/images/bg-account.jpg";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OTPForm from "@/features/auth/components/OTPForm";
+import {toast} from "sonner";
 const params = new URLSearchParams(window.location.search);
 const verifyType = params.get("type");
 
@@ -28,6 +29,9 @@ function Test (){
 function AccountVerify() {
   const navigate = useNavigate();
   
+  useEffect(() => {
+    toast.info("Mã PIN tồn tại trong 5 phút");
+  }, []);
 
   const [optValue, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -59,13 +63,17 @@ function AccountVerify() {
         if (data.code === "success"){
           localStorage.removeItem("registerForm");
           navigate("/accounts/login");
+          toast.success("Xác thực thành công!")
+          
         }
         else {
           setError(data.message || "Error happens");
+          toast.error("Mã PIN không chính xác")
         }
       }
       catch(error){
         console.log ("Error fetching data in check OTP:", error);
+        toast.error("Mất kết nối. Vui lòng thử lại")
       }
     }
     checkOTP();

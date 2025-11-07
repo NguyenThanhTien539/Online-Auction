@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import JustValidate from "just-validate";
-import bg from "@/assets/images/bg-account.svg";
+import bg from "@/assets/images/bg-account.jpg";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import {toast} from "sonner";
 function AccountLogin() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -43,10 +44,12 @@ function AccountLogin() {
           .then((data) => {
             if (data.code == "error") {
               console.log(data.message);
+              toast.error("Đăng nhập thất bại")
             }
 
             if (data.code == "success") {
               navigate(`/`);
+              toast.success("Đăng nhập thành công!")
             }
           });
       });

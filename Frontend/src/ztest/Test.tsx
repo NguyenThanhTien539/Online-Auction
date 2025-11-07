@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/navigation-menu"
 
 import OTPForm from "@/features/auth/components/OTPForm"
-
+import {toast, Toaster} from "sonner"
 
 
 function Test(){
@@ -26,6 +26,19 @@ function Test(){
       <ProductCard/>
       <SubCategoryCard/>
       <OTPForm/>
+
+      {/* <Toaster richColors closeButton/> */}
+      <button className = "flex mx-auto my-10 p-2 rounded-2xl text-white bg-green-500"
+      onClick = {() => {toast.success(
+        <div className = "ml-2 text-green-400 text-lg">
+          Toi dep trai vcl
+        </div>
+      )}}
+      >
+        CLick me
+      </button>
+
+      
       
 
     </div>
