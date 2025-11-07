@@ -16,6 +16,7 @@ import {
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
 
+import OTPForm from "@/features/auth/components/OTPForm"
 
 
 
@@ -24,6 +25,7 @@ function Test(){
     <div >
       <ProductCard/>
       <SubCategoryCard/>
+      <OTPForm/>
       
 
     </div>

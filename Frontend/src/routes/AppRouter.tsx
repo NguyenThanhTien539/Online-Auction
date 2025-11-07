@@ -5,6 +5,8 @@ import AccountRegister from "@/features/auth/pages/AccountRegister";
 import AccountVerify from "@/features/auth/pages/AccountVerify";
 import AccountLogin from "@/features/auth/pages/AccountLogin";
 import Test from "@/ztest/Test"
+import ForgotPassword from "@/features/auth/pages/ForgotPassword";
+
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -36,6 +38,10 @@ const routers = createBrowserRouter([
       {
         path: "login",
         element: <AccountLogin />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
       },
     ],
   },

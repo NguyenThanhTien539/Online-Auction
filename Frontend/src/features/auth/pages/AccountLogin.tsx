@@ -6,12 +6,15 @@ import { useEffect } from "react";
 function AccountLogin() {
   const navigate = useNavigate();
   useEffect(() => {
-    const validate = new JustValidate("#loginForm");
+    const validate = new JustValidate("#loginForm", {lockForm: false});
 
     validate
       .addField(
         "#email",
-        [{ rule: "required", errorMessage: "Vui lòng nhập email!" }],
+        [
+          { rule: "required", errorMessage: "Vui lòng nhập email!" },
+          { rule: "email", errorMessage: "Email không đúng định dạng" },
+        ],
         { errorContainer: "#emailError" }
       )
       .addField(
@@ -22,10 +25,34 @@ function AccountLogin() {
       .onSuccess((event: any) => {
         const email = event.target.email.value;
         const password = event.target.password.value;
+        const rememberPassword = event.target.rememberPassword.checked;
 
-        console.log(email, password);
+        const dataFinal = {
+          email: email,
+          password: password,
+          rememberPassword: rememberPassword,
+        };
+
+        fetch("http://localhost:5000/accounts/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataFinal),
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.code == "error") {
+              console.log(data.message);
+            }
+
+            if (data.code == "success") {
+              navigate(`/`);
+            }
+          });
       });
   }, []);
+
+
 
   return (
     <>
@@ -75,10 +102,21 @@ function AccountLogin() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <input type="checkbox" className="w-[20px] h-[20px]" />
-                <span className="ml-[10px]">Nhớ mật khẩu</span>
+                <input
+                  id="rememberPassword"
+                  type="checkbox"
+                  className="w-[20px] h-[20px]"
+                />
+                <label htmlFor="rememberPassword" className="ml-[10px]">
+                  Nhớ mật khẩu
+                </label>
               </div>
-              <span className="text-blue-500 cursor-pointer">
+              <span
+                className="text-blue-500 cursor-pointer"
+                onClick={() => {
+                  navigate("/accounts/forgot-password");
+                }}
+              >
                 Quên mật khẩu
               </span>
             </div>
@@ -95,7 +133,7 @@ function AccountLogin() {
             <div className="text-center text-[14px]">
               Bạn chưa có tài khoản?
               <span
-                className="pl-1 text-blue-500 underline cursor-pointer hover:text-blue-700"
+                className="pl-1 text-blue-500 cursor-pointer hover:text-blue-700"
                 onClick={() => {
                   navigate("/accounts/register");
                 }}
