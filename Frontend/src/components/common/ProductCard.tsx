@@ -1,27 +1,27 @@
 import Cristiano from "@/assets/images/Cristiano.jpg";
 import LoveIcon from "@/assets/icons/love.svg";
+import {cn} from "@/lib/utils"
 
 
 
 
 
 
-
-function ProductCard(data: any) {
+function ProductCard({data, className} : {data? : any, className? : string}) {
     
-    const nameProduct = data.nameProduct;
-    const currentPrice = data.currentPrice;
-    const buyNowPrice = data.buyNowPrice;
-    const postDate = data.postDate;
-    const endTime = data.endTime;
-    const highestBidder = data.highestBidder;
-    const bidCount = data.bidCount;
-    const image = data.image;
+    // const nameProduct = data.nameProduct;
+    // const currentPrice = data.currentPrice;
+    // const buyNowPrice = data.buyNowPrice;
+    // const postDate = data.postDate;
+    // const endTime = data.endTime;
+    // const highestBidder = data.highestBidder;
+    // const bidCount = data.bidCount;
+    // const image = data.image;
 
     return (
         // Container
-        <div className = "w-80 h-110 relative flex flex-col items-center  border border-gray-300 rounded-lg shadow-lg\
-        hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 ">
+        <div className = {cn("w-80 h-110 relative flex flex-col items-center  border border-gray-300 rounded-lg shadow-lg\
+        hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 shrink-0", className)}>
             {/* Image */}
             <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-lg justify-center">
                 <img src = {Cristiano} className = "bg-red-300 flex object-cover w-full h-full"></img>

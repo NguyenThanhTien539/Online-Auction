@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
-import Home from "@/pages/Home";
+import Home from "@/pages/home/Home";
 import MainLayout from "@/layouts/MainLayout";
-import AccountRegister from "@/features/auth/pages/AccountRegister";
-import AccountVerify from "@/features/auth/pages/AccountVerify";
-import AccountLogin from "@/features/auth/pages/AccountLogin";
+import AccountRegister from "@/pages/auth/AccountRegister";
+import AccountVerify from "@/pages/auth/AccountVerify";
+import AccountLogin from "@/pages/auth/AccountLogin";
 import Test from "@/ztest/Test"
-import ForgotPassword from "@/features/auth/pages/ForgotPassword";
-
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import AllCategoriesPage from "@/components/common/AllCategories";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -14,8 +14,12 @@ const routers = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Home />
       },
+      {
+        path: "/categories",
+        element: <AllCategoriesPage/>
+      }
 
     ],
   },

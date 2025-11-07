@@ -1,6 +1,6 @@
 import {Outlet} from "react-router-dom";
-import Navbar from "@/components/layout/Navbar";
-import Breadcrumbs from "@/components/layout/Breadcrumb";
+import Navbar from "@/components/common/Navbar";
+import Breadcrumbs from "@/components/common/Breadcrumb";
 
 function MainLayout() {
     return (
@@ -11,7 +11,6 @@ function MainLayout() {
                 <div className = "ml-[50px]">
                     <Breadcrumbs/>
                 </div>
-                
                 <Outlet/>
             </main>
         </div>  

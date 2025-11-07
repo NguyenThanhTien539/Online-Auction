@@ -3,8 +3,8 @@ import {useEffect, useState, useRef} from "react";
 import * as React from "react"
 import {Link} from "react-router-dom"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Navigation } from "lucide-react"
-import ProductCard from "@/features/auction/components/ProductCard"
-import SubCategoryCard from "@/features/auction/components/SubCategoryCard";
+import ProductCard from "@/components/common/ProductCard"
+import SubCategoryCard from "@/components/common/SubCategoryCard";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,7 +16,7 @@ import {
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
 
-import OTPForm from "@/features/auth/components/OTPForm"
+import OTPForm from "@/components/common/OTPForm"
 import {toast, Toaster} from "sonner"
 
 

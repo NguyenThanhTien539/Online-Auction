@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
 import {toast} from "sonner";
+
 function AccountRegister() {
   const navigate = useNavigate();
   useEffect(() => {

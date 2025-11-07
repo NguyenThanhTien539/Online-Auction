@@ -1,6 +1,6 @@
-import HorizontalBar from "@/components/home/HorizontalBar"
+import HorizontalBar from "@/components/common/HorizontalBar"
 
-import React from "react";
+
 
 import heroImage from "@/assets/images/hero-section-background.png"
 import loveIcon from "@/assets/icons/love.svg"

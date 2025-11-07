@@ -26,15 +26,13 @@ function HorizontalBar({data, className, children, Card} : {data? : any, classNa
   return (
     <div className = {cn("w-[90%] rounded-2xl h-[200px]  relative mx-auto my-[50px] bg-gray-100", className)}>    
       <div ref = {scrollRef} className = "rounded-2xl h-full relative flex flex-row gap-1.5 overflow-x-auto items-center justify-start scrollbar-hide">
-        
+{/*         
         {data && data.map((item : any, index : any) => {
           const C = Card ?? CatagoriesMiniItem;
           // const C = Card;
           return <C key={index} image={item.image} name={item.name} link={item.link} />;
-        })}
+        })} */}
         {children}
-       
-
       </div>
       
       {/* Button move left */}

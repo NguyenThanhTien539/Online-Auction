@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {Link} from "react-router-dom";
+import Ronaldo from "@/assets/images/Cristiano.jpg"
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -13,7 +14,7 @@ const categoriesData = [
   {
     name: "Thời Trang",
     items: [
-      { name: "Áo sơ mi", image: "@/assets/icons/love.svg", link: "/ao-so-mi" },
+      { name: "Áo sơ mi", image: Ronaldo, link: "/ao-so-mi" },
       { name: "Quần jean", image: "/img/jean.jpg", link: "/quan-jean" },
       { name: "Giày dép", image: "/img/shoes.jpg", link: "/giay-dep" },
     ],
@@ -32,36 +33,7 @@ const categoriesData = [
 
 
 
-function CatagoriesMiniItem({image, name, link} : {image?: string, name?: string, link?: string}){
-  if (!name) name = "Category";
-  return(
-    <Link to = {link ? link : "#"} title = {name}>
-      <div className = " h-[130px] aspect-square flex flex-col shrink-0 items-center justify-center ml-2 rounded-2xl border-2\
-          hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.3)] hover:scale-105 hover:cursor-pointer transition-all duration-300 bg-white ">
-        {/* Image */}
-        <img className = "object-cover h-[80%] aspect-square flex rounded-xl border-2 flex items-center justify-center" src = {image}></img>
 
-      </div>
-    </Link>
-  );
-}
-
-function CatagoriesDetailContent({title, items} : {title: string, items: {name: string, image: string, link: string}[] }){
-  return (
-    <div className = "bg-gray-300 w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide">
-      {/* Tittle */}
-      <div className = "font-bold text-2xl ml-3 text-black/80 mb-[20px]">{title}</div>
-
-      {/* Content */}
-      <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
-        {items.map((item, i) => (
-          <CatagoriesMiniItem key={i} image={item.image} name={item.name} link={item.link} />
-        ))}
-
-      </div>
-    </div>
-  );
-}
 
 
 
@@ -166,4 +138,35 @@ function CatagoriesButton (
         </div>
     );
 };
+
+function CatagoriesMiniItem({image, name, link} : {image?: string, name?: string, link?: string}){
+  if (!name) name = "Category";
+  return(
+    <Link to = {link ? link : "#"} title = {name}>
+      <div className = " h-[130px] aspect-square flex flex-col shrink-0 items-center justify-center ml-1 rounded-2xl border-2\
+          hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.3)] hover:scale-105 hover:cursor-pointer transition-all duration-300 bg-white ">
+        {/* Image */}
+        <img className = "object-cover h-[100%] aspect-square flex rounded-xl border-2 flex items-center justify-center" src = {image}></img>
+
+      </div>
+    </Link>
+  );
+}
+
+function CatagoriesDetailContent({title, items} : {title: string, items: {name: string, image: string, link: string}[] }){
+  return (
+    <div className = "bg-gray-300 w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-2xl">
+      {/* Tittle */}
+      <div className = "font-bold text-2xl ml-3 text-black/80 mb-[20px]">{title}</div>
+
+      {/* Content */}
+      <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
+        {items.map((item, i) => (
+          <CatagoriesMiniItem key={i} image={item.image} name={item.name} link={item.link} />
+        ))}
+
+      </div>
+    </div>
+  );
+}
 export default CatagoriesButton;

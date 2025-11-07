@@ -3,29 +3,14 @@ import JustValidate from "just-validate";
 import bg from "@/assets/images/bg-account.jpg";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OTPForm from "@/features/auth/components/OTPForm";
+import OTPForm from "@/components/common/OTPForm";
 import {toast} from "sonner";
 const params = new URLSearchParams(window.location.search);
 const verifyType = params.get("type");
 
 
 
-function TestCount() {
-  const [count, setCount] = useState(0);
-  return(
-    <div>
-      <button type = "submit"  disabled = {false} className = "disabled:bg-red-600 bg-amber-200" onClick={() => setCount(count + 1)}>Increase</button>
-      <p>{count}</p>
-    </div>
-  );
-}
-function Test (){
-  return(
-    <div>
-      <input className = "min-h-[50px]" />
-    </div>
-  );
-}
+
 function AccountVerify() {
   const navigate = useNavigate();
   
