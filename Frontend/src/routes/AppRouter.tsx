@@ -6,7 +6,7 @@ import AccountVerify from "@/pages/auth/AccountVerifyPage";
 import AccountLogin from "@/pages/auth/AccountLoginPage";
 import Test from "@/ztest/Test"
 import ForgotPassword from "@/pages/auth/ForgotPasswordPage";
-import AllCategoriesPage from "@/pages/client/AllCategoriesPage";
+import AllCategoriesPage from "@/pages/client/CategoriesPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -17,9 +17,18 @@ const routers = createBrowserRouter([
         element: <Home />
       },
       {
+        path: "/categories/:slugid",
+        element: <AllCategoriesPage level = {2}/>
+      },
+      {
         path: "/categories",
-        element: <AllCategoriesPage/>
-      }
+        element: <AllCategoriesPage level = {1}/>,
+      },
+      // {
+      //   path: "/categories/:slugnameId",
+      //   element: <div>Hello guy</div>
+      // },
+
 
     ],
   },

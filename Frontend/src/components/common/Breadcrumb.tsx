@@ -8,10 +8,20 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { SlashIcon } from "lucide-react"
+
+function formatSlug(slug: string) {
+  // loại bỏ id nếu có
+  const parts = slug.split("-");
+  if (!isNaN(Number(parts[parts.length - 1]))) parts.pop();
+  return parts.join(" "); // "dien thoai"
+}
+
 function Breadcrumbs() {
 
   const Location = useLocation();
-  const list = Location.pathname.split("/").filter((i) => i);
+  const pathname = location.pathname.split("?")[0]; // No query
+  const pathSegments = pathname.split("/").filter(Boolean);
+  
 
 
   return(
@@ -20,23 +30,28 @@ function Breadcrumbs() {
         <BreadcrumbList>
 
         {/* First Item: Home */}
-        <BreadcrumbItem>
-          <Link to = "/" className = "hover:text-gray-300 transition-all duration-100">Home</Link>
-        </BreadcrumbItem>
-        {/* {list.length > 0 && <BreadcrumbSeparator/>} */}
-        <BreadcrumbSeparator/>
+        {pathSegments.length > 0 ?
+          <>
+          <BreadcrumbItem>
+            <Link to = "/" className = "hover:text-gray-300 transition-all duration-100">Home</Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator/>
+          </>
+          : null
+        }
     
         {/* Dynamic Items */}
-        {list.map((item, index) => {
-          const path = "/" + list.slice(0, index + 1).join("/");
-          const isLast = index === list.length - 1;
+        {pathSegments.map((item, index) => {
+          const path = "/" + pathSegments.slice(0, index + 1).join("/");
+          const isLast = index === pathSegments.length - 1;
+          const displayName = formatSlug(item);
           return (
-
             <BreadcrumbItem key={path}>
-                <Link to = {path} className = "hover:text-gray-300 transition-all duration-100">
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                <Link to = {path}
+                 className = {`hover:text-gray-300 transition-all duration-100 `}>
+                    {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
                 </Link>
-                {isLast ? null : <BreadcrumbSeparator/>}
+                {!isLast ? <BreadcrumbSeparator/> : null}
             </BreadcrumbItem>
     
           )

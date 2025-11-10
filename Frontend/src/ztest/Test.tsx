@@ -4,7 +4,7 @@ import * as React from "react"
 import {Link} from "react-router-dom"
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Navigation } from "lucide-react"
 import ProductCard from "@/components/common/ProductCard"
-import SubCategoryCard from "@/components/common/SubCategoryCard";
+import SubCategoryCard from "@/components/common/CategoryCard";
 import {
   NavigationMenu,
   NavigationMenuContent,
