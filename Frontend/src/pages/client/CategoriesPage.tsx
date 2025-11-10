@@ -1,9 +1,8 @@
 import CategoryCard from "@/components/common/CategoryCard"
-import Ronaldo from "@/assets/images/Cristiano.jpg"
-import {useLocation, Link} from "react-router-dom";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom"
+import {useParams, useNavigate} from "react-router-dom"
+import {slugify} from "@/utils/make_slug"
 
 const getLevelCategoriesList = async(level : number, catId? : number, catSlug? : string) =>{
     
@@ -34,22 +33,16 @@ const getLevelCategoriesList = async(level : number, catId? : number, catSlug? :
     }    
 
 }
-/*
-Data pash into SubCategoryCard:
-{
-    id: number
-    name : string,
-    image: string (link url),
-}
- */
+
 
 interface CategoryData {
-    id : number,
+    cat1_id : number,
+    cat2_id : number,
     name: string,
     image: string,
 }
 function AllCategoriesPage({level} : {level : number}){
-
+    const navigate = useNavigate();
     const [subCategories, setSubCategories] =useState<CategoryData[]> ([]);
     const [isLoading, setLoading] = useState(true);
 
@@ -85,7 +78,20 @@ function AllCategoriesPage({level} : {level : number}){
 
         fetchData();
         
-    }, [level]);
+    }, [level, slugid]);
+
+    // Difference between cat 1 and cat 2
+    const handleClick =(cat1_id : Number, cat2_id: Number, name: string) => {
+        if (level == 1)
+        {
+            const slug = slugify(name);
+            navigate(`/categories/${slug}-${cat1_id}`)
+        }
+        if (level == 2)
+        {
+            navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
+        }
+    };
 
     return(
         <>
@@ -94,10 +100,9 @@ function AllCategoriesPage({level} : {level : number}){
                     return (
                         <CategoryCard
                             key = {index}
-                            id = {item.id}
                             image = {item.image}
                             name = {item.name}
-                            level = {level}
+                            onClick = {() => handleClick(item.cat1_id, item.cat2_id, item.name)}
                         ></CategoryCard>     
                     )
                 })}

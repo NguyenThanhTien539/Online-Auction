@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import {Link} from "react-router-dom";
 import Ronaldo from "@/assets/images/Cristiano.jpg"
+import {toast} from "sonner"
+import {useNavigate} from "react-router-dom"
+import {slugify} from "@/utils/make_slug"
+
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -9,6 +13,7 @@ import {
     NavigationMenuContent,
     NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+
 
 const categoriesData = [
   {
@@ -35,32 +40,68 @@ const categoriesData = [
 
 
 
-
+interface catData{
+  cat1_id: number,
+  name: string,
+  items: any
+}
 
 function CatagoriesDropdownMenu(){
+  const navigate = useNavigate();
+  const [catData, setCatData] = useState<catData[]>([]);
+  useEffect(()=>{
+
+    const loadData = async () => {
+      let response = await fetch("http://localhost:5000/api/categories/all")
+      let data = await response.json();
+      if (!response.ok){
+        console.log("Error in loading all categories ", data.message)
+        toast.error("Lỗi kết nối server lấy thông tin categories")
+        return;
+      }
+      else{
+        setCatData(data.data);
+        console.log("Success in loading all cats");
+      }
+    }
+
+    loadData();
+
+  }, [])
+
+  const handleClickCat1 = (cat1_id : number, cat1_name : string) => {
+    const slug = slugify(cat1_name);
+    navigate(`/categories/${slug}-${cat1_id}`)
+  }
+  
+
+
   return (
     
       
       <NavigationMenu className = "rounded-2xl min-w-[200px]">
         <NavigationMenuList className = "flex-col w-[100%] flex ">
 
-          {categoriesData.map((category, i) => (
-            <React.Fragment key={i}>
-              <NavigationMenuItem className="w-full flex">
-                <NavigationMenuTrigger className="bg-transparent w-full font-bold min-w-[200px] py-4 h-fit">
-                  {category.name}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="w-full flex">
-                  <CatagoriesDetailContent title={category.name} items={category.items} />
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+          {catData && catData.map((category, i) => {
 
-           
-              {i !== categoriesData.length - 1 && (
-                <div className="block h-[2px] w-[80%] bg-white/50 flex"></div>
-              )}
-            </React.Fragment>
-          ))}
+              return(
+                <div key={i}>
+                  <NavigationMenuItem className="w-full flex">
+                    <NavigationMenuTrigger className="bg-transparent w-full font-bold min-w-[200px] py-4 h-fit" 
+                    onClick = {()=>handleClickCat1(category.cat1_id, category.name)}>
+                      {category.name}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent className="w-full flex">
+                      <CatagoriesDetailContent title={category.name} items={category.items} />
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  {i !== catData.length - 1 && (
+                    <div className="block h-[2px] w-[80%] bg-white/50 flex"></div>
+                  )}
+                </div>
+              )
+            })}
 
         </NavigationMenuList>
 
@@ -95,24 +136,28 @@ let HoverDropMenu = (handler : any) =>{
 
 
 function CatagoriesButton (
-   {name = "Categories"} : {name?: string}
-){
-
+  {name = "Categories"} : {name?: string}){
+    const navigate = useNavigate();
     const [open, handleOpen] = useState(false);
 
- 
+    const handleClick = () =>{
+      navigate("/categories")
+    }
 
     let domRefHover = HoverDropMenu(() => {
         handleOpen(o => !o);
     });
 
     return(
-        <div ref = {domRefHover} className = "flex w-fit relative py-10 px-3">
+        <div ref = {domRefHover} className = "flex w-fit relative py-10 px-3" >
 
             {/* trigger */}
             <div className = "flex relative w-full bg-neutral-800 text-white font-bold justify-center items-center \
-                px-4 py-3 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-neutral-500 transition-all duration-300">
-                {name}
+                px-4 py-3 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-neutral-500 transition-all duration-300"
+                >
+                <div onClick = {handleClick}>
+                  {name}
+                </div>
                 <span className = "pl-1">
                     <svg
                         width={20}
@@ -139,21 +184,26 @@ function CatagoriesButton (
     );
 };
 
-function CatagoriesMiniItem({image, name, link} : {image?: string, name?: string, link?: string}){
+function CatagoriesMiniItem({image, name, handleClick} : {image?: string, name?: string, handleClick : any}){
   if (!name) name = "Category";
   return(
-    <Link to = {link ? link : "#"} title = {name}>
+    
       <div className = " h-[130px] aspect-square flex flex-col shrink-0 items-center justify-center ml-1 rounded-2xl border-2\
-          hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.3)] hover:scale-105 hover:cursor-pointer transition-all duration-300 bg-white ">
+          hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.3)] hover:scale-105 hover:cursor-pointer transition-all duration-300 bg-white "
+          onClick = {handleClick}>
         {/* Image */}
         <img className = "object-cover h-[100%] aspect-square flex rounded-xl border-2 flex items-center justify-center" src = {image}></img>
 
       </div>
-    </Link>
+    
   );
 }
 
-function CatagoriesDetailContent({title, items} : {title: string, items: {name: string, image: string, link: string}[] }){
+function CatagoriesDetailContent({title, items} : {title: string, items: {cat2_id : number,name: string, image: string}[] }){
+  const navigate = useNavigate();
+  const handleClickCat2 = (cat2_id: number) => {
+    navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
+  }
   return (
     <div className = "bg-gray-300 w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-2xl">
       {/* Tittle */}
@@ -162,7 +212,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {name: 
       {/* Content */}
       <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
         {items.map((item, i) => (
-          <CatagoriesMiniItem key={i} image={item.image} name={item.name} link={item.link} />
+          <CatagoriesMiniItem key={i} image={item.image} name={item.name} handleClick = {()=>handleClickCat2(item.cat2_id)}/>
         ))}
 
       </div>
