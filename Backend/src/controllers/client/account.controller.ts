@@ -1,65 +1,86 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import * as AccountModel from "../../models/account.model.ts";
 import * as VerifyModel from "../../models/verify.model.ts";
 import { generateOTP } from "../../helpers/generate.helper.ts";
 import { sendMail } from "../../helpers/mail.helper.ts";
-
-// import database from "../../config/database.config.ts";
-
-
+import dotenv from "dotenv";
+dotenv.config();
 
 // Hasing password function
 const SALT_ROUNDS = 10;
-export async function hashPassword(password: string): Promise<string>{
+export async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
   const hashedPassword = await bcrypt.hash(password, salt);
   return hashedPassword;
 }
-export async function comparePassword(password: string, hashedPassword: string): Promise<boolean>{
+export async function comparePassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
   return await bcrypt.compare(password, hashedPassword);
 }
-
 
 //  JWT token generation functions
 
 type userPayLoad = {
   id: number;
   role: string;
-}
+};
 
-
-export function generateAccessToken(user : userPayLoad, rememberMe?: boolean){
-  const payload = {
-    id: user.id,
-    role: user.role
-  };
-
-  return jwt.sign(
-    payload,
-    process.env.JWT_SECRET as string,
-   { expiresIn: rememberMe ? "3d" : "1d" }
-  );
-}
-
-const sectionType = ["long", "short"];
-export function generateRefreshToken(user : userPayLoad, rememberMe: boolean){
+export function generateAccessToken(user: userPayLoad, rememberMe?: boolean) {
   const payload = {
     id: user.id,
     role: user.role,
-    section: rememberMe ? sectionType[0] : sectionType[1]
   };
-  return jwt.sign(
-    payload,
-    process.env.JWT_REFRESH_SECRET as string,
-   { expiresIn: rememberMe ? "7d" : "1d" }
-  );
+
+  return jwt.sign(payload, process.env.JWT_SECRET as string, {
+    expiresIn: rememberMe ? "3d" : "1d",
+  });
 }
 
+const sectionType = ["long", "short"];
+export function generateRefreshToken(user: userPayLoad, rememberMe: boolean) {
+  const payload = {
+    id: user.id,
+    role: user.role,
+    section: rememberMe ? sectionType[0] : sectionType[1],
+  };
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string, {
+    expiresIn: rememberMe ? "7d" : "1d",
+  });
+}
 
+export const verifyAccount = async (req: Request, res: Response) => {
+  await VerifyModel.deleteExpiredOTP();
+  const verified_otp_token = req.cookies.verified_otp_token;
+  if (!verified_otp_token) {
+    res.json({ code: "error", message: "Có lỗi xảy ra ở đây" });
+    return;
+  }
+  const decoded = jwt.verify(
+    verified_otp_token,
+    `${process.env.JWT_SECRET}`
+  ) as JwtPayload;
 
-
+  const existedOTP = await VerifyModel.findEmailAndOtp(
+    decoded.email,
+    decoded.otp
+  );
+  if (!existedOTP) {
+    res.clearCookie("verified_otp_token");
+    res.json({
+      code: "error",
+      message: "Có lỗi xảy ra ở đây",
+    });
+    return;
+  }
+  res.json({
+    code: "success",
+    message: "Mã PIN tồn tại trong 5 phút",
+  });
+};
 
 export const registerPost = async (req: Request, res: Response) => {
   const existedEmail = await AccountModel.findEmail(req.body.email);
@@ -87,9 +108,30 @@ export const registerPost = async (req: Request, res: Response) => {
 
   await VerifyModel.insertOtpAndEmail(req.body.email, otp);
 
+  const verified_otp_token = jwt.sign(
+    {
+      otp: otp,
+      email: req.body.email,
+      fullName: req.body.fullName,
+      address: req.body.address,
+      password: req.body.password,
+    },
+    `${process.env.JWT_SECRET}`,
+    {
+      expiresIn: "5m",
+    }
+  );
+
   const title = "Mã OTP xác nhận đăng ký";
   const content = `Mã OTP của bạn là <b>${otp}</b>. Mã OTP có hiệu lực trong 5 phút, vui lòng không cung cấp cho bất kỳ ai`;
   sendMail(req.body.email, title, content);
+
+  res.cookie("verified_otp_token", verified_otp_token, {
+    maxAge: 5 * 60 * 1000,
+    httpOnly: true,
+    secure: false, //https sets true and http sets false
+    sameSite: "lax", //allow send cookie between domains
+  });
 
   res.json({
     code: "success",
@@ -98,35 +140,35 @@ export const registerPost = async (req: Request, res: Response) => {
 };
 
 export const registerVerifyPost = async (req: Request, res: Response) => {
-  await VerifyModel.deleteExpiredOTP();
+  if (!req.verified_otp_token) {
+    return res.json({ code: "error", message: "OTP chưa xác thực" });
+  }
 
+  await VerifyModel.deleteExpiredOTP();
   const existedRecord = await VerifyModel.findEmailAndOtp(
-    req.body.email,
+    `${req.verified_otp_token.email}`,
     req.body.otp
   );
-
+  console.log(req.verified_otp_token.email);
+  console.log(req.verified_otp_token.otp);
   if (!existedRecord) {
     res.json({
-      code: "error",
+      code: "otp error",
       message: "OTP không hợp lệ!",
     });
     return;
   }
 
-  // const salt = await bcrypt.genSalt(10);
-  // req.body.password = await bcrypt.hash(req.body.password, salt);
-  req.body.password = await hashPassword(req.body.password);
+  req.verified_otp_token.password = await hashPassword(
+    req.verified_otp_token.password
+  );
 
-  delete req.body.otp;
-  req.body.username = req.body.fullName;
-  console.log(req.body);
+  delete req.verified_otp_token.otp;
+  req.verified_otp_token.username = req.verified_otp_token.fullName;
 
-  await AccountModel.insertAccount(req.body);
+  await AccountModel.insertAccount(req.verified_otp_token);
 
-
-  // Insert into databbase logic here 
-  
-
+  res.clearCookie("verified_otp_token");
   res.json({
     code: "success",
     message: "Chúc mừng bạn đã đăng ký thành công",
@@ -134,8 +176,6 @@ export const registerVerifyPost = async (req: Request, res: Response) => {
 };
 
 export const forgotPasswordPost = async (req: Request, res: Response) => {
-  console.log(req.body);
-
   const existedEmail = AccountModel.findEmail(req.body.email);
   if (!existedEmail) {
     res.json({
@@ -159,7 +199,6 @@ export const forgotPasswordPost = async (req: Request, res: Response) => {
   const length = 5;
   const otp = generateOTP(length);
 
-
   await VerifyModel.insertOtpAndEmail(req.body.email, otp);
 
   const title = "Mã OTP đặt lại mật khẩu";
@@ -181,7 +220,6 @@ export const loginPost = async (req: Request, res: Response) => {
     return;
   }
 
-
   const isPasswordValidate = await comparePassword(
     req.body.password,
     existedAccount.password
@@ -195,19 +233,17 @@ export const loginPost = async (req: Request, res: Response) => {
     return;
   }
 
-
-  const accessToken = generateAccessToken (
-    {id: existedAccount.id_user, role: existedAccount.role}, req.body.rememberMe
+  const accessToken = generateAccessToken(
+    { id: existedAccount.id_user, role: existedAccount.role },
+    req.body.rememberMe
   );
 
-
   res.cookie("accessToken", accessToken, {
-    maxAge: req.body.rememberMe ? 3 * 24 * 60 * 60 * 1000 :  24 * 60 * 60 * 1000, //3 days or 1 days
+    maxAge: req.body.rememberMe ? 3 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000, //3 days or 1 days
     httpOnly: true,
     secure: false, //https sets true and http sets false
     sameSite: "lax", //allow send cookie between domains
   });
-
 
   res.json({
     code: "success",
@@ -215,13 +251,11 @@ export const loginPost = async (req: Request, res: Response) => {
   });
 };
 
-
-
 // export const newTokenRequest = async (req: Request, res: Response) => {
 //   const { refreshToken } = req.body;
 //   if (!refreshToken){
 //     return res.status(400).json({ code: 'error', message: 'Refresh token is missing' });
-//   }   
+//   }
 //   jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err : any, user : any) => {
 //     if (err){
 //       return res.status(403).json({ code: 'error', message: 'Invalid refresh token' });
@@ -229,7 +263,7 @@ export const loginPost = async (req: Request, res: Response) => {
 //     const userPayload = { id: (user as any).id, role: (user as any).role };
 //     const newAccessToken = generateAccessToken(userPayload);
 //     const newRefreshToken = generateRefreshToken(userPayload, (user as any).section === sectionType[0] ? true : false);
-    
+
 //     res.cookie('accessToken', newAccessToken, {
 //       maxAge: 20 * 60 * 1000, //20 minutes
 //       httpOnly: true,
