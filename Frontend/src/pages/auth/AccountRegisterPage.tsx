@@ -3,7 +3,7 @@ import bg from "@/assets/images/bg-account.jpg";
 import { useEffect } from "react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 function AccountRegister() {
   const navigate = useNavigate();
@@ -89,31 +89,24 @@ function AccountRegister() {
           address: address,
         };
 
-
         fetch("http://localhost:5000/accounts/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(finalData),
         })
           .then((res) => res.json())
           .then((data) => {
             if (data.code == "error") {
-              console.log(data.message);
-              toast.error("Có lỗi xảy ra. Vui lòng thử lại")
+              toast.error(data.message);
             }
 
             if (data.code == "success") {
-              localStorage.clear();
-              localStorage.setItem("registerForm", JSON.stringify(finalData));
               navigate(`/accounts/verify?email=${email}&type=register`);
-              
             }
-            
-            // Mục này nên sửa lại
-            if (data.code == "existedOTP") { 
-              console.log(data.message);
-              localStorage.clear();
-              localStorage.setItem("registerForm", JSON.stringify(finalData));
+
+            if (data.code == "existedOTP") {
+              toast.error(data.message);
               navigate(`/accounts/verify?email=${email}&type=register`);
             }
           });
