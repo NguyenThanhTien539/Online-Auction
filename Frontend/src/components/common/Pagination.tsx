@@ -93,7 +93,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
             <Pagination>
             <PaginationContent>
                 <PaginationItem className = "">
-                <PaginationPrevious href="#" onClick = {()=> {controlPage && controlPage(currentPage - 1)}}
+                <PaginationPrevious href = "#" onClick = {()=> {controlPage && controlPage(currentPage - 1)}}
                     className = {`${currentPage - 1 === 0 ? "pointer-events-none text-gray-300": ""}`}/>
                 </PaginationItem>
                 {pageRange.map((items, index) => {
@@ -123,12 +123,12 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
                     
                     if (needSeparator){
                         element = (
-                            <>
-                            <PaginationItem key = "ellipsis">
-                                <PaginationEllipsis></PaginationEllipsis>
-                            </PaginationItem>
-                            {element}
-                            </>
+                            <div key = {`ellipsis-${index}`} className = "flex">
+                                <PaginationItem >
+                                    <PaginationEllipsis></PaginationEllipsis>
+                                </PaginationItem>
+                                {element}
+                            </div>
                         )
                     }
                     

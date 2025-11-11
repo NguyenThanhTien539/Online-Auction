@@ -2,7 +2,7 @@ import  {useState} from "react";
 import auction from "@/assets/logos/auction-logo.svg";
 import {Link} from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
-
+import {useNavigate} from "react-router-dom"
 
 
 interface ListItemProps {
@@ -15,6 +15,7 @@ interface ListItemProps {
 
 function Navbar () {
     const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
     const navbarItems = [{link: "#", option: "Home"}, {link: "#", option: "About"}, {link: "#", option: "Payment"},
         {link: "#", option: "Contact"}
     ];
@@ -27,7 +28,7 @@ function Navbar () {
                 <div className = "container ml-3 flex items-center ">
 
                     {/* Logo */}
-                    <div className = "flex w-fit max-w-full h-full p-2 justify-center">
+                    <div className = "flex w-fit max-w-full h-full p-2 justify-center" onClick = {()=>{navigate("/")}}>
                         <a href = "# b" className = "0 w-full flex items-center pl-2.5">
                             <img src = {auction} alt = "logo" className = "flex  h-[90%] my-auto object-cover rounded-[50%] hover:rotate-30 transition-all duration-300"></img>
                             <span className = "text-2xl mx-2 font-bold w-full text-blue-500 hover:text-blue-300 transition-all duration-300">
@@ -40,7 +41,7 @@ function Navbar () {
                     
                     {/* List center content */}
                     <div className = {`absolute right-4 top-[110%] w-full max-w-[300px] py-3 z-40 rounded-2xl justify-center items-center font-semibold text-2xl mx-2 \
-                        ${open ? "top-[110%] opacity-100 visible bg-gray-700" : "top-[150%] opacity-0 "} transition-opacity duration-3000 \ 
+                        ${open ? "top-[110%] opacity-100 visible bg-gray-700" : "top-[150%] opacity-0 pointer-events-none"} transition-opacity duration-3000 \ 
                         lg:flex lg:static lg:flex-1 lg:max-w-full lg:opacity-100 lg:visible lg:bg-transparent`}>
                         <ul>
                             {navbarItems.map((item, idx) => ( 

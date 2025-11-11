@@ -124,7 +124,22 @@
 
 html{
   overflow-y: scroll;
+
+
 }
+
+/* Ngăn Radix Select gây dịch chuyển layout */
+body[data-scroll-locked="1"] {
+  pointer-events: auto !important; /* Khôi phục tương tác */
+  overflow: visible !important;    /* Không khóa scroll */
+  padding-right: 0 !important;     /* Giữ nguyên layout */
+}
+html {
+  scrollbar-gutter: stable;
+}
+
+
+
 
 
 /* Hide scrollbar cross-browser */

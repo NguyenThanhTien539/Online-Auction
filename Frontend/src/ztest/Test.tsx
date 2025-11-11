@@ -22,6 +22,24 @@ import Pagination from "@/components/common/Pagination"
 
 
 function Test(){
+
+  useEffect(()=>{
+    const input = document.querySelector('input[type="file"]');
+    if(input){
+      input.addEventListener('change', (e) => {
+      let file;
+        if(e.target)
+      { 
+        file =  e.target
+      }
+      
+      console.log(file);
+    })
+  }
+   
+  });
+
+
   return (
     <div >
       <ProductCard/>
@@ -39,6 +57,7 @@ function Test(){
         CLick me
       </button>
 
+      <input type = "file" id = "test-input-file" className = "bg-gray-600 text-white"></input>
 
       <TestPagination/>
       

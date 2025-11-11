@@ -205,7 +205,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {cat2_i
     navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
   }
   return (
-    <div className = "bg-gray-300 w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-2xl">
+    <div className = "bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-[20px] z-1000 m-3">
       {/* Tittle */}
       <div className = "font-bold text-2xl ml-3 text-black/80 mb-[20px]">{title}</div>
 

@@ -1,30 +1,93 @@
 import Cristiano from "@/assets/images/Cristiano.jpg";
 import LoveIcon from "@/assets/icons/love.svg";
 import {cn} from "@/lib/utils"
+import {DateTime} from "luxon";
+import {useState, useEffect} from "react";
 
+type Products = {
+    product_image ?: string,
+    product_name ?: string,
+    current_price ?: string,
+    buy_now_price ?: string,
+    start_time ?: any,
+    end_time ?: any,
+    price_owner_username? : string,
+    bid_turns?: string
+}
 
-
-
-
-
-function ProductCard({data, className} : {data? : any, className? : string}) {
+function ProductCard({product_image, product_name, current_price, buy_now_price, start_time, end_time, price_owner_username, bid_turns, ...data} : Products & {className? : string}
+    &{onClick?: () => void}
+) {
     
-    // const nameProduct = data.nameProduct;
-    // const currentPrice = data.currentPrice;
-    // const buyNowPrice = data.buyNowPrice;
-    // const postDate = data.postDate;
-    // const endTime = data.endTime;
-    // const highestBidder = data.highestBidder;
-    // const bidCount = data.bidCount;
-    // const image = data.image;
+    let [formattedStartTime, setFormatStartTime] =useState("");
+    let [timeLeft, setTimeLeft] = useState("");
+    
+    // Start time take day, month, year
+    const startDate = DateTime.fromISO(start_time, { zone: "Asia/Ho_Chi_Minh" });
+    const endDate = DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
+
+    console.log(startDate);
+    
+    const formatStartTime =() =>{
+        if (start_time)
+        {
+            setFormatStartTime(startDate.toFormat("dd-MM-yyyy HH:mm"));
+        }
+    }
+    const formatEndTime = () => {
+        if (!end_time) return;
+
+        // Lấy thời điểm hiện tại đúng timezone
+        const present_time = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+        console.log("Time hiện tại: ",present_time.toFormat("dd-MM-yyyy HH-mm-ss"))
+        // Parse endDate nếu chưa parse
+        const endDateValid = DateTime.isDateTime(endDate) ? endDate : DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
+        console.log("Time kết thúc: ",endDateValid.toFormat("dd-MM-yyyy HH-mm-ss"))
+        // Kiểm tra valid trước khi diff
+        if (!endDateValid.isValid) {
+            console.error("endDate invalid:", endDateValid.invalidReason);
+            timeLeft = "";
+            return;
+        }
+
+        const diff = endDateValid.diff(present_time, ["days", "hours", "minutes", "seconds"]).toObject();
+
+        // diff luôn có keys nhưng values có thể NaN → gán mặc định 0
+        const days = diff.days ?? 0;
+        const hours = diff.hours ?? 0;
+        const minutes = diff.minutes ?? 0;
+        const seconds = diff.seconds ?? 0;
+        let result;
+        if (days >= 1) {
+            result = `Còn ${Math.floor(days)} ngày ${Math.floor(hours)} giờ`;
+        } else if (hours >= 1) {
+            result = `Còn ${Math.floor(hours)} giờ ${Math.floor(minutes)} phút`;
+        } else if (minutes >= 0) {
+            result = `Còn ${Math.floor(minutes)} phút ${Math.floor(seconds)} giây`;
+        } else {
+            result = "Đã hết hạn";
+        }
+        setTimeLeft(result);
+    };
+
+    useEffect(()=>{
+        const timer = setInterval(()=>{
+            formatEndTime();
+        }, 1000);
+        formatStartTime();
+        return ()=> clearInterval(timer);
+    })
+
+    
 
     return (
         // Container
         <div className = {cn("w-80 h-110 relative flex flex-col items-center  border border-gray-300 rounded-lg shadow-lg\
-        hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 shrink-0", className)}>
+        hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 shrink-0", data.className)}
+            onClick = {data.onClick}>
             {/* Image */}
             <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-lg justify-center">
-                <img src = {Cristiano} className = "bg-red-300 flex object-cover w-full h-full"></img>
+                <img src = {product_image} className = "flex object-cover w-full h-full"></img>
             </div>
             {/* Add to Love */}
             <div className = "absolute w-fit h-[42px] top-5 right-5 bg-gray-200/50 rounded-[10px] flex flex-row items-center gap-1\
@@ -37,7 +100,7 @@ function ProductCard({data, className} : {data? : any, className? : string}) {
 
             {/* Name Product */}
             <div className = "text-xl font-semibold mx-2  flex h-[15%] pt-2 grow-0 self-start limit-to-2-lines">
-                Ronaldo quá đẹp trai ahihi
+                {product_name ?? "Ronaldo"}
             </div>
             <div className = "block h-[1px] mt-1 w-[90%] bg-black"></div>
             {/* Product Details */}
@@ -48,37 +111,37 @@ function ProductCard({data, className} : {data? : any, className? : string}) {
                     <div className = "font-semibold text-gray-500">
                         Giá:
                     </div>
-                    100.000 đồng 
+                    {current_price ?? "0"} đồng 
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Giá mua ngay:
                     </div>
-                    100.000.000 đồng 
+                    {buy_now_price ?? "0"} đồng 
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
-                        Ngày đăng:
+                        Thời điểm đăng:
                     </div>
-                    10/10/2025
+                    {formattedStartTime}
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Thời gian kết thúc:
                     </div>
-                    10 phút
+                    {timeLeft}
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Người giữ giá:
                     </div>
-                    Lock1412
+                    {price_owner_username ?? "..."}
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Số lượt đấu giá:
                     </div>
-                    10
+                    {bid_turns}
                 </div>
 
             </div>

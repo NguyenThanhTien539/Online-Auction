@@ -1,5 +1,5 @@
 import {useEffect, useState, useRef} from "react";
-
+import {cn} from "@/lib/utils"
 
 
 let HoverDropMenu = (handler : any) =>{
@@ -24,7 +24,7 @@ let HoverDropMenu = (handler : any) =>{
 function DropDownMenuAlpha ({items = [
     {link: "#", option: "Option 1"},
     {link: "#", option: "Option 2"},
-    {link: "#", option: "Option 3"}], name = "My dropdown menu"}
+    {link: "#", option: "Option 3"}], name = "My dropdown menu", className = ""}
 ){
 
     const [open, handleOpen] = useState(false);
@@ -37,8 +37,8 @@ function DropDownMenuAlpha ({items = [
 
     return(
         <div ref = {domRefHover} className = "flex w-fit m-5 p-3">
-            <div className = "flex relative w-full bg-neutral-800 text-white font-bold justify-center items-center \
-                px-4 py-3 rounded-[10px] mb-2">
+            <div className = {cn("flex relative w-full bg-neutral-800 text-white font-bold justify-center items-center \
+                px-4 py-3 rounded-[10px] mb-2",className)}>
                 <button>
                     {name}
                 </button>

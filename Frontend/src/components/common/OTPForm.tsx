@@ -28,7 +28,7 @@ function OTPForm({ className, onChange, value }: { className?: string; onChange?
     };
 
     return (
-        <div className={cn("", className)}>
+        <div className={cn("", className)} >
             <InputOTP
                 maxLength={6}
                 className="m-2 w-full hover:cursor-pointer"

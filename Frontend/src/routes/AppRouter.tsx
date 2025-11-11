@@ -7,6 +7,7 @@ import AccountLogin from "@/pages/auth/AccountLoginPage";
 import Test from "@/ztest/Test"
 import ForgotPassword from "@/pages/auth/ForgotPasswordPage";
 import AllCategoriesPage from "@/pages/client/CategoriesPage";
+import ListProductsPage from "@/pages/client/ListProductsPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -24,11 +25,10 @@ const routers = createBrowserRouter([
         path: "/categories",
         element: <AllCategoriesPage level = {1}/>,
       },
-      // {
-      //   path: "/categories/:slugnameId",
-      //   element: <div>Hello guy</div>
-      // },
-
+      {
+        path: "/products",
+        element: <ListProductsPage/>
+      }
 
     ],
   },
