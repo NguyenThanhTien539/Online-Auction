@@ -15,25 +15,7 @@ import {
 } from "@/components/ui/navigation-menu";
 
 
-const categoriesData = [
-  {
-    name: "Thời Trang",
-    items: [
-      { name: "Áo sơ mi", image: Ronaldo, link: "/ao-so-mi" },
-      { name: "Quần jean", image: "/img/jean.jpg", link: "/quan-jean" },
-      { name: "Giày dép", image: "/img/shoes.jpg", link: "/giay-dep" },
-    ],
-  },
-  {
-    name: "Điện Tử",
-    items: [
-      { name: "Laptop", image: "/img/laptop.jpg", link: "/laptop" },
-      { name: "Điện thoại", image: "/img/phone.jpg", link: "/dien-thoai" },
-      { name: "Tai nghe", image: "/img/headphone.jpg", link: "/tai-nghe" },
-    ],
-  },
 
-];
 
 
 
@@ -80,18 +62,18 @@ function CatagoriesDropdownMenu(){
     
       
       <NavigationMenu className = "rounded-2xl min-w-[200px]">
-        <NavigationMenuList className = "flex-col w-[100%] flex ">
+        <NavigationMenuList className = "flex-col w-[100%] flex bg-transparent">
 
           {catData && catData.map((category, i) => {
 
               return(
                 <div key={i}>
-                  <NavigationMenuItem className="w-full flex">
+                  <NavigationMenuItem className="w-full flex rounded-2xl ">
                     <NavigationMenuTrigger className="bg-transparent w-full font-bold min-w-[200px] py-4 h-fit" 
                     onClick = {()=>handleClickCat1(category.cat1_id, category.name)}>
                       {category.name}
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent className="w-full flex">
+                    <NavigationMenuContent className="w-full flex bg-black/90 shadow-lg shadow-gray-900/10">
                       <CatagoriesDetailContent title={category.name} items={category.items} />
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -149,11 +131,11 @@ function CatagoriesButton (
     });
 
     return(
-        <div ref = {domRefHover} className = "flex w-fit relative py-10 px-3" >
+        <div ref = {domRefHover} className = "flex w-fit relative mt-3 py-10 px-3 self-center" >
 
             {/* trigger */}
-            <div className = "flex relative w-full bg-neutral-800 text-white font-bold justify-center items-center \
-                px-4 py-3 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-neutral-500 transition-all duration-300"
+            <div className = "flex relative w-full font-semibold  text-black justify-center items-center shadow-[0px_5px_5px] shadow-black/30 \
+                px-3 py-2 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-gray-100/70 transition-all duration-300"
                 >
                 <div onClick = {handleClick}>
                   {name}
@@ -172,7 +154,7 @@ function CatagoriesButton (
                 </span>
             {/* Drop menu */}
             {open &&
-                <div className = "absolute top-[130%] left-0 bg-blue-300 w-fit rounded-2xl shadow-lg shadow-gray-900/10">
+                <div className = "absolute top-[130%] left-0 bg-black/90 text-white w-fit rounded-2xl shadow-lg shadow-gray-900/10">
                     <CatagoriesDropdownMenu/>
                 </div>
             }
@@ -207,7 +189,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {cat2_i
   return (
     <div className = "bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-[20px] z-1000 m-3">
       {/* Tittle */}
-      <div className = "font-bold text-2xl ml-3 text-black/80 mb-[20px]">{title}</div>
+      <div className = "font-bold text-2xl ml-3 text-white mb-[20px]">{title}</div>
 
       {/* Content */}
       <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">

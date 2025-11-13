@@ -3,28 +3,37 @@ import LoveIcon from "@/assets/icons/love.svg";
 import {cn} from "@/lib/utils"
 import {DateTime} from "luxon";
 import {useState, useEffect} from "react";
-
+import {formatPrice} from "@/utils/format_price";
+import {useNavigate} from "react-router-dom";
+import {slugify} from "@/utils/make_slug";
 type Products = {
+    product_id? : number,
     product_image ?: string,
     product_name ?: string,
-    current_price ?: string,
-    buy_now_price ?: string,
+    current_price ?: number,
+    buy_now_price ?: number,
     start_time ?: any,
     end_time ?: any,
     price_owner_username? : string,
     bid_turns?: string
 }
 
-function ProductCard({product_image, product_name, current_price, buy_now_price, start_time, end_time, price_owner_username, bid_turns, ...data} : Products & {className? : string}
+function ProductCard({product_image, product_id, product_name, current_price, buy_now_price, start_time, end_time, price_owner_username, bid_turns, ...data} : Products & {className? : string}
     &{onClick?: () => void}
 ) {
-    
+    const navigate = useNavigate();
     let [formattedStartTime, setFormatStartTime] =useState("");
     let [timeLeft, setTimeLeft] = useState("");
     
     // Start time take day, month, year
     const startDate = DateTime.fromISO(start_time, { zone: "Asia/Ho_Chi_Minh" });
     const endDate = DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
+
+    const handleClickProduct = (productId? : number, productName? : string) => {
+            const slug = slugify(productName?? "");
+            navigate(`/product/${slug}-${productId}`);
+        }
+    
 
     console.log(startDate);
     
@@ -84,7 +93,7 @@ function ProductCard({product_image, product_name, current_price, buy_now_price,
         // Container
         <div className = {cn("w-80 h-110 relative flex flex-col items-center  border border-gray-300 rounded-lg shadow-lg\
         hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 shrink-0", data.className)}
-            onClick = {data.onClick}>
+            onClick = {data.onClick ?? (() => {handleClickProduct(product_id?? 0, product_name?? "")})}>
             {/* Image */}
             <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-lg justify-center">
                 <img src = {product_image} className = "flex object-cover w-full h-full"></img>
@@ -111,13 +120,13 @@ function ProductCard({product_image, product_name, current_price, buy_now_price,
                     <div className = "font-semibold text-gray-500">
                         Giá:
                     </div>
-                    {current_price ?? "0"} đồng 
+                    {formatPrice(current_price) ?? "0"} đồng 
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Giá mua ngay:
                     </div>
-                    {buy_now_price ?? "0"} đồng 
+                    {formatPrice(buy_now_price) ?? "0"} đồng 
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">

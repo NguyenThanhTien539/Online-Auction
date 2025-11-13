@@ -1,7 +1,9 @@
 import HorizontalBar from "@/components/common/HorizontalBar"
 import ProductCard from "@/components/common/ProductCard"
 import {useEffect} from "react"
-
+import moneyIcon from "@/assets/icons/money.png"
+import bidIcon from "@/assets/icons/bid_turn.svg"
+import clockIcon from "@/assets/icons/clock.png"
 const getDataAllTop5 =() => {
     let endProducts;
     let turnProducts;
@@ -27,13 +29,16 @@ const getDataAllTop5 =() => {
     }, [])
 }
 
+
 function Section2(){
     return(
         <>
             {/* Top 5 sản phẩm gần kết thúc */}
-            <div className = "ml-2 text-3xl font-bold text-red-500">Top 5 sản phẩm sắp kết thúc</div>
+            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm sắp kết thúc
+                <span><img src= {clockIcon} className = "flex h-[35px] aspect-square ml-3"></img></span>
+            </div>
             <div>
-                <HorizontalBar className = "h-[400px] bg-red-200">
+                <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
@@ -42,9 +47,11 @@ function Section2(){
                 </HorizontalBar>
             </div>
             {/* Top 5 sản phẩm có nhiều lượt ra giá nhất */}
-            <div className = "ml-2 text-3xl font-bold text-yellow-300">Top 5 sản phẩm được ra giá nhiều nhất</div>
+            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm được đấu giá nhiều nhất
+                <span><img src = {bidIcon} className = "flex w-[35px] ml-3 aspect-square"></img></span>
+            </div>
             <div>
-                <HorizontalBar className = "h-[400px] bg-yellow-200">
+                <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
@@ -53,9 +60,11 @@ function Section2(){
                 </HorizontalBar>
             </div>
             {/* Top 5 sản phẩm có giá cao nhất */}
-            <div className = "ml-2 text-3xl font-bold text-violet-500">Top 5 sản phẩm có giá nhiều nhất</div>
+            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm có giá cao nhất
+                <span><img src={moneyIcon} className = "flex w-[35px] ml-3 aspect-square"></img></span>
+            </div>
             <div>
-                <HorizontalBar className = "h-[400px] bg-violet-300">
+                <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>
                     <ProductCard className = "scale-80 hover:scale-85"></ProductCard>

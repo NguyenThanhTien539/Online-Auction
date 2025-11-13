@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import { AuthProvider } from "@/routes/ProtectedRouter";
 import Home from "@/pages/home/HomePage";
 import MainLayout from "@/layouts/MainLayout";
 import AdminMainLayout from "@/layouts/AdminMainLayout";
@@ -12,10 +13,15 @@ import ListProductsPage from "@/pages/client/ListProductsPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
+import DetailProductPage from "@/pages/client/DetailProductPage";
 const routers = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <AuthProvider>
+        <MainLayout />
+      </AuthProvider>
+    ),
     children: [
       {
         path: "/",
@@ -32,6 +38,10 @@ const routers = createBrowserRouter([
       {
         path: "/products",
         element: <ListProductsPage />,
+      },
+      {
+        path: "product/:slugid",
+        element: <DetailProductPage />,
       },
     ],
   },
@@ -60,7 +70,6 @@ const routers = createBrowserRouter([
       },
     ],
   },
-
 
   {
     path: "/admin",
