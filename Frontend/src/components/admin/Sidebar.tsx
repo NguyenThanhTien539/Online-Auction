@@ -1,0 +1,108 @@
+import {
+  FiClock,
+  FiGrid,
+  FiMap,
+  FiUsers,
+  FiUser,
+  FiSettings,
+  FiUserCheck,
+  FiLogOut,
+} from "react-icons/fi";
+import { NavLink, useLocation } from "react-router-dom";
+
+const baseLinkClass =
+  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-[500]";
+const activeClass = "bg-blue-500 text-white hover:bg-blue-500/90";
+const normalClass = "text-gray-800 hover:bg-gray-100";
+
+export default function Sidebar() {
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  const isCategoryActive = pathname.startsWith("/admin/category"); //đường dẫn cha
+
+  return (
+    <nav className="p-3 space-y-1">
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/dashboard`}
+        end //trùng với đường dẫn
+        className={({ isActive }) =>
+          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+        }
+      >
+        <FiClock className="text-lg" />
+        <span>Tổng quan</span>
+      </NavLink>
+
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/category/list`}
+        className={() =>
+          `${baseLinkClass} ${isCategoryActive ? activeClass : normalClass}`
+        }
+      >
+        <FiGrid className="text-lg" />
+        <span>Quản lý danh mục</span>
+      </NavLink>
+
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/product/list`}
+        className={({ isActive }) =>
+          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+        }
+      >
+        <FiMap className="text-lg" />
+        <span>Quản lý sản phẩm</span>
+      </NavLink>
+
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/user/list`}
+        className={({ isActive }) =>
+          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+        }
+      >
+        <FiUsers className="text-lg" />
+        <span>Quản lý người dùng</span>
+      </NavLink>
+
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/contacts`}
+        className={({ isActive }) =>
+          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+        }
+      >
+        <FiUser className="text-lg" />
+        <span>Thông tin liên hệ</span>
+      </NavLink>
+
+      <div className="pt-4 mt-4 border-t">
+        <NavLink
+          to={`/${import.meta.env.VITE_PATH_ADMIN}/settings`}
+          className={({ isActive }) =>
+            `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+          }
+        >
+          <FiSettings className="text-lg" />
+          <span>Cài đặt chung</span>
+        </NavLink>
+
+        <NavLink
+          to={`/${import.meta.env.VITE_PATH_ADMIN}/profile`}
+          className={({ isActive }) =>
+            `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+          }
+        >
+          <FiUserCheck className="text-lg" />
+          <span>Thông tin cá nhân</span>
+        </NavLink>
+
+        <a
+          href="/logout"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-[500] text-red-600 hover:bg-red-50"
+        >
+          <FiLogOut className="text-lg" />
+          <span>Đăng xuất</span>
+        </a>
+      </div>
+    </nav>
+  );
+}

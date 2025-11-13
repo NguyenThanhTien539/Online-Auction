@@ -3,7 +3,6 @@ import bg from "@/assets/images/bg-account.jpg";
 import { useNavigate } from "react-router-dom";
 import JustValidate from "just-validate";
 import { useEffect } from "react";
-import {toast} from "sonner";
 function ForgotPassword() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -25,7 +24,7 @@ function ForgotPassword() {
           email: email,
         };
 
-        fetch("http://localhost:5000/accounts/forgot-password", {
+        fetch(`${import.meta.env.VITE_API_URL}/accounts/forgot-password`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataFinal),
@@ -35,7 +34,6 @@ function ForgotPassword() {
           .then((data) => {
             if (data.code == "error") {
               console.log(data.message);
-          
             }
 
             if (data.code == "success") {

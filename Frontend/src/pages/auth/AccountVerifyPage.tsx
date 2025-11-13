@@ -12,7 +12,7 @@ function AccountVerify() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/accounts/verify-account", {
+    fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-account`, {
       method: "get",
       credentials: "include",
     })
@@ -39,7 +39,7 @@ function AccountVerify() {
       return;
     }
     const finalData = { otp: otpValue };
-    fetch("http://localhost:5000/accounts/verify-register", {
+    fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-register`, {
       method: "post",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

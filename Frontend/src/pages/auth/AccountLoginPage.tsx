@@ -34,7 +34,7 @@ function AccountLogin() {
           rememberPassword: rememberPassword,
         };
 
-        fetch("http://localhost:5000/accounts/login", {
+        fetch(`${import.meta.env.VITE_API_URL}/accounts/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataFinal),
@@ -130,7 +130,7 @@ function AccountLogin() {
                 type="submit"
               >
                 Đăng nhập
-              </button>
+              </button>``
             </div>
 
             <div className="text-center text-[14px]">
