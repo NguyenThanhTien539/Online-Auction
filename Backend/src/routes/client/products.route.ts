@@ -3,5 +3,6 @@ import * as productsController from "../../controllers/client/products.controlle
 const route = express.Router();
 
 route.get("/page_list",  productsController.getProductsPageList);
+route.get("/detail", productsController.getProductDetailBySlugId);
 
 export default route;

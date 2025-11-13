@@ -25,3 +25,41 @@ export async function getProductsPageList(req: Request, res: Response){
     return  res.status(200).json({message: "Success", data: result});
 
 }
+
+
+export async function getProductDetailBySlugId (req: Request, res: Response) {
+    try{
+        // Check slugid parameters
+        const product_id = req.query.product_id as string;
+        const product_slug = req.query.product_slug as string;
+        if (!product_id || !product_slug){
+            return res.status(400).json({
+                status: "error",
+                message: "product_id and product_slug are required"
+            });
+        }
+
+        
+        // Find product by product_id
+        const productDetail = await productsModel.getProductDetail(product_id, product_slug);
+        if (!productDetail){
+            return res.status(404).json({
+                status: "error",
+                message: "Sản phẩm không tồn tại"
+            });
+        }
+        return res.status(200).json({
+            status: "success",
+            data: productDetail
+        });
+
+
+    }
+    catch (e){
+        console.error(e);
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+}

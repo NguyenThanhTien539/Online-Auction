@@ -31,7 +31,7 @@ type userPayLoad = {
 
 export function generateAccessToken(user: userPayLoad, rememberMe?: boolean) {
   const payload = {
-    id: user.id,
+    user_id: user.id,
     role: user.role,
   };
 

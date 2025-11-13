@@ -10,11 +10,11 @@ export default function verifyToken(req: Request, res: Response, next: NextFunct
     }
 
     jwt.verify(token, process.env.JWT_SECRET as string, (err : any, user : any) => {
-    if (err){
-        return res.status(403).json({ message: 'Invalid access token' });
-    }
-    (req as any).user = user; // Attach user info to request object
-    next();
+        if (err){
+            return res.status(403).json({ message: 'Invalid access token' });
+        }
+        (req as any).user = user; // Attach user info to request object
+        next();
     });
 
 }

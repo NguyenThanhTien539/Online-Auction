@@ -12,9 +12,9 @@ import {slugify} from "@/utils/make_slug";
 type Products = {
     product_id : number,
     product_images : string[],
-    name: string,
-    current_price : string,
-    buy_now_price: string,
+    product_name: string,
+    current_price : number,
+    buy_now_price: number,
     start_time: any,
     end_time: any,
     price_owner_username : string,
@@ -153,9 +153,9 @@ function ListProductsPage() {
                     return(
                     <div className = "flex justify-center" key = {index}>
                         <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""}
-                            product_name = {item.name} current_price = {item.current_price} buy_now_price = {item.buy_now_price}
+                            product_name = {item.product_name} current_price = {item.current_price} buy_now_price = {item.buy_now_price}
                             start_time = {item.start_time} end_time = {item.end_time} price_owner_username = {item.price_owner_username}
-                            bid_turns = {item.bid_turns} onClick = {()=> handleClickProduct(item.product_id, item.name)}
+                            bid_turns = {item.bid_turns} onClick = {()=> handleClickProduct(item.product_id, item.product_name)}
                         />
                     </div>
                 )

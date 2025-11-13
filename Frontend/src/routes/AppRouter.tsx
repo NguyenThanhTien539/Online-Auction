@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
+import {AuthProvider} from "@/routes/ProtectedRouter";
 import Home from "@/pages/home/HomePage";
 import MainLayout from "@/layouts/MainLayout";
 import AccountRegister from "@/pages/auth/AccountRegisterPage";
@@ -8,10 +9,11 @@ import Test from "@/ztest/Test"
 import ForgotPassword from "@/pages/auth/ForgotPasswordPage";
 import AllCategoriesPage from "@/pages/client/CategoriesPage";
 import ListProductsPage from "@/pages/client/ListProductsPage";
+import DetailProductPage from "@/pages/client/DetailProductPage";
 const routers = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: <AuthProvider><MainLayout /></AuthProvider>,
     children: [
       {
         path: "/",
@@ -28,6 +30,10 @@ const routers = createBrowserRouter([
       {
         path: "/products",
         element: <ListProductsPage/>
+      },
+      {
+        path: "product/:slugid",
+        element: <DetailProductPage/>
       }
 
     ],
