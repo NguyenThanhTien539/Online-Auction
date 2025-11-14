@@ -1,3 +1,3 @@
 export default {
-  pathAdmin: "pathAdmin",
+  pathAdmin: "admin",
 };

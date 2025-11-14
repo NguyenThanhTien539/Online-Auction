@@ -2,10 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-
 dotenv.config();
-
-
 
 import clientRoutes from "./routes/client/index.route.ts";
 
@@ -27,11 +24,9 @@ app.use(
   })
 );
 
-
 var pathAdmin: String = variableConfig.pathAdmin; //set global variable for admin routes
-
 app.use("/", clientRoutes);
-app.use(`${pathAdmin}/`, adminRoutes);
+app.use(`/${pathAdmin}`, adminRoutes);
 
 app.listen(port, () => {
   console.log(`Your website is running at port: http://localhost:${port}`);
