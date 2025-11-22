@@ -6,4 +6,6 @@ route.get("/build-tree", categoriesController.buildTree);
 
 route.post("/create", categoriesController.createPost);
 
+route.get("/list", categoriesController.list);
+
 export default route;

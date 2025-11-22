@@ -13,6 +13,15 @@ export interface FlatOption {
   label: string;
 }
 
+type CategoryItem = {
+  id: number;
+  name: string;
+  status: "active" | "inactive";
+  createdBy: string;
+  createdAt: string;
+  updatedBy: string;
+  updatedAt: string;
+};
 export function useBuildTree(): FlatOption[] | null {
   const [options, setOptions] = useState<FlatOption[] | null>(null);
 
@@ -55,4 +64,40 @@ export function useBuildTree(): FlatOption[] | null {
       });
   }, []);
   return options;
+}
+
+export function useCategories() {
+  const [items, setItems] = useState<CategoryItem[]>([]);
+
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const mapped: CategoryItem[] = data.list.map((it: any) => ({
+          id: it.id,
+          name: it.name,
+          status: it.status, // active / inactive
+          createdBy: it.created_by ?? "Không rõ",
+          updatedBy: it.updated_by ?? "Không rõ",
+          createdAt: formatDate(it.created_at),
+          updatedAt: formatDate(it.updated_at),
+        }));
+        console.log(mapped);
+        setItems(mapped);
+      })
+      .catch(() => setItems([]));
+  }, []);
+
+  return { items, setItems };
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleString("vi-VN"); // 14:46 12/10/2025
 }

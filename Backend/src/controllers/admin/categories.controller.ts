@@ -13,3 +13,8 @@ export async function createPost(req: Request, res: Response) {
   await categoriesModel.insertCategory(req.body);
   res.json({ code: "success", message: "Thành công" });
 }
+export async function list(req: Request, res: Response) {
+  const list = await categoriesModel.getAllCategory();
+  console.log(list)
+  res.json({ code: "success", message: "Thành công", list: list });
+}
