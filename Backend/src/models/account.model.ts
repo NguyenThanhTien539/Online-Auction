@@ -12,8 +12,9 @@ export const findPassword = async (password: string) => {
   return db("users").select("*").where({ password }).first();
 };
 
-
-
+export const updatePassword = async (email: string, newPassword: string) => {
+  return db("users").where({ email: email }).update({ password: newPassword });
+};
 
 export const insertOtpAndEmail = async (email: string, otp: string) => {
   return db("otp_codes").insert({ email: email, otp: otp });

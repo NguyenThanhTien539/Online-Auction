@@ -4,7 +4,7 @@ import Joi from "joi";
 
 export const registerPost = (req: Request,  res: Response,  next: NextFunction) => {
   const schema = Joi.object({
-    fullName: Joi.string().min(5).max(50).required().messages({
+    full_name: Joi.string().min(5).max(50).required().messages({
       "string.empty": "Vui lòng nhập họ tên!",
       "string.min": "Họ tên phải có ít nhất 5 ký tự!",
       "string.max": "Họ tên không được vượt quá 50 ký tự!",
