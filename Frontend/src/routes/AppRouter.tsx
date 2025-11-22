@@ -13,7 +13,8 @@ import ListProductsPage from "@/pages/client/ListProductsPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
-import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage";
+import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage"
+import ResetPassword from "@/pages/auth/ResetPasswordPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -67,6 +68,10 @@ const routers = createBrowserRouter([
       {
         path: "forgot-password",
         element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
       },
     ],
   },

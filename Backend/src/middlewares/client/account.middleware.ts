@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 interface VerifiedOtpToken {
   email: string;
   otp?: string;
-  fullName: string;
+  full_name: string;
   address: string;
   password: string;
   username?: string;
@@ -51,7 +51,7 @@ export const verifyOtpToken = async (
     req.verified_otp_token = {
       email: decoded.email,
       otp: decoded.otp,
-      fullName: decoded.fullName,
+      full_name: decoded.full_name,
       address: decoded.address,
       password: decoded.password,
     };

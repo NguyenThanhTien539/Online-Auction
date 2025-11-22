@@ -3,6 +3,8 @@ import bg from "@/assets/images/bg-account.jpg";
 import { useNavigate } from "react-router-dom";
 import JustValidate from "just-validate";
 import { useEffect } from "react";
+import { toast } from "sonner";
+
 function ForgotPassword() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -33,10 +35,14 @@ function ForgotPassword() {
           .then((res) => res.json())
           .then((data) => {
             if (data.code == "error") {
-              console.log(data.message);
+              toast.error(data.message);
             }
 
             if (data.code == "success") {
+              navigate(`/accounts/verify?email=${email}&type=forgot-password`);
+            }
+
+            if (data.code == "existedOTP") {
               navigate(`/accounts/verify?email=${email}&type=forgot-password`);
             }
           });

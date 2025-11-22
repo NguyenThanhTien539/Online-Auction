@@ -14,15 +14,21 @@ route.get("/verify-account", accountController.verifyAccount);
 
 route.post(
   "/verify-register",
-  // accountValidate.registerVerifyPost,
-  accountMiddleware.verifyOtpToken,
   accountController.registerVerifyPost
+);
+
+route.patch(
+  "/verify-forgot-password",
+  accountController.forgotPasswordVerify
 );
 
 route.post(
   "/forgot-password",
-  // accountValidate.registerVerifyPost,
-  accountController.forgotPasswordPost
+  accountController.forgotPassword
+);
+route.post(
+  "/reset-password",
+  accountController.resetPassword
 );
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);

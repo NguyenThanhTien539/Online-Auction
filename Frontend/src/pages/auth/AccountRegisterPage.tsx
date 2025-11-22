@@ -11,7 +11,7 @@ function AccountRegister() {
     const validation = new JustValidate("#registerForm");
     validation
       .addField(
-        "#fullName",
+        "#full_name",
         [
           { rule: "required", errorMessage: "Vui lòng nhập họ tên!" },
           {
@@ -25,7 +25,7 @@ function AccountRegister() {
             errorMessage: "Họ tên không được quá 50 kí tự!",
           },
         ],
-        { errorContainer: "#fullNameError" }
+        { errorContainer: "#full_nameError" }
       )
       .addField(
         "#email",
@@ -77,13 +77,13 @@ function AccountRegister() {
         }
       )
       .onSuccess((event: any) => {
-        const fullName = event.target.fullName.value;
+        const full_name = event.target.full_name.value;
         const email = event.target.email.value;
         const password = event.target.password.value;
         const address = event.target.address.value;
 
         const finalData = {
-          fullName: fullName,
+          full_name: full_name,
           email: email,
           password: password,
           address: address,
@@ -136,18 +136,18 @@ function AccountRegister() {
           <div className="flex flex-col gap-4 mt-[25px]">
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="full_name"
                 className="block font-[500] text-[14px] mb-[5px]"
               >
                 Họ Tên*
               </label>
               <input
                 type="text"
-                id="fullName"
+                id="full_name"
                 placeholder="Ví dụ: Nguyễn Văn A"
                 className="border border-gray-500 rounded-lg p-2 w-full  "
               />
-              <div id="fullNameError" className="text-sm text-red "></div>
+              <div id="full_nameError" className="text-sm text-red "></div>
             </div>
 
             <div>
@@ -221,7 +221,7 @@ function AccountRegister() {
             <div className="text-center text-[14px]">
               Bạn đã có tài khoản?
               <span
-                className="pl-1 text-blue-500 underline cursor-pointer hover:text-blue-700"
+                className="pl-1 text-blue-500 cursor-pointer hover:text-blue-700"
                 onClick={() => {
                   navigate("/accounts/login");
                 }}

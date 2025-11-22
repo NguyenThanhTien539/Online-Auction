@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OTPForm from "@/components/common/OTPForm";
 import { toast } from "sonner";
-// const params = new URLSearchParams(window.location.search);
-// const verifyType = params.get("type");
 
 function AccountVerify() {
   const navigate = useNavigate();
+  const params = new URLSearchParams(window.location.search);
+  const verifyType = params.get("type");
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-account`, {
@@ -23,7 +23,7 @@ function AccountVerify() {
         }
         if (data.code == "error") {
           toast.error(data.message);
-          navigate("/accounts/register");
+          navigate("/accounts/login");
         }
       });
   }, []);
@@ -39,27 +39,50 @@ function AccountVerify() {
       return;
     }
     const finalData = { otp: otpValue };
-    console.log("Final data to submit: ", finalData);
-    fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-register`, {
-      method: "post",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.code == "success") {
-          toast.success(data.message);
-          navigate("/accounts/login");
-        }
-        if (data.code == "error") {
-          toast.error(data.message);
-          navigate("/accounts/register");
-        }
-        if (data.code == "otp error") {
-          toast.error(data.message);
-        }
-      });
+    if (verifyType == "forgot-password") {
+      fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-forgot-password`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalData),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code == "success") {
+            toast.success(data.message);
+            const email = params.get("email");
+            navigate(`/accounts/reset-password?email=${email}`);
+          }
+          if (data.code == "error") {
+            toast.error(data.message);
+            navigate("/accounts/forgot-password");
+          }
+          if (data.code == "otp error") {
+            toast.error(data.message);
+          }
+        });
+    } else {
+      fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-register`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalData),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code == "success") {
+            toast.success(data.message);
+            navigate("/accounts/login");
+          }
+          if (data.code == "error") {
+            toast.error(data.message);
+            navigate("/accounts/register");
+          }
+          if (data.code == "otp error") {
+            toast.error(data.message);
+          }
+        });
+    }
   };
 
   return (
@@ -74,7 +97,7 @@ function AccountVerify() {
         id="registerVerify"
         action=""
         // onSubmit={(e) => e.preventDefault()}
-        className="relative z-20 bg-white/85 w-[40%] min-h-[400px] rounded-[20%] p-6 shadow-2xl shadow-green-500"
+        className="relative z-20 mx-auto bg-white/85 w-[40%] min-h-[400px] rounded-[20%] p-6 shadow-2xl shadow-green-500"
       >
         <div className="text-center font-bold font-sans text-[30px] p-[20px] text-gray-400">
           <h1>Nhập mã OTP</h1>
@@ -101,9 +124,9 @@ function AccountVerify() {
           </div>
         </div>
 
-        <div className="mt-[20px] text-center">
+        <div className="mt-[20px] text-center ">
           <button
-            className="bg-blue-300 hover:bg-green-300 hover:scale-105 transition-all duration-300 border ml-[50%] border-[#DEDEDE] rounded-lg px-4 py-2 font-bold text-[16px] text-white cursor-pointer"
+            className=" mx-auto  bg-blue-300 hover:bg-green-300 hover:scale-105 transition-all duration-300 border  border-[#DEDEDE] rounded-lg px-4 py-2 font-bold text-[16px] text-white cursor-pointer"
             type="submit"
             onClick={handleSubmit}
           >
