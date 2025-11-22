@@ -44,6 +44,7 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         where product_id = ?
         LIMIT 1 offset 0
     `, [product_id]);
+    console.log("Find Max Price History: ", findMaxPriceHistory.rows);
     const maxPriceHistory = await findMaxPriceHistory.rows[0].highest_price;
     const maxProductPrice = await findMaxPriceHistory.rows[0].product_price;
     const maxUserId = await findMaxPriceHistory.rows[0].user_id;
@@ -80,8 +81,6 @@ export async function playBid (user_id: number, product_id: number, max_price: n
             newPriceOwnerId = user_id;
         }
     }
-    
-
     
 
     // Insert new bid
@@ -123,6 +122,7 @@ export function getBidHistoryByProductId (product_id: number, isSeller: boolean)
             from bidding_history
             where product_id = ? 
         `, [product_id]);
+        console.log("Bid History : ", query.rows);
         return query.rows;
     }
 }

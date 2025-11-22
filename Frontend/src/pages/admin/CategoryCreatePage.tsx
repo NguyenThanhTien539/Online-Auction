@@ -11,6 +11,7 @@ export default function CategoryCreate() {
   const editorRef = useRef(null);
   const options = useBuildTree();
   const navigate = useNavigate();
+  console.log("options", options);
 
   useEffect(() => {
     const validate = new JustValidate("#CategoryCreateForm");

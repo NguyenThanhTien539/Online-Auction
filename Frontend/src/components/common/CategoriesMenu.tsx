@@ -61,14 +61,14 @@ function CatagoriesDropdownMenu(){
   return (
     
       
-      <NavigationMenu className = "rounded-2xl min-w-[200px]">
+      <NavigationMenu className = "min-w-[200px]">
         <NavigationMenuList className = "flex-col w-[100%] flex bg-transparent">
 
           {catData && catData.map((category, i) => {
 
               return(
                 <div key={i}>
-                  <NavigationMenuItem className="w-full flex rounded-2xl ">
+                  <NavigationMenuItem className="w-full flex ">
                     <NavigationMenuTrigger className="bg-transparent w-full font-bold min-w-[200px] py-4 h-fit" 
                     onClick = {()=>handleClickCat1(category.cat1_id, category.name)}>
                       {category.name}
@@ -79,7 +79,7 @@ function CatagoriesDropdownMenu(){
                   </NavigationMenuItem>
 
                   {i !== catData.length - 1 && (
-                    <div className="block h-[2px] w-[80%] bg-white/50 flex"></div>
+                    <div className="block h-[2px] w-[100%] bg-white/50 flex"></div>
                   )}
                 </div>
               )
@@ -134,8 +134,8 @@ function CatagoriesButton (
         <div ref = {domRefHover} className = "flex w-fit relative mt-3 py-10 px-3 self-center" >
 
             {/* trigger */}
-            <div className = "flex relative w-full font-semibold  text-black justify-center items-center shadow-[0px_5px_5px] shadow-black/30 \
-                px-3 py-2 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-gray-100/70 transition-all duration-300"
+            <div className = "flex relative w-full font-semibold  text-black justify-center items-center \
+                px-3 py-2 rounded-[10px] mb-2 hover:cursor-pointer hover:bg-gray-100/70 transition-all duration-300 text-sm"
                 >
                 <div onClick = {handleClick}>
                   {name}
@@ -154,7 +154,7 @@ function CatagoriesButton (
                 </span>
             {/* Drop menu */}
             {open &&
-                <div className = "absolute top-[130%] left-0 bg-black/90 text-white w-fit rounded-2xl shadow-lg shadow-gray-900/10">
+                <div className = "absolute top-[130%] left-0 bg-black/90 text-white w-fit shadow-lg shadow-gray-900/10">
                     <CatagoriesDropdownMenu/>
                 </div>
             }

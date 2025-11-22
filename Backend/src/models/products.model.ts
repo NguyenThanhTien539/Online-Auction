@@ -79,7 +79,7 @@ export async function getProductDetail(product_id: string, product_slug: string)
     `, [product_id]);
     let result = await query.rows[0];
 
-    console.log("Raw Product Detail: ", result);
+
     // Format start_time and end_time
     if (result){
         result = {
@@ -88,7 +88,7 @@ export async function getProductDetail(product_id: string, product_slug: string)
             start_time: normVietNamTime(result.start_time),
             end_time: normVietNamTime(result.end_time)
         };
-        console.log("Formatted Product Detail: ", result);
+        // console.log("Formatted Product Detail: ", result);
         return result;
     }
     return null;

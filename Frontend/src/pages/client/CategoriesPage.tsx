@@ -16,8 +16,8 @@ const getLevelCategoriesList = async(level : number, catId? : number, catSlug? :
         linkFetch = `http://localhost:5000/api/categories/level2?cat_id=${catId}&cat_slug=${catSlug}`;
     }
     try{
-        let response = await fetch(linkFetch);
-        let data = await response.json();
+        const response = await fetch(linkFetch);
+        const data = await response.json();
 
         if (!response.ok){
             console.log("Error: ", data.message);
@@ -81,7 +81,7 @@ function AllCategoriesPage({level} : {level : number}){
     }, [level, slugid]);
 
     // Difference between cat 1 and cat 2
-    const handleClick =(cat1_id : Number, cat2_id: Number, name: string) => {
+    const handleClick =(cat1_id : number, cat2_id: number, name: string) => {
         if (level == 1)
         {
             const slug = slugify(name);

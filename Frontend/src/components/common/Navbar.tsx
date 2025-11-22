@@ -1,8 +1,9 @@
-import  {useState} from "react";
+import  {use, useState} from "react";
 import auction from "@/assets/logos/auction-logo.svg";
 import {Link} from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
 import {useNavigate} from "react-router-dom"
+import {useAuth} from "@/routes/ProtectedRouter"; 
 
 
 interface ListItemProps {
@@ -14,11 +15,11 @@ interface ListItemProps {
 
 
 function Navbar () {
-    const [open, setOpen] = useState(false);
+    // const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const navbarItems = [{link: "#", option: "Home"}, {link: "#", option: "About"}, {link: "#", option: "Payment"},
-        {link: "#", option: "Contact"}
-    ];
+
+    const auth = useAuth();
+    console.log("User in navbar: ", auth);
     return(
         // Header section
    
@@ -39,35 +40,31 @@ function Navbar () {
                     
                     <CatagoriseButton />
                     
-                    {/* List center content */}
-                    <div className = {`absolute right-4 top-[110%] w-full max-w-[300px] py-3 z-40 rounded-2xl justify-center items-center font-semibold text-2xl mx-2 \
-                        ${open ? "top-[110%] opacity-100 visible bg-gray-700" : "top-[150%] opacity-0"} transition-opacity duration-3000 \ 
-                        lg:flex lg:static lg:flex-1 lg:max-w-full lg:opacity-100 lg:visible lg:bg-transparent`}>
-                        <ul>
-                            {navbarItems.map((item, idx) => ( 
-                                <ListItem key = {idx} index = {idx} link = {item.link}>{item.option}</ListItem>
-                            ))}
-                        </ul>
+                    {/* Search Bar */}
+                    
+                    
+                        
+                    {/* </div>  */}
+                    <div className = "flex-1 flex justify-center lg:justify-start">
+                        <SearchBar />
+
                     </div>
 
         
 
                     {/* button */}
-                    <div className = " hidden justify-end md:flex md:absolute md:right-15 lg:static max-w-[250px] w-fit m-4 p-4">
+                    { !auth ?
+                        <div className = " hidden justify-end md:flex md:absolute md:right-15 lg:static max-w-[250px] w-fit m-4 p-4">
                         <Link to = "/accounts/login" className=" my-2 py-2 mr-1 rounded-2xl text-black text-lg font-bold hover:text-blue-300">Sign in</Link>
                         <div className = "w-[2px] rounded-[2px] h-[20px] self-center bg-black mr-1"></div>
                         <Link to = "/accounts/register" className="my-2 py-2 rounded-2xl text-black text-lg font-bold hover:text-blue-300">Sign up</Link>
                     </div>
+                    :
+                        <ProfileMenu></ProfileMenu>
+                    }
+                    
 
-                    {/* Toggle button for small device */}
-                    <div>
-                            <button onClick = {() => setOpen(!open)}
-                            className = {`absolute right-6 rounded-xl top-1/2 -translate-y-1/2 bg-gray-500 w-[50px] aspect-square lg:hidden`}>
-                                <span className = "h-[3px] w-[30px] bg-white block m-auto my-2"></span>
-                                <span className = "h-[3px] w-[30px] bg-white block m-auto my-2"></span>
-                                <span className = "h-[3px] w-[30px] bg-white block m-auto my-2"></span>
-                            </button>
-                    </div>
+
                 </div> 
             </div>
         </header>
@@ -78,10 +75,34 @@ function Navbar () {
 }
 export default Navbar;
 
-function ListItem ({index, children, link} : ListItemProps) {
+function SearchBar(){
+    const [searchQuery, setSearchQuery] = useState("");
+    
     return (
-        <li key = {index} className = "flex lg:inline-flex text-black text-lg m-2 p-1 my-3 hover:text-green-500 z-100">
-            <a href = {link} title = {children}>{children}</a>
-        </li>
+        <div className="flex-1 max-w-[500px] mx-4 ml-10 text-sm">
+            <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
+            />
+        </div>
     );
 }
+
+function ProfileMenu(){
+    const navigate = useNavigate();
+    const auth = useAuth();
+
+    return (
+        <div>
+            <div className = "relative w-fit h-fit justify-end flex m-6" onClick = {()=>{navigate(`/profile/${auth?.user_id}`)}}>
+                <a className = "rounded-full flex w-fit p-2 justify-center items-center font-semibold shadow-[0px_5px_10px] shadow-blue-100 \
+                hover:scale-105 cursor-pointer transition-all duration-300">{auth?.username}</a>
+            </div>
+        </div>
+    );
+
+}
+

@@ -25,13 +25,13 @@ export async function comparePassword(
 //  JWT token generation functions
 
 type userPayLoad = {
-  id: number;
+  user_id: number;
   role: string;
 };
 
 export function generateAccessToken(user: userPayLoad, rememberMe?: boolean) {
   const payload = {
-    user_id: user.id,
+    user_id: user.user_id,
     role: user.role,
   };
 
@@ -43,7 +43,7 @@ export function generateAccessToken(user: userPayLoad, rememberMe?: boolean) {
 const sectionType = ["long", "short"];
 export function generateRefreshToken(user: userPayLoad, rememberMe: boolean) {
   const payload = {
-    id: user.id,
+    id: user.user_id,
     role: user.role,
     section: rememberMe ? sectionType[0] : sectionType[1],
   };
@@ -232,9 +232,9 @@ export const loginPost = async (req: Request, res: Response) => {
     });
     return;
   }
-
+  console.log ("Login success for user: ", existedAccount);
   const accessToken = generateAccessToken(
-    { id: existedAccount.id_user, role: existedAccount.role },
+    { user_id: existedAccount.user_id, role: existedAccount.role },
     req.body.rememberMe
   );
 
@@ -251,29 +251,3 @@ export const loginPost = async (req: Request, res: Response) => {
   });
 };
 
-// export const newTokenRequest = async (req: Request, res: Response) => {
-//   const { refreshToken } = req.body;
-//   if (!refreshToken){
-//     return res.status(400).json({ code: 'error', message: 'Refresh token is missing' });
-//   }
-//   jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err : any, user : any) => {
-//     if (err){
-//       return res.status(403).json({ code: 'error', message: 'Invalid refresh token' });
-//     }
-//     const userPayload = { id: (user as any).id, role: (user as any).role };
-//     const newAccessToken = generateAccessToken(userPayload);
-//     const newRefreshToken = generateRefreshToken(userPayload, (user as any).section === sectionType[0] ? true : false);
-
-//     res.cookie('accessToken', newAccessToken, {
-//       maxAge: 20 * 60 * 1000, //20 minutes
-//       httpOnly: true,
-//       secure: false, //https sets true and http sets false
-//       sameSite: "lax", //allow send cookie between domains
-//     });
-
-//     res.json({
-//       code: 'success',
-//       message: 'Token refreshed successfully',
-//     });
-//   });
-// }

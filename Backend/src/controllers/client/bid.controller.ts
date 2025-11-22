@@ -44,7 +44,7 @@ export async function getBidHistoryByProductId (req: Request, res: Response) {
     try{
         const product_id = req.query.product_id;
         const user_id = (req as any).user.user_id;
-
+        console.log ("Bid history here")
         // Check if user is seller of the product
         const isSeller = await bidModels.checkUserIsSeller(user_id, Number(product_id));
         const bidHistory = await bidModels.getBidHistoryByProductId(Number(product_id), isSeller);

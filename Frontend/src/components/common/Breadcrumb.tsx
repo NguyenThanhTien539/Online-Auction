@@ -46,7 +46,7 @@ function Breadcrumbs() {
           const isLast = index === pathSegments.length - 1;
           const displayName = formatSlug(item);
           return (
-            <BreadcrumbItem key={path}>
+            <BreadcrumbItem key={index}>
                 <Link to = {path}
                  className = {`hover:text-gray-300 transition-all duration-100 `}>
                     {displayName.charAt(0).toUpperCase() + displayName.slice(1)}

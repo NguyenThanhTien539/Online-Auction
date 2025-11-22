@@ -17,6 +17,6 @@ route.use("/api/products", productsRoutes);
 
 route.use("/api/me", meRoutes);
 
-route.use("/bid", bidRoutes);
+route.use("/api/bid", bidRoutes);
 
 export default route;

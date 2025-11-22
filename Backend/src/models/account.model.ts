@@ -13,7 +13,9 @@ export const findPassword = async (password: string) => {
 };
 
 
-
+export const findAcountById = async (user_id: number) => {
+  return db("users").select("*").where({ user_id }).first();
+}
 
 export const insertOtpAndEmail = async (email: string, otp: string) => {
   return db("otp_codes").insert({ email: email, otp: otp });

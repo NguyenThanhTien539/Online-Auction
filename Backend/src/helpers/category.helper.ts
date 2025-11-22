@@ -27,7 +27,7 @@ export const buildTree = (
         name: item.name,
         slug: item.slug,
         children,
-      });
+      }); 
     }
   });
 

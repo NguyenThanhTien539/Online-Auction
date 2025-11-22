@@ -35,7 +35,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
         }
     
 
-    console.log(startDate);
+    // console.log(startDate);
     
     const formatStartTime =() =>{
         if (start_time)
@@ -48,10 +48,10 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
 
         // Lấy thời điểm hiện tại đúng timezone
         const present_time = DateTime.now().setZone("Asia/Ho_Chi_Minh");
-        console.log("Time hiện tại: ",present_time.toFormat("dd-MM-yyyy HH-mm-ss"))
+        // console.log("Time hiện tại: ",present_time.toFormat("dd-MM-yyyy HH-mm-ss"))
         // Parse endDate nếu chưa parse
         const endDateValid = DateTime.isDateTime(endDate) ? endDate : DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
-        console.log("Time kết thúc: ",endDateValid.toFormat("dd-MM-yyyy HH-mm-ss"))
+        // console.log("Time kết thúc: ",endDateValid.toFormat("dd-MM-yyyy HH-mm-ss"))
         // Kiểm tra valid trước khi diff
         if (!endDateValid.isValid) {
             console.error("endDate invalid:", endDateValid.invalidReason);

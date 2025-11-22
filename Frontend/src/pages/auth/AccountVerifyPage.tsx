@@ -39,6 +39,7 @@ function AccountVerify() {
       return;
     }
     const finalData = { otp: otpValue };
+    console.log("Final data to submit: ", finalData);
     fetch(`${import.meta.env.VITE_API_URL}/accounts/verify-register`, {
       method: "post",
       credentials: "include",
