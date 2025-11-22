@@ -24,7 +24,7 @@ export default function CategoryCreate() {
       .onSuccess((event: any) => {
         const name = event.target.name.value;
         const status = event.target.status.value;
-        const parentValue = event.target.parent.value as string; 
+        const parentValue = event.target.parent.value as string; // "" hoặc "3"
         const parent_id = parentValue === "" ? null : Number(parentValue);
         let description;
         if (editorRef.current) {

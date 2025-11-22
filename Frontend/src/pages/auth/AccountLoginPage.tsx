@@ -130,7 +130,7 @@ function AccountLogin() {
                 type="submit"
               >
                 Đăng nhập
-              </button>``
+              </button>
             </div>
 
             <div className="text-center text-[14px]">

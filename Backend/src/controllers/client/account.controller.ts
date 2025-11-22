@@ -305,7 +305,6 @@ export const forgotPasswordVerify = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  console.log(password);
   const newPassword = await hashPassword(password);
   await AccountModel.updatePassword(email, newPassword);
 
