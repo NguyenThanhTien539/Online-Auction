@@ -84,38 +84,39 @@ function ResetPassword() {
       .onSuccess((event: any) => {
         const password = event.target.password.value;
         const confirmPassword = event.target.confirmPassword.value;
-        // if (password != confirmPassword) {
-        //   toast.error("Mật khẩu không khớp");
-        // }
-        // lấy email từ query
-        const params = new URLSearchParams(window.location.search);
-        const email = params.get("email");
+        if (password != confirmPassword) {
+          toast.error("Mật khẩu không khớp");
+        } else {
+          // lấy email từ query
+          const params = new URLSearchParams(window.location.search);
+          const email = params.get("email");
 
-        const dataFinal = {
-          email,
-          password,
-        };
+          const dataFinal = {
+            email,
+            password,
+          };
 
-        fetch(`${import.meta.env.VITE_API_URL}/accounts/reset-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dataFinal),
-          credentials: "include",
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.code === "error") {
-              toast.error(data.message);
-            }
-
-            if (data.code === "success") {
-              toast.success(data.message);
-              navigate("/accounts/login");
-            }
+          fetch(`${import.meta.env.VITE_API_URL}/accounts/reset-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dataFinal),
+            credentials: "include",
           })
-          .catch(() => {
-            toast.error("Có lỗi xảy ra, vui lòng thử lại!");
-          });
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.code === "error") {
+                toast.error(data.message);
+              }
+
+              if (data.code === "success") {
+                toast.success(data.message);
+                navigate("/accounts/login");
+              }
+            })
+            .catch(() => {
+              toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+            });
+        }
       });
   }, []);
 
