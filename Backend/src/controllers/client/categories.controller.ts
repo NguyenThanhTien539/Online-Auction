@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as categoriesModel from "../../models/categories.model.ts";
-
+import {buildTree} from "../../helpers/category.helper.ts";
 export async function getAllCategoriesLv1(_: Request, res: Response) {
   // Handle select all categories level 1
   const resultData = await categoriesModel.getAllCategoriesLv1();
@@ -27,11 +27,13 @@ export async function getAllCategoriesLv2(req: Request, res: Response) {
   console.log("Category Slug received: ", slug);
 
   // Handle select all categories level 2 with lv1 id
+  
 
   const resultData = await categoriesModel.getAllCategoriesLv2(
     Number(id),
     String(slug)
   );
+  
   if (resultData === null) {
     return res.status(400).json({
       code: "error",
@@ -55,27 +57,30 @@ export async function getAll(_: Request, res: Response) {
     });
   }
   // format data into nested structure
-  const formattedData: any[] = [];
-  const categoryMap: { [key: number]: any } = {};
-  resultData.forEach((item: any) => {
-    if (!categoryMap[item.cat1_id]) {
-      categoryMap[item.cat1_id] = {
-        cat1_id: item.cat1_id,
-        name: item.cat1_name,
-        items: [],
-      };
-      formattedData.push(categoryMap[item.cat1_id]);
-    }
-    categoryMap[item.cat1_id].items.push({
-      cat2_id: item.cat2_id,
-      name: item.cat2_name,
-      image: item.cat2_image,
-    });
-  });
-  console.log(
-    "Formatted Categories Data: ",
-    JSON.stringify(formattedData, null, 2)
-  );
+  // const formattedData: any[] = [];
+  // const categoryMap: { [key: number]: any } = {};
+  // resultData.forEach((item: any) => {
+  //   if (!categoryMap[item.cat1_id]) {
+  //     categoryMap[item.cat1_id] = {
+  //       cat1_id: item.cat1_id,
+  //       name: item.cat1_name,
+  //       items: [],
+  //     };
+  //     formattedData.push(categoryMap[item.cat1_id]);
+  //   }
+  //   categoryMap[item.cat1_id].items.push({
+  //     cat2_id: item.cat2_id,
+  //     name: item.cat2_name,
+  //     image: item.cat2_image,
+  //   });
+  // });
+
+  const formattedData = buildTree(resultData);
+  console.log (formattedData);
+  // console.log(
+  //   "Formatted Categories Data: ",
+  //   JSON.stringify(formattedData, null, 2)
+  // );
 
   return res.status(200).json({
     code: "success",

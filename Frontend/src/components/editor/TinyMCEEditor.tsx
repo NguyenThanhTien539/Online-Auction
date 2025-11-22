@@ -3,7 +3,7 @@ import { Editor } from "@tinymce/tinymce-react";
 
 export default function TinyMCEEditor(props: {
   editorRef: any,
-  value: string;
+  value?: string;
 }) {
   const { editorRef, value } = props;
   return (

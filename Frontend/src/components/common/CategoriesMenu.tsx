@@ -23,9 +23,9 @@ import {
 
 
 interface catData{
-  cat1_id: number,
+  id: number,
   name: string,
-  items: any
+  children: any[],
 }
 
 function CatagoriesDropdownMenu(){
@@ -70,11 +70,11 @@ function CatagoriesDropdownMenu(){
                 <div key={i}>
                   <NavigationMenuItem className="w-full flex ">
                     <NavigationMenuTrigger className="bg-transparent w-full font-bold min-w-[200px] py-4 h-fit" 
-                    onClick = {()=>handleClickCat1(category.cat1_id, category.name)}>
+                    onClick = {()=>handleClickCat1(category.id, category.name)}>
                       {category.name}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent className="w-full flex bg-black/90 shadow-lg shadow-gray-900/10">
-                      <CatagoriesDetailContent title={category.name} items={category.items} />
+                      <CatagoriesDetailContent title={category.name} items={category.children} />
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
@@ -181,7 +181,7 @@ function CatagoriesMiniItem({image, name, handleClick} : {image?: string, name?:
   );
 }
 
-function CatagoriesDetailContent({title, items} : {title: string, items: {cat2_id : number,name: string, image: string}[] }){
+function CatagoriesDetailContent({title, items} : {title: string, items: {id : number,name: string, image: string}[] }){
   const navigate = useNavigate();
   const handleClickCat2 = (cat2_id: number) => {
     navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
@@ -194,7 +194,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {cat2_i
       {/* Content */}
       <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
         {items.map((item, i) => (
-          <CatagoriesMiniItem key={i} image={item.image} name={item.name} handleClick = {()=>handleClickCat2(item.cat2_id)}/>
+          <CatagoriesMiniItem key={i} image={item.image} name={item.name} handleClick = {()=>handleClickCat2(item.id)}/>
         ))}
 
       </div>

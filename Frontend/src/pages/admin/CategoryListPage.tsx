@@ -17,7 +17,7 @@ type CategoryItem = {
 const MOCK_DATA: CategoryItem[] = [
   {
     id: 1,
-    name: "Tour trong nước",
+    name: "Tour trong nướcfjs dlkfjsdlkf jsdkfjk",
     status: "active",
     createdBy: "Le Van A",
     createdAt: "23:10 - 08/10/2025",
@@ -91,14 +91,14 @@ export default function CategoryList() {
 
       <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-sm table-auto">
+          <table className="w-full text-sm table-fixed">
             <colgroup>
-              <col className="w-12" /> {/* checkbox */}
-              <col className="w-[260px]" /> {/* Tên danh mục */}
-              <col className="w-[140px]" /> {/* Trạng thái */}
-              <col className="w-[220px]" /> {/* Tạo bởi */}
-              <col className="w-[220px]" /> {/* Cập nhật bởi */}
-              <col className="w-[160px]" /> {/* Hành động */}
+              <col className="w-[8%]" /> {/* Checkbox */}
+              <col className="w-[15%]" /> {/* Tên danh mục */}
+              <col className="w-[12%]" /> {/* Trạng thái */}
+              <col className="w-[22%]" /> {/* Tạo bởi */}
+              <col className="w-[22%]" /> {/* Cập nhật bởi */}
+              <col className="w-[11%]" /> {/* Hành động */}
             </colgroup>
 
             <thead className="bg-gray-50 text-gray-700">
@@ -137,7 +137,7 @@ export default function CategoryList() {
                       />
                     </td>
 
-                    <td className="font-medium text-gray-900 break-words">
+                    <td className="font-medium text-gray-900 max-w-[300px] truncate" title={item.name}>
                       {item.name}
                     </td>
 
@@ -154,16 +154,16 @@ export default function CategoryList() {
                       </span>
                     </td>
 
-                    <td>
-                      <div className="font-medium">{item.createdBy}</div>
-                      <div className="text-gray-500 text-xs mt-1">
+                    <td className="max-w-[220px]">
+                      <div className="font-medium truncate" title={item.createdBy}>{item.createdBy}</div>
+                      <div className="text-gray-500 text-xs mt-1 truncate" title={item.createdAt}>
                         {item.createdAt}
                       </div>
                     </td>
 
-                    <td>
-                      <div className="font-medium">{item.updatedBy}</div>
-                      <div className="text-gray-500 text-xs mt-1">
+                    <td className="max-w-[220px]">
+                      <div className="font-medium truncate" title={item.updatedBy}>{item.updatedBy}</div>
+                      <div className="text-gray-500 text-xs mt-1 truncate" title={item.updatedAt}>
                         {item.updatedAt}
                       </div>
                     </td>

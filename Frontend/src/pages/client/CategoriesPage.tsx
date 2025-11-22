@@ -36,8 +36,7 @@ const getLevelCategoriesList = async(level : number, catId? : number, catSlug? :
 
 
 interface CategoryData {
-    cat1_id : number,
-    cat2_id : number,
+    id: number,
     name: string,
     image: string,
 }
@@ -81,15 +80,15 @@ function AllCategoriesPage({level} : {level : number}){
     }, [level, slugid]);
 
     // Difference between cat 1 and cat 2
-    const handleClick =(cat1_id : number, cat2_id: number, name: string) => {
+    const handleClick =(id: number, name: string) => {
         if (level == 1)
         {
             const slug = slugify(name);
-            navigate(`/categories/${slug}-${cat1_id}`)
+            navigate(`/categories/${slug}-${id}`)
         }
         if (level == 2)
         {
-            navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
+            navigate(`/products?cat2_id=${id}&page=${1}`)
         }
     };
 
@@ -102,7 +101,7 @@ function AllCategoriesPage({level} : {level : number}){
                             key = {index}
                             image = {item.image}
                             name = {item.name}
-                            onClick = {() => handleClick(item.cat1_id, item.cat2_id, item.name)}
+                            onClick = {() => handleClick(item.id, item.name)}
                         ></CategoryCard>     
                     )
                 })}

@@ -15,6 +15,7 @@ import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
 import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage"
 import ResetPassword from "@/pages/auth/ResetPasswordPage";
+import PostProductPage from "@/pages/client/PostProductPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -44,6 +45,10 @@ const routers = createBrowserRouter([
         path: "product/:slugid",
         element: <DetailProductPage />,
       },
+      {
+        path: "products/post",
+        element: <PostProductPage />,
+      }
     ],
   },
   {
