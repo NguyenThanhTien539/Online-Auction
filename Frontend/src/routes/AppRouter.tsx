@@ -13,8 +13,9 @@ import ListProductsPage from "@/pages/client/ListProductsPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
-import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage"
+import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage";
 import ResetPassword from "@/pages/auth/ResetPasswordPage";
+import CategoryEdit from "@/pages/admin/CategoryEditPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -91,6 +92,10 @@ const routers = createBrowserRouter([
       {
         path: "category/create",
         element: <CategoryCreate />,
+      },
+      {
+        path: "category/edit/:id",
+        element: <CategoryEdit />,
       },
     ],
   },

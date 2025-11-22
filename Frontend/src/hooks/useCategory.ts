@@ -17,30 +17,22 @@ type CategoryItem = {
   id: number;
   name: string;
   status: "active" | "inactive";
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
 };
-export function useBuildTree(): FlatOption[] | null {
-  const [options, setOptions] = useState<FlatOption[] | null>(null);
 
-  // helper: convert tree -> list có indent
-  const flattenTree = (nodes: CategoryNode[], level = 0): FlatOption[] => {
-    const result: FlatOption[] = [];
+export type CategoryEditItem = {
+  id: number;
+  name: string;
+  status: "active" | "inactive";
+  parent_id: number | null;
+  description: string;
+};
 
-    nodes.forEach((node) => {
-      const prefix = level > 0 ? "-".repeat(level) : "";
-      result.push({ id: node.id, label: `${prefix}${node.name}` });
-
-      if (node.children && node.children.length > 0) {
-        result.push(...flattenTree(node.children, level + 1));
-      }
-    });
-
-    return result;
-  };
-
+export function useBuildTree() {
+  const [tree, setTree] = useState<CategoryNode[] | null>(null);
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
@@ -52,18 +44,17 @@ export function useBuildTree(): FlatOption[] | null {
     )
       .then((res) => res.json())
       .then((data) => {
-        const tree: CategoryNode[] = data.tree;
-        if (Array.isArray(tree)) {
-          setOptions(flattenTree(tree));
+        if (data.tree.length != 0) {
+          setTree(data.tree);
         } else {
-          setOptions(null);
+          setTree(null);
         }
       })
       .catch(() => {
-        setOptions(null);
+        setTree(null);
       });
   }, []);
-  return options;
+  return { tree };
 }
 
 export function useCategories() {
@@ -78,26 +69,41 @@ export function useCategories() {
     )
       .then((res) => res.json())
       .then((data) => {
-        const mapped: CategoryItem[] = data.list.map((it: any) => ({
-          id: it.id,
-          name: it.name,
-          status: it.status, // active / inactive
-          createdBy: it.created_by ?? "Không rõ",
-          updatedBy: it.updated_by ?? "Không rõ",
-          createdAt: formatDate(it.created_at),
-          updatedAt: formatDate(it.updated_at),
-        }));
-        console.log(mapped);
-        setItems(mapped);
+        console.log(data.list);
+        setItems(data.list);
       })
       .catch(() => setItems([]));
   }, []);
 
-  return { items, setItems };
+  return { items };
 }
 
-function formatDate(dateStr: string) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toLocaleString("vi-VN"); // 14:46 12/10/2025
+export function useCategoryWithID(id: number) {
+  const [item, setItem] = useState<CategoryEditItem | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/edit/${id}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const it = data.item;
+
+        setItem({
+          id: it.id,
+          name: it.name,
+          status: it.status,
+          parent_id: it.parent_id ?? null,
+          description: it.description ?? "",
+        });
+      })
+      .catch(() => setItem(null));
+  }, [id]);
+
+  return { item };
 }

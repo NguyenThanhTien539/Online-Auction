@@ -2,16 +2,40 @@
 import { useNavigate } from "react-router-dom";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 import JustValidate from "just-validate";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { slugify } from "@/utils/make_slug";
 import { useBuildTree } from "@/hooks/useCategory";
 import { toast } from "sonner";
 
+type FlatOption = {
+  id: number;
+  label: string;
+};
+
 export default function CategoryCreate() {
   const editorRef = useRef(null);
-  const options = useBuildTree();
+  const { tree } = useBuildTree();
   const navigate = useNavigate();
-  console.log("options", options);
+
+  const flattenTree = (nodes: any, level = 0): FlatOption[] => {
+    const result: FlatOption[] = [];
+
+    nodes.forEach((node: any) => {
+      const prefix = level > 0 ? "-".repeat(level) + " " : "";
+      result.push({ id: node.id, label: `${prefix}${node.name}` });
+
+      if (node.children && node.children.length > 0) {
+        result.push(...flattenTree(node.children, level + 1));
+      }
+    });
+
+    return result;
+  };
+
+  const options: FlatOption[] = useMemo(() => {
+    if (!tree) return [];
+    return flattenTree(tree);
+  }, [tree]);
 
   useEffect(() => {
     const validate = new JustValidate("#CategoryCreateForm");
@@ -86,6 +110,7 @@ export default function CategoryCreate() {
                 <input
                   id="name"
                   type="text"
+                  name="name"
                   className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="Nhập tên danh mục"
                 />
@@ -110,12 +135,11 @@ export default function CategoryCreate() {
                 defaultValue=""
               >
                 <option value="">-- Chọn danh mục --</option>
-                {options &&
-                  options.map((opt) => (
-                    <option key={opt.id} value={opt.id}>
-                      {opt.label}
-                    </option>
-                  ))}
+                {options.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -131,6 +155,7 @@ export default function CategoryCreate() {
               </label>
               <select
                 id="status"
+                name="status"
                 className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 defaultValue="active"
               >

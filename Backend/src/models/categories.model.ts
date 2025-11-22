@@ -38,3 +38,13 @@ export const insertCategory = async (data: object) => {
 export const getAllCategory = async () => {
   return db("categories").select("*").where({ deleted: false });
 };
+
+export const getCategoryWithID = async (id: number) => {
+  return db("categories").select("*").where({ deleted: false, id: id });
+};
+
+export const updateCategoryWithID = async (id: number, data: any) => {
+  return db("categories")
+    .where({ deleted: false, id })
+    .update(data);
+};

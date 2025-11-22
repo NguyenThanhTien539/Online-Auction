@@ -13,8 +13,30 @@ export async function createPost(req: Request, res: Response) {
   await categoriesModel.insertCategory(req.body);
   res.json({ code: "success", message: "Thành công" });
 }
-export async function list(req: Request, res: Response) {
+export async function list(_: Request, res: Response) {
   const list = await categoriesModel.getAllCategory();
-  console.log(list)
   res.json({ code: "success", message: "Thành công", list: list });
+}
+
+export async function edit(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const list = await categoriesModel.getCategoryWithID(Number(id));
+    const item = list.length > 0 ? list[0] : null;
+
+    res.json({ code: "success", item });
+  } catch (error) {
+    res.json({ code: "error", item: null });
+  }
+}
+
+export async function editPatch(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    await categoriesModel.updateCategoryWithID(Number(id), req.body);
+
+    res.json({ code: "success", message: "Cập nhật thành công" });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra ở đây" });
+  }
 }
