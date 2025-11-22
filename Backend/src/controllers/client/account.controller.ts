@@ -175,7 +175,7 @@ export const registerVerifyPost = async (req: Request, res: Response) => {
   };
 
   await AccountModel.insertAccount(finalData);
-
+  await VerifyModel.deletedOTP(finalData.email);
   res.clearCookie("verified_otp_token");
   res.json({
     code: "success",
@@ -202,7 +202,7 @@ export const loginPost = async (req: Request, res: Response) => {
     });
     return;
   }
-  console.log ("Login success for user: ", existedAccount);
+  console.log("Login success for user: ", existedAccount);
   const accessToken = generateAccessToken(
     { user_id: existedAccount.user_id, role: existedAccount.role },
     req.body.rememberMe
@@ -307,6 +307,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   const newPassword = await hashPassword(password);
   await AccountModel.updatePassword(email, newPassword);
+  await VerifyModel.deletedOTP(email);
 
   res.clearCookie("verified_otp_token");
   res.json({

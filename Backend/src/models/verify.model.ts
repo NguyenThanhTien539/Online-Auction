@@ -8,12 +8,15 @@ export const findEmail = async (email: string) => {
   return db("otp_codes").select("*").where({ email }).first();
 };
 
-  export const findEmailAndOtp = async (email: string, otp: string) => {
-    return db("otp_codes").select("*").where({ email, otp }).first();
-  };
+export const findEmailAndOtp = async (email: string, otp: string) => {
+  return db("otp_codes").select("*").where({ email, otp }).first();
+};
 
 export const deleteExpiredOTP = async () => {
   return db("otp_codes")
     .whereRaw("otp_expiry + interval '2 minutes' < now()")
     .del();
+};
+export const deletedOTP = async (email: string) => {
+  return db("otp_codes").where({ email: email }).del();
 };
