@@ -10,12 +10,12 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-          <div className="size-10 rounded-full overflow-hidden">
-            <img
-              src={avatar}
-              alt="Avatar"
-              className="w-full h-full object-cover"
-            />
+        <div className="size-10 rounded-full overflow-hidden">
+          <img
+            src={avatar}
+            alt="Avatar"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="flex flex-col leading-tight">

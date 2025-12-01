@@ -3,11 +3,11 @@ import JustValidate from "just-validate";
 import bg from "@/assets/images/bg-account.jpg";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import {toast} from "sonner";
+import { toast } from "sonner";
 function AccountLogin() {
   const navigate = useNavigate();
   useEffect(() => {
-    const validate = new JustValidate("#loginForm", {lockForm: false});
+    const validate = new JustValidate("#loginForm", { lockForm: false });
 
     validate
       .addField(
@@ -44,18 +44,16 @@ function AccountLogin() {
           .then((data) => {
             if (data.code == "error") {
               console.log(data.message);
-              toast.error("Đăng nhập thất bại")
+              toast.error("Đăng nhập thất bại");
             }
 
             if (data.code == "success") {
               navigate(`/`);
-              toast.success("Đăng nhập thành công!")
+              toast.success("Đăng nhập thành công!");
             }
           });
       });
   }, []);
-
-
 
   return (
     <>

@@ -50,8 +50,10 @@ export default function CategoryList() {
   return (
     <>
       <h2 className="font-[600] text-3xl mb-5">Quản lý danh mục</h2>
-      <FilterBar />
-
+      <FilterBar
+        onCreateClick={() => navigate("/admin/category/create")}
+        createLabel="+ Thêm sản phẩm"
+      />
       {/* ===== TABLE GRID ===== */}
       <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div className="w-full overflow-x-auto">

@@ -1,7 +1,6 @@
-// components/admin/FilterBar.tsx
 import { useState } from "react";
 import { FiFilter, FiRotateCw, FiSearch } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+
 const STATUS_OPTIONS = [
   { value: "", label: "Trạng thái" },
   { value: "active", label: "Hoạt động" },
@@ -21,11 +20,22 @@ const ALL_SELECTED_OPTIONS = [
   { value: "remove", label: "Xóa" },
 ];
 
-export default function FilterBar() {
-  const nagivate = useNavigate();
+// ✅ Định nghĩa props
+type FilterBarProps = {
+  // nếu truyền hàm này vào thì mới hiện nút "Tạo mới"
+  onCreateClick?: () => void;
+  // có thể truyền label khác nếu muốn
+  createLabel?: string;
+};
+
+export default function FilterBar({
+  onCreateClick,
+  createLabel = "+ Tạo mới",
+}: FilterBarProps) {
   const [openStatus, setOpenStatus] = useState("");
   const [initiatorStatus, setInitiatorStatus] = useState("");
   const [allSelectedStatus, setAllSelectedStatus] = useState("");
+
   return (
     <div className="space-y-5">
       <div className="inline-flex w-full max-w-[800px] items-center  rounded-2xl border bg-white font-[500] text-[15px]">
@@ -104,15 +114,15 @@ export default function FilterBar() {
           />
         </div>
 
-        {/* Nút tạo mới */}
-        <button
-          className="px-6 py-5 rounded-2xl bg-blue-500 text-sm font-medium text-white hover:bg-blue-600 cursor-pointer "
-          onClick={() => {
-            nagivate("/admin/category/create");
-          }}
-        >
-          + Tạo mới
-        </button>
+        {/* ✅ Nút tạo mới: chỉ render khi có onCreateClick */}
+        {onCreateClick && (
+          <button
+            className="px-6 py-5 rounded-2xl bg-blue-500 text-sm font-medium text-white hover:bg-blue-600 cursor-pointer "
+            onClick={onCreateClick}
+          >
+            {createLabel}
+          </button>
+        )}
       </div>
     </div>
   );
