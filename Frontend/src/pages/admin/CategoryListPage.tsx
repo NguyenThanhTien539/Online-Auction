@@ -10,46 +10,6 @@ function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return "";
 
-<<<<<<< HEAD
-const MOCK_DATA: CategoryItem[] = [
-  {
-    id: 1,
-    name: "Tour trong nướcfjs dlkfjsdlkf jsdkfjk",
-    status: "active",
-    createdBy: "Le Van A",
-    createdAt: "23:10 - 08/10/2025",
-    updatedBy: "Le Van A",
-    updatedAt: "14:44 - 12/10/2025",
-  },
-  {
-    id: 2,
-    name: "Tour nước ngoài",
-    status: "active",
-    createdBy: "Le Van A",
-    createdAt: "23:10 - 08/10/2025",
-    updatedBy: "Le Van A",
-    updatedAt: "23:10 - 08/10/2025",
-  },
-  {
-    id: 3,
-    name: "Tour Miền Bắc",
-    status: "active",
-    createdBy: "Le Van A",
-    createdAt: "23:12 - 08/10/2025",
-    updatedBy: "Le Van A",
-    updatedAt: "14:45 - 12/10/2025",
-  },
-  {
-    id: 4,
-    name: "Tour Miền Nam",
-    status: "active",
-    createdBy: "Le Van A",
-    createdAt: "23:12 - 08/10/2025",
-    updatedBy: "Le Van A",
-    updatedAt: "14:46 - 12/10/2025",
-  },
-];
-=======
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
@@ -60,7 +20,6 @@ const MOCK_DATA: CategoryItem[] = [
 
   return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
 }
->>>>>>> eab463a2a34b53317cbe972fd76e57885bc820ee
 
 export default function CategoryList() {
   const navigate = useNavigate();
@@ -188,26 +147,10 @@ export default function CategoryList() {
       {/* Desktop Table View */}
       <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden hidden lg:block">
         <div className="w-full overflow-x-auto">
-<<<<<<< HEAD
-          <table className="w-full text-sm table-fixed">
-            <colgroup>
-              <col className="w-[8%]" /> {/* Checkbox */}
-              <col className="w-[15%]" /> {/* Tên danh mục */}
-              <col className="w-[12%]" /> {/* Trạng thái */}
-              <col className="w-[22%]" /> {/* Tạo bởi */}
-              <col className="w-[22%]" /> {/* Cập nhật bởi */}
-              <col className="w-[11%]" /> {/* Hành động */}
-            </colgroup>
-
-            <thead className="bg-gray-50 text-gray-700">
-              <tr className="[&>th]:px-4 [&>th]:py-4 [&>th]:font-semibold">
-                <th className="text-left">
-=======
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-4 text-left w-12">
->>>>>>> eab463a2a34b53317cbe972fd76e57885bc820ee
                   <input
                     type="checkbox"
                     checked={allChecked}
@@ -245,12 +188,7 @@ export default function CategoryList() {
                         className="w-4 h-4"
                       />
                     </td>
-<<<<<<< HEAD
-
-                    <td className="font-medium text-gray-900 max-w-[300px] truncate" title={item.name}>
-=======
                     <td className="px-4 py-4 font-medium text-gray-900 text-center">
->>>>>>> eab463a2a34b53317cbe972fd76e57885bc820ee
                       {item.name}
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -264,20 +202,6 @@ export default function CategoryList() {
                         {item.status === "active" ? "Hoạt động" : "Dừng"}
                       </span>
                     </td>
-<<<<<<< HEAD
-
-                    <td className="max-w-[220px]">
-                      <div className="font-medium truncate" title={item.createdBy}>{item.createdBy}</div>
-                      <div className="text-gray-500 text-xs mt-1 truncate" title={item.createdAt}>
-                        {item.createdAt}
-                      </div>
-                    </td>
-
-                    <td className="max-w-[220px]">
-                      <div className="font-medium truncate" title={item.updatedBy}>{item.updatedBy}</div>
-                      <div className="text-gray-500 text-xs mt-1 truncate" title={item.updatedAt}>
-                        {item.updatedAt}
-=======
                     <td className="px-4 py-4 text-center">
                       <div className="font-medium">
                         {item.created_by || "Không rõ"}
@@ -292,7 +216,6 @@ export default function CategoryList() {
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
                         {formatDate(item.updated_at)}
->>>>>>> eab463a2a34b53317cbe972fd76e57885bc820ee
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
