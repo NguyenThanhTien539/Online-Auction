@@ -13,25 +13,26 @@ export interface FlatOption {
   label: string;
 }
 
-export function useBuildTree(): FlatOption[] | null {
-  const [options, setOptions] = useState<FlatOption[] | null>(null);
+type CategoryItem = {
+  id: number;
+  name: string;
+  status: "active" | "inactive";
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
+};
 
-  // helper: convert tree -> list có indent
-  const flattenTree = (nodes: CategoryNode[], level = 0): FlatOption[] => {
-    const result: FlatOption[] = [];
+export type CategoryEditItem = {
+  id: number;
+  name: string;
+  status: "active" | "inactive";
+  parent_id: number | null;
+  description: string;
+};
 
-    nodes.forEach((node) => {
-      const prefix = level > 0 ? "-".repeat(level) : "";
-      result.push({ id: node.id, label: `${prefix}${node.name}` });
-
-      if (node.children && node.children.length > 0) {
-        result.push(...flattenTree(node.children, level + 1));
-      }
-    });
-
-    return result;
-  };
-
+export function useBuildTree() {
+  const [tree, setTree] = useState<CategoryNode[] | null>(null);
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
@@ -43,16 +44,66 @@ export function useBuildTree(): FlatOption[] | null {
     )
       .then((res) => res.json())
       .then((data) => {
-        const tree: CategoryNode[] = data.tree;
-        if (Array.isArray(tree)) {
-          setOptions(flattenTree(tree));
+        if (data.tree.length != 0) {
+          setTree(data.tree);
         } else {
-          setOptions(null);
+          setTree(null);
         }
       })
       .catch(() => {
-        setOptions(null);
+        setTree(null);
       });
   }, []);
-  return options;
+  return { tree };
+}
+
+export function useCategories() {
+  const [items, setItems] = useState<CategoryItem[]>([]);
+
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.list);
+        setItems(data.list);
+      })
+      .catch(() => setItems([]));
+  }, []);
+
+  return { items };
+}
+
+export function useCategoryWithID(id: number) {
+  const [item, setItem] = useState<CategoryEditItem | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/edit/${id}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const it = data.item;
+
+        setItem({
+          id: it.id,
+          name: it.name,
+          status: it.status,
+          parent_id: it.parent_id ?? null,
+          description: it.description ?? "",
+        });
+      })
+      .catch(() => setItem(null));
+  }, [id]);
+
+  return { item };
 }

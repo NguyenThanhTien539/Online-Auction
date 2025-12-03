@@ -217,6 +217,7 @@ export const loginPost = async (req: Request, res: Response) => {
 
   res.json({
     code: "success",
+    role: existedAccount.role,
     message: "Chúc mừng bạn đã đến website của chúng tôi!",
   });
 };

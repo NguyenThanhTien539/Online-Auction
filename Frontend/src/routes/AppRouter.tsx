@@ -13,8 +13,13 @@ import ListProductsPage from "@/pages/client/ListProductsPage";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
-import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage"
+import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage";
 import ResetPassword from "@/pages/auth/ResetPasswordPage";
+import CategoryEdit from "@/pages/admin/CategoryEditPage";
+import ProductListPage from "@/pages/admin/ProductListPage";
+import ProductDetailPage from "@/pages/admin/ProductDetailPage";
+import UserListPage from "@/pages/admin/UserListPage";
+import BidderFormListPage from "@/pages/admin/BidderFormListPage";
 import PostProductPage from "@/pages/client/PostProductPage";
 const routers = createBrowserRouter([
   {
@@ -83,7 +88,11 @@ const routers = createBrowserRouter([
 
   {
     path: "/admin",
-    element: <AdminMainLayout />,
+    element: (
+      <AuthProvider>
+        <AdminMainLayout />
+      </AuthProvider>
+    ),
     children: [
       {
         path: "dashboard",
@@ -96,6 +105,26 @@ const routers = createBrowserRouter([
       {
         path: "category/create",
         element: <CategoryCreate />,
+      },
+      {
+        path: "category/edit/:id",
+        element: <CategoryEdit />,
+      },
+      {
+        path: "product/list",
+        element: <ProductListPage />,
+      },
+      {
+        path: "product/detail",
+        element: <ProductDetailPage />,
+      },
+      {
+        path: "user/list",
+        element: <UserListPage />,
+      },
+      {
+        path: "bidder/form/list",
+        element: <BidderFormListPage />,
       },
     ],
   },

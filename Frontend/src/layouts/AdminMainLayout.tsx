@@ -2,8 +2,23 @@
 import { Outlet } from "react-router-dom";
 import Header from "@/components/admin/Header";
 import Sidebar from "@/components/admin/Sidebar";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/routes/ProtectedRouter";
 
 export default function MainLayout() {
+  const auth = useAuth();
+  const route = useNavigate();
+
+  if (!auth) {
+    route("/");
+    return null;
+  }
+
+  if (auth.role !== "admin") {
+    route("/");
+    return null;
+  }
+
   return (
     <div className="min-h-screen w-full">
       <header className="fixed inset-x-0 top-0 z-20 border-b bg-white">

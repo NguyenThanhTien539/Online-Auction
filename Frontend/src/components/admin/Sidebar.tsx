@@ -7,6 +7,7 @@ import {
   FiSettings,
   FiUserCheck,
   FiLogOut,
+  FiUserPlus,
 } from "react-icons/fi";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -62,6 +63,16 @@ export default function Sidebar() {
       >
         <FiUsers className="text-lg" />
         <span>Quản lý người dùng</span>
+      </NavLink>
+
+      <NavLink
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/bidder/form/list`}
+        className={({ isActive }) =>
+          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
+        }
+      >
+        <FiUserPlus className="text-lg" />
+        <span>Quản lý form đăng ký</span>
       </NavLink>
 
       <NavLink
