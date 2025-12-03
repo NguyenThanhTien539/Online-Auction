@@ -16,10 +16,12 @@ route.post("/verify-register", accountController.registerVerifyPost);
 route.patch("/verify-forgot-password", accountController.forgotPasswordVerify);
 
 route.post("/forgot-password", accountController.forgotPassword);
+
 route.post("/reset-password", accountController.resetPassword);
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
+route.get("/logout", accountController.logout);
 // route.post("/refresh-token", accountController.refreshToken);
 
 export default route;

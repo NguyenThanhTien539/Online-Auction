@@ -316,3 +316,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     message: "Đã đặt lại mật khẩu thành công",
   });
 };
+
+export const logout = async (_: Request, res: Response) => {
+  res.clearCookie("accessToken");
+  res.json({ code: "success", message: "Đăng xuất thành công" });
+};

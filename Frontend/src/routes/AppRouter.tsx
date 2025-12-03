@@ -21,6 +21,8 @@ import ProductDetailPage from "@/pages/admin/ProductDetailPage";
 import UserListPage from "@/pages/admin/UserListPage";
 import BidderFormListPage from "@/pages/admin/BidderFormListPage";
 import PostProductPage from "@/pages/client/PostProductPage";
+import UserDetailPage from "@/pages/admin/UserDetailPage";
+import BidderFormDetailPage from "@/pages/admin/BidderFormDetailPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -123,8 +125,16 @@ const routers = createBrowserRouter([
         element: <UserListPage />,
       },
       {
+        path: "user/detail/:id",
+        element: <UserDetailPage />,
+      },
+      {
         path: "bidder/form/list",
         element: <BidderFormListPage />,
+      },
+      {
+        path: "bidder/form/detail/:id",
+        element: <BidderFormDetailPage />,
       },
     ],
   },
