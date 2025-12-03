@@ -178,7 +178,7 @@ export default function CategoryCreate() {
             </div>
 
             {/* Nút hành động */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-4">
+            <div className="flex flex-col  items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-4">
               <button
                 type="submit"
                 className="w-full sm:w-auto rounded-lg bg-blue-500 px-8 py-3 text-base font-medium text-white hover:bg-blue-600 active:bg-blue-700 transition-colors shadow-sm hover:shadow-md"

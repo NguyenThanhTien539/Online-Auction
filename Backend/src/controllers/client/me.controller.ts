@@ -1,17 +1,14 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AccountRequest } from "../../interfaces/request.interface.ts";
 
-
-
-export function getMeInfo(req : Request, res : Response) {
-    
-    res.json({
-        data : {
-            user_id: (req as any).user.user_id,
-            role: (req as any).user.role,
-            email: (req as any).user.email,
-            full_name: (req as any).user.full_name,
-            username: (req as any).user.username,
-        }
-    });
-
+export function getMeInfo(req: AccountRequest, res: Response) {
+  res.json({
+    data: {
+      user_id: req.user.user_id,
+      role: req.user.role,
+      email: req.user.email,
+      full_name: req.user.full_name,
+      username: req.user.username,
+    },
+  });
 }

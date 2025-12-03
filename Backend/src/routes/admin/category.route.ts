@@ -12,7 +12,12 @@ route.post(
   categoriesController.createPost
 );
 
-route.get("/list", categoriesController.list);
+route.get(
+  "/list",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyRole("admin"),
+  categoriesController.list
+);
 
 route.get("/edit/:id", categoriesController.edit);
 
