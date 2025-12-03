@@ -7,6 +7,7 @@ import {useAuth} from "@/routes/ProtectedRouter";
 import PlayBidSection from './components/PlayBidSection';
 import BidHistorySection from './components/BidHistorySection';
 import QASection from './components/QASection';
+import { Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ProductType = {
   product_id : number,
@@ -132,9 +133,28 @@ function DetailProductPage() {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [modalImageIndex, setModalImageIndex] = useState(0);
 
   const handleImageClick = (index: number) => {
     setCurrentImageIndex(index);
+  };
+
+  const openImageModal = (index: number) => {
+    setModalImageIndex(index);
+    setImageModalOpen(true);
+  };
+
+  const nextImage = () => {
+    if (products?.product_images) {
+      setModalImageIndex((prev) => (prev + 1) % products.product_images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (products?.product_images) {
+      setModalImageIndex((prev) => (prev - 1 + products.product_images.length) % products.product_images.length);
+    }
   };
 
 
@@ -148,12 +168,20 @@ function DetailProductPage() {
         {/* Main Image and Related Images */}
         <div className="space-y-4">
           {/* Main Image */}
-          <div className="flex justify-center">
+          <div className="flex justify-center relative">
             <img
               src={products?.product_images[currentImageIndex]}
               alt={products?.product_name}
-              className="w-full h-[380px] object-cover rounded-lg shadow-lg"
+              className="w-full h-[500px] object-cover rounded-lg shadow-lg cursor-pointer"
+              onClick={() => openImageModal(currentImageIndex)}
             />
+            <div 
+              className="absolute top-3 right-3 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 backdrop-blur-sm"
+              onClick={() => openImageModal(currentImageIndex)}
+              title="Xem chi tiết hình ảnh"
+            >
+              <Eye className="w-5 h-5 text-white"/>
+            </div>
           </div>
 
           {/* Related Images - Horizontal Scroll */}
@@ -164,8 +192,8 @@ function DetailProductPage() {
                   key={index}
                   src={image}
                   alt={`Image ${index + 1}`}
-                  className={`w-24 h-16 object-cover rounded-lg shadow-md flex-shrink-0 cursor-pointer ${
-                    index === currentImageIndex ? 'ring-2 ring-blue-500' : ''
+                  className={`w-24 h-16 object-cover rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:scale-105 flex-shrink-0 ${
+                    index === currentImageIndex ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'
                   }`}
                   onClick={() => handleImageClick(index)}
                 />
@@ -191,7 +219,11 @@ function DetailProductPage() {
           <div className= "p-0 rounded-lg w-full my-6">
             <div className = "h-[1px] w-[70%] bg-black rounded-3xl mb-5"></div>
             <h4 className="text-xl font-semibold text-gray-800 mb-3">Mô tả sản phẩm</h4>
-            <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>{products?.description}</p>
+            {/* <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>{products?.description}</p> */}
+            <p
+              className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}
+              dangerouslySetInnerHTML={{ __html: products?.description || '' }}
+            />
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="mt-2 text-blue-600 hover:text-blue-800 font-medium"
@@ -227,13 +259,13 @@ function DetailProductPage() {
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm shadow-black/30">
             <h4 className="text-xl font-semibold text-gray-800 mb-3">Thông tin người bán</h4>
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex it`ems-center justify-center">
+              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                 <span className="text-gray-600 font-bold">{products?.seller_username?.charAt(0)}</span>
               </div>
               <div>
                 <p className="font-medium text-gray-900">{products?.seller_username}</p>
                 <p className="text-sm text-gray-600">Điểm đánh giá: 
-                  <span className="ml-2 font-semibold text-yellow-500">{products?.seller_rating}/10
+                  <span className="ml-2 font-semibold text-yellow-500">{products?.seller_rating}
                   </span>
                 </p>
               </div>
@@ -251,7 +283,7 @@ function DetailProductPage() {
                 <p className="font-medium text-gray-900">{products?.price_owner_username}</p>
                 <p className="text-sm text-gray-600">Điểm đánh giá: 
                   <span className="ml-2 font-semibold text-yellow-500">
-                    {products?.price_owner_rating}/10
+                    {products?.price_owner_rating}
                   </span>
                 </p>
               </div>
@@ -275,6 +307,80 @@ function DetailProductPage() {
 
       {/* Q&A Section */}
       <QASection product_id = {products?.product_id}></QASection>
+
+      {/* Image Preview Modal */}
+      {imageModalOpen && products?.product_images && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center p-2 bg-black/80 backdrop-blur-sm animate-fadeIn" onClick={() => setImageModalOpen(false)}>
+          <div className="relative w-[95vw] max-w-7xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-500 to-white text-white">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Eye className="w-5 h-5 mr-2" />
+                {products?.product_name} ({modalImageIndex + 1}/{products?.product_images.length})
+              </h3>
+              <button
+                onClick={() => setImageModalOpen(false)}
+                className="p-2 hover:bg-red-400 rounded-full transition-all duration-200"
+                title="Đóng"
+              >
+                <X className="w-5 h-5 bg-red-500 cursor-pointer" />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="relative bg-gray-300">
+              <div className="relative p-6">
+                <img
+                  src={products?.product_images[modalImageIndex]}
+                  alt={`${products?.product_name} - Image ${modalImageIndex + 1}`}
+                  className="max-w-full max-h-[70vh] object-contain mx-auto rounded-lg shadow-lg"
+                />
+                
+                {/* Navigation Arrows */}
+                {products?.product_images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+                      title="Hình trước"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
+                      title="Hình tiếp theo"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </div>
+              
+              {/* Thumbnail Navigation */}
+              {products?.product_images.length > 1 && (
+                <div className="p-4 bg-gray-100">
+                  <div className="flex justify-center space-x-2 overflow-x-auto">
+                    {products.product_images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image}
+                        alt={`Thumbnail ${index + 1}`}
+                        className={`w-16 h-12 object-cover rounded cursor-pointer transition-all duration-200 flex-shrink-0 ${
+                          index === modalImageIndex 
+                            ? 'ring-2 ring-pink-500 ring-offset-2' 
+                            : 'opacity-70 hover:opacity-100'
+                        }`}
+                        onClick={() => setModalImageIndex(index)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       
     </div>
   );

@@ -38,7 +38,7 @@ const getLevelCategoriesList = async(level : number, catId? : number, catSlug? :
 interface CategoryData {
     id: number,
     name: string,
-    image: string,
+    cat_image: string,
 }
 function AllCategoriesPage({level} : {level : number}){
     const navigate = useNavigate();
@@ -99,7 +99,7 @@ function AllCategoriesPage({level} : {level : number}){
                     return (
                         <CategoryCard
                             key = {index}
-                            image = {item.image}
+                            image = {item.cat_image}
                             name = {item.name}
                             onClick = {() => handleClick(item.id, item.name)}
                         ></CategoryCard>     

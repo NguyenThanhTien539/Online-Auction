@@ -94,3 +94,15 @@ export async function getProductDetail(product_id: string, product_slug: string)
     return null;
 
 }
+
+export async function postNewProduct (productData: any) {
+    try {
+        console.log("Inserting product data:", productData);
+        const result = await db('products').insert(productData);
+        console.log("Insert result:", result);
+        return result;
+    } catch (e) {
+        console.error("Error inserting new product: ", e);
+        throw e; // Re-throw to let controller handle the error
+    }
+}

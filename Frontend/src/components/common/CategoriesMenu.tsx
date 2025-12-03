@@ -166,6 +166,30 @@ function CatagoriesButton (
     );
 };
 
+
+
+function CatagoriesDetailContent({title, items} : {title: string, items: {id : number,name: string, cat_image: string}[] }){
+  const navigate = useNavigate();
+  const handleClickCat2 = (cat2_id: number) => {
+    navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
+  }
+  console.log("Items in cat detail content: ", items);
+  return (
+    <div className = "bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-[20px] z-1000 m-3">
+      {/* Tittle */}
+      <div className = "font-bold text-2xl ml-3 text-white mb-[20px]">{title}</div>
+
+      {/* Content */}
+      <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
+        {items.map((item, i) => (
+          <CatagoriesMiniItem key={i} image={item.cat_image} name={item.name} handleClick = {()=>handleClickCat2(item.id)}/>
+        ))}
+
+      </div>
+    </div>
+  );
+}
+
 function CatagoriesMiniItem({image, name, handleClick} : {image?: string, name?: string, handleClick : any}){
   if (!name) name = "Category";
   return(
@@ -178,27 +202,6 @@ function CatagoriesMiniItem({image, name, handleClick} : {image?: string, name?:
 
       </div>
     
-  );
-}
-
-function CatagoriesDetailContent({title, items} : {title: string, items: {id : number,name: string, image: string}[] }){
-  const navigate = useNavigate();
-  const handleClickCat2 = (cat2_id: number) => {
-    navigate(`/products?cat2_id=${cat2_id}&page=${1}`)
-  }
-  return (
-    <div className = "bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-[20px] z-1000 m-3">
-      {/* Tittle */}
-      <div className = "font-bold text-2xl ml-3 text-white mb-[20px]">{title}</div>
-
-      {/* Content */}
-      <div className = "m-5 grid grid-cols-3 gap-3 mx-auto">
-        {items.map((item, i) => (
-          <CatagoriesMiniItem key={i} image={item.image} name={item.name} handleClick = {()=>handleClickCat2(item.id)}/>
-        ))}
-
-      </div>
-    </div>
   );
 }
 export default CatagoriesButton;

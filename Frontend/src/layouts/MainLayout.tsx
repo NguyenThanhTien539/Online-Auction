@@ -9,7 +9,6 @@ function MainLayout() {
             
             <main className = "flex-1 pt-[100px]">
                 <div className = "ml-[50px]">
-                    {/*     <Breadcrumbs/> */}
                 </div>
                 <Outlet/>
             </main>

@@ -23,3 +23,12 @@ export default async function verifyToken(req: Request, res: Response, next: Nex
 
 }
 
+export async function checkAccountToken (req: Request, _: Response, next: NextFunction){
+    // Get Token from cookies
+    const token = req.cookies.accessToken;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload
+    const account = await accountModel.findAcountById(decoded?.user_id);
+    (req as any).user = account; // Attach user info to request object
+    next();
+}

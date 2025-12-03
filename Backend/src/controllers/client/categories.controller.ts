@@ -18,6 +18,24 @@ export async function getAllCategoriesLv1(_: Request, res: Response) {
     data: resultData,
   });
 }
+export async function getAllCategoriesLv2NoSlug(req: Request, res: Response) {
+  const id = req.query.cat_id;
+  console.log("Category ID received: ", id);
+  // Handle select all categories level 2 with lv1 id
+  const resultData = await categoriesModel.getAllCategoriesLv2NoSlug( Number(id) );
+  console.log("Fetched Level 2 Categories: ", resultData);
+  if (resultData === null) {
+    return res.status(500).json({
+      code: "error",
+      message: "Lỗi máy chủ khi lấy danh mục cấp 2",
+    });
+  }
+  return res.status(200).json({
+    code: "success",
+    message: "Lấy tất cả danh mục cấp 2 thành công",
+    data: resultData,
+  });
+}
 
 export async function getAllCategoriesLv2(req: Request, res: Response) {
   const id = req.query.cat_id;

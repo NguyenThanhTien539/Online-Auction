@@ -1,6 +1,6 @@
 import ProductCard from "@/components/common/ProductCard";
 import PaginationComponent from "@/components/common/Pagination";
-import SelectComponent from "@/components/common/SelectFilter"
+import SelectComponent from "@/components/common/Select"
 import { usePreventBodyLock } from "@/hooks/usePreventBodyLock";
 import {useState, useEffect} from "react"
 import {useNavigate, useSearchParams} from "react-router-dom"
