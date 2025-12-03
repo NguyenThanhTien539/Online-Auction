@@ -48,8 +48,13 @@ function AccountLogin() {
             }
 
             if (data.code == "success") {
-              navigate(`/`);
-              toast.success("Đăng nhập thành công!");
+              if (data.role === "admin") {
+                navigate(`/admin/dashboard`);
+                toast.success("Đăng nhập thành công!");
+              } else {
+                navigate(`/`);
+                toast.success("Đăng nhập thành công!");
+              }
             }
           });
       });

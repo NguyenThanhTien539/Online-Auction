@@ -83,7 +83,11 @@ const routers = createBrowserRouter([
 
   {
     path: "/admin",
-    element: <AdminMainLayout />,
+    element: (
+      <AuthProvider>
+        <AdminMainLayout />
+      </AuthProvider>
+    ),
     children: [
       {
         path: "dashboard",

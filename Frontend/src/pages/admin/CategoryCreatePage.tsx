@@ -49,7 +49,7 @@ export default function CategoryCreate() {
       .onSuccess((event: any) => {
         const name = event.target.name.value;
         const status = event.target.status.value;
-        const parentValue = event.target.parent.value as string; // "" hoặc "3"
+        const parentValue = event.target.parent.value as string;
         const parent_id = parentValue === "" ? null : Number(parentValue);
         let description;
         if (editorRef.current) {
@@ -92,102 +92,113 @@ export default function CategoryCreate() {
   const value = "";
 
   return (
-    <form id="CategoryCreateForm" className="space-y-6">
-      <h2 className="text-3xl font-medium">Tạo danh mục</h2>
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
+      <form
+        id="CategoryCreateForm"
+        className="w-full max-w-6xl mx-auto space-y-4 sm:space-y-6"
+      >
+        <h2 className="text-2xl sm:text-3xl font-semibold">Tạo danh mục</h2>
 
-      <div className="rounded-2xl border-3 bg-white p-6 md:p-8">
-        <div className="space-y-8">
-          {/* tên danh mục */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="">
-              <div className="space-y-5  ">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6 lg:p-8">
+          <div className="space-y-5 sm:space-y-6">
+            {/* Tên danh mục và Danh mục cha */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="w-full">
                 <label
                   htmlFor="name"
-                  className="mb-4 block text-sm font-medium text-gray-700"
+                  className="mb-2 block text-sm font-medium text-gray-700"
                 >
-                  Tên danh mục
+                  Tên danh mục <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="name"
                   type="text"
                   name="name"
-                  className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                   placeholder="Nhập tên danh mục"
                 />
+                <div
+                  id="nameError"
+                  className="text-sm text-red-500 mt-1 min-h-[20px]"
+                ></div>
               </div>
-              <div id="errorName" className="text-sm text-red mt-0.2"></div>
+
+              <div className="w-full">
+                <label
+                  htmlFor="parent"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Danh mục cha
+                </label>
+                <select
+                  id="parent"
+                  name="parent"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 transition-all"
+                  defaultValue=""
+                >
+                  <option value="">-- Chọn danh mục --</option>
+                  {options.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="parent"
-                className="mb-4 block text-sm font-medium text-gray-700"
-              >
-                Danh mục cha
+            {/* Trạng thái */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="w-full">
+                <label
+                  htmlFor="status"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  Trạng thái
+                </label>
+                <select
+                  id="status"
+                  name="status"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  defaultValue="active"
+                >
+                  <option value="active">Hoạt động</option>
+                  <option value="inactive">Tạm dừng</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Mô tả */}
+            <div className="w-full">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Mô tả
               </label>
-              <select
-                id="parent"
-                name="parent"
-                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm
-             text-gray-800 shadow-sm outline-none
-             focus:border-blue-500 focus:ring-2 focus:ring-blue-200
-             disabled:bg-gray-100"
-                defaultValue=""
-              >
-                <option value="">-- Chọn danh mục --</option>
-                {options.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full">
+                <TinyMCEEditor editorRef={editorRef} value={value} />
+              </div>
             </div>
-          </div>
 
-          {/* Hàng 2: Vị trí + Trạng thái */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label
-                htmlFor="status"
-                className="mb-4 block text-sm font-medium text-gray-700"
+            {/* Nút hành động */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-4">
+              <button
+                type="submit"
+                className="w-full sm:w-auto rounded-lg bg-blue-500 px-8 py-3 text-base font-medium text-white hover:bg-blue-600 active:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
               >
-                Trạng thái
-              </label>
-              <select
-                id="status"
-                name="status"
-                className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                defaultValue="active"
+                Tạo mới danh mục
+              </button>
+
+              <button
+                type="button"
+                className="w-full sm:w-auto text-base font-medium text-blue-500 hover:text-blue-600 underline transition-colors py-2"
+                onClick={() => {
+                  navigate(`/${import.meta.env.VITE_PATH_ADMIN}/category/list`);
+                }}
               >
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Tạm dừng</option>
-              </select>
+                Quay lại danh sách
+              </button>
             </div>
-          </div>
-
-          {/* Mô tả */}
-          <TinyMCEEditor editorRef={editorRef} value={value} />
-
-          {/* Nút hành động */}
-          <div className="flex flex-col items-center justify-center gap-5 pt-2">
-            <button
-              type="submit"
-              className="rounded-xl bg-blue-500 px-3 py-5 text-[18px] font-medium text-white hover:bg-blue-600 cursor-pointer"
-            >
-              Tạo mới danh mục
-            </button>
-
-            <span
-              className="text-[15px] font-medium cursor-pointer underline text-blue-400"
-              onClick={() => {
-                navigate(`/${import.meta.env.VITE_PATH_ADMIN}/category/list`);
-              }}
-            >
-              Quay lại danh sách
-            </span>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
