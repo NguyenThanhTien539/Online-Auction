@@ -1,20 +1,19 @@
-
-import React, { useState, useEffect, useRef, use } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  Mail, 
-  FileText, 
-  Send, 
-  ArrowLeft, 
-  Shield, 
+import React, { useState, useEffect, useRef, use } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  User,
+  Mail,
+  FileText,
+  Send,
+  ArrowLeft,
+  Shield,
   CheckCircle,
-  AlertCircle 
-} from 'lucide-react';
-import { toast } from 'sonner';
-import {useAuth} from "@/routes/ProtectedRouter";
+  AlertCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/routes/ProtectedRouter";
 import justValidate from "just-validate";
-import TinyMCEEditor from '@/components/editor/TinyMCEEditor';
+import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 
 interface UserInfo {
   username: string;
@@ -28,33 +27,33 @@ export default function RegisterSellerPage() {
   const auth = useAuth();
   const editor = useRef<any>(null);
   const handleEditorChange = (content: string) => {
-    const reasonContent = document.getElementById('reason') as HTMLInputElement;
+    const reasonContent = document.getElementById("reason") as HTMLInputElement;
     reasonContent.value = content;
 
   }
   // Sample user data - in real app, get from auth context or API
   const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
-    email: "", 
-    full_name: ""
+    email: "",
+    full_name: "",
   });
   useEffect(() => {
     if (auth) {
       setUserInfo({
         username: auth.username,
         email: auth.email,
-        full_name: auth.full_name
+        full_name: auth.full_name,
       });
     }
-  }, [auth])
+  }, [auth]);
 
-  useEffect (() => {
+  useEffect(() => {
     const validator = new justValidate("#register-seller-form");
     validator
       .addField("#reason", [
         {
-            rule: "required",
-            errorMessage: "Lý do không được để trống",
+          rule: "required",
+          errorMessage: "Lý do không được để trống",
         },
       ])
       .onSuccess ((e : any)=> {
@@ -111,13 +110,17 @@ export default function RegisterSellerPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Quay lại Profile
           </button>
-          
+
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Đăng ký trở thành Seller</h1>
-          <p className="text-gray-600">Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá</p>
+
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Đăng ký trở thành Seller
+          </h1>
+          <p className="text-gray-600">
+            Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá
+          </p>
         </div>
 
         {/* Form Card */}
@@ -128,7 +131,9 @@ export default function RegisterSellerPage() {
               <FileText className="w-5 h-5 mr-3" />
               Thông tin đăng ký
             </h2>
-            <p className="text-green-100 mt-2">Vui lòng kiểm tra thông tin và nhập lý do muốn trở thành seller</p>
+            <p className="text-green-100 mt-2">
+              Vui lòng kiểm tra thông tin và nhập lý do muốn trở thành seller
+            </p>
           </div>
 
           {/* Form Content */}
@@ -139,7 +144,7 @@ export default function RegisterSellerPage() {
                 <User className="w-5 h-5 mr-2 text-blue-500" />
                 Thông tin cá nhân
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Username */}
                 <div>
@@ -197,10 +202,11 @@ export default function RegisterSellerPage() {
                 <FileText className="w-5 h-5 mr-2 text-green-500" />
                 Lý do muốn trở thành Seller
               </h3>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Vui lòng chia sẻ lý do bạn muốn trở thành seller trên nền tảng của chúng tôi
+                  Vui lòng chia sẻ lý do bạn muốn trở thành seller trên nền tảng
+                  của chúng tôi
                   <span className="text-red-500 ml-1">*</span>
                 </label>
                 <TinyMCEEditor
@@ -219,7 +225,9 @@ export default function RegisterSellerPage() {
                   <p className="font-semibold mb-1">Lưu ý quan trọng:</p>
                   <ul className="space-y-1">
                     <li>• Yêu cầu sẽ được xem xét trong vòng 7 ngày</li>
-                    <li>• Chúng tôi sẽ liên hệ qua email để thông báo kết quả</li>
+                    <li>
+                      • Chúng tôi sẽ liên hệ qua email để thông báo kết quả
+                    </li>
                     <li>• Seller cần tuân thủ các quy định của nền tảng</li>
                     <li>• Có thể yêu cầu xác minh thông tin bổ sung</li>
                   </ul>
@@ -231,12 +239,12 @@ export default function RegisterSellerPage() {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate("/profile")}
                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Hủy bỏ
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -264,30 +272,42 @@ export default function RegisterSellerPage() {
             <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
             Lợi ích khi trở thành Seller
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <FileText className="w-6 h-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Đăng sản phẩm</h4>
-              <p className="text-sm text-gray-600">Đăng bán sản phẩm của bạn trên nền tảng đấu giá</p>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Đăng sản phẩm
+              </h4>
+              <p className="text-sm text-gray-600">
+                Đăng bán sản phẩm của bạn trên nền tảng đấu giá
+              </p>
             </div>
-            
+
             <div className="text-center p-4">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <User className="w-6 h-6 text-blue-600" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Quản lý khách hàng</h4>
-              <p className="text-sm text-gray-600">Tương tác và chăm sóc khách hàng hiệu quả</p>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Quản lý khách hàng
+              </h4>
+              <p className="text-sm text-gray-600">
+                Tương tác và chăm sóc khách hàng hiệu quả
+              </p>
             </div>
-            
+
             <div className="text-center p-4">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-6 h-6 text-purple-600" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Uy tín & Đánh giá</h4>
-              <p className="text-sm text-gray-600">Xây dựng thương hiệu qua hệ thống đánh giá</p>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Uy tín & Đánh giá
+              </h4>
+              <p className="text-sm text-gray-600">
+                Xây dựng thương hiệu qua hệ thống đánh giá
+              </p>
             </div>
           </div>
         </div>

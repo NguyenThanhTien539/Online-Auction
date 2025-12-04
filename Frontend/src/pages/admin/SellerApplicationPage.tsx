@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Eye, Check, X } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
 import { useNavigate } from "react-router-dom";
+
 type BidderForm = {
   id: number;
   full_name: string;
   email: string;
-  phone: string;
   created_at: string;
   status: "pending" | "accepted" | "rejected";
 };
@@ -28,41 +28,8 @@ function formatDate(dateStr: string) {
 
 export default function BidderFormListPage() {
   const navigate = useNavigate();
-  const [list] = useState<BidderForm[]>([
-    {
-      id: 1,
-      full_name: "Nguyễn Văn A",
-      email: "vana@gmail.com",
-      phone: "0123456789",
-      created_at: "2024-12-01T10:30:00",
-      status: "pending",
-    },
-    {
-      id: 2,
-      full_name: "Lê Thị B",
-      email: "leb@gmail.com",
-      phone: "0987654321",
-      created_at: "2024-12-02T14:20:00",
-      status: "pending",
-    },
-    {
-      id: 3,
-      full_name: "Phạm Văn C",
-      email: "phamc@gmail.com",
-      phone: "0345678901",
-      created_at: "2024-11-28T09:15:00",
-      status: "accepted",
-    },
-    {
-      id: 4,
-      full_name: "Trần Thị D",
-      email: "trand@gmail.com",
-      phone: "0912345678",
-      created_at: "2024-11-25T16:45:00",
-      status: "rejected",
-    },
-  ]);
 
+  const [list, setList] = useState<BidderForm[]>([]);
   // ========= FILTER STATE =========
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "accepted" | "rejected"
@@ -84,8 +51,7 @@ export default function BidderFormListPage() {
           const key = search.toLowerCase();
           if (
             !item.full_name.toLowerCase().includes(key) &&
-            !item.email.toLowerCase().includes(key) &&
-            !item.phone.toLowerCase().includes(key)
+            !item.email.toLowerCase().includes(key)
           ) {
             return false;
           }
@@ -113,7 +79,6 @@ export default function BidderFormListPage() {
     setDateTo("");
   };
 
-  // ========= CHECKBOX =========
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const allChecked =
@@ -135,22 +100,26 @@ export default function BidderFormListPage() {
     );
   };
 
-  // ========= ACTION =========
-  const handleView = (id: number) => {
-    console.log("Xem chi tiết form:", id);
-  };
-
-  const handleAccept = (id: number) => {
-    console.log("Chấp nhận:", id);
-  };
-
-  const handleReject = (id: number) => {
-    console.log("Từ chối:", id);
-  };
-
   const handleStatusFilterChange = (v: string) => {
     setStatusFilter(v as "all" | "pending" | "accepted" | "rejected");
   };
+
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/seller/applications`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code === "success") {
+          setList(data.list);
+        } else {
+          setList([]);
+        }
+      });
+  }, []);
 
   return (
     <div className="w-full min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
@@ -176,8 +145,8 @@ export default function BidderFormListPage() {
           setDateTo={setDateTo}
           onResetFilters={resetFilters}
           bulkActionOptions={[
-            { value: "accept", label: "Chấp nhận" },
-            { value: "reject", label: "Từ chối" },
+            { value: "accepted", label: "Chấp nhận" },
+            { value: "rejected", label: "Từ chối" },
           ]}
           onApplyBulkAction={(action) => console.log(action, selectedIds)}
         />
@@ -201,9 +170,6 @@ export default function BidderFormListPage() {
                   </th>
                   <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
                     Email
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Số điện thoại
                   </th>
                   <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
                     Ngày gửi
@@ -232,18 +198,16 @@ export default function BidderFormListPage() {
                           className="w-4 h-4 cursor-pointer"
                         />
                       </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 font-medium text-gray-900 text-center text-sm lg:text-base">
+                      <td className="px-3 lg:px-4 py-3 lg:py-4  text-gray-900 text-center text-sm lg:text-base">
                         {item.full_name}
                       </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
+                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
                         <div className="max-w-[200px] mx-auto truncate">
                           {item.email}
                         </div>
                       </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
-                        {item.phone}
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-600 text-xs lg:text-sm">
+
+                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
                         {formatDate(item.created_at)}
                       </td>
                       <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
@@ -267,7 +231,11 @@ export default function BidderFormListPage() {
                         <div className="flex items-center justify-center gap-1 lg:gap-2">
                           <button
                             className="p-1.5 lg:p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"
-                            onClick={() => navigate(`/admin/bidder/form/detail/${item.id}`)}
+                            onClick={() =>
+                              navigate(
+                                `/admin/seller/application/detail/${item.id}`
+                              )
+                            }
                             title="Xem chi tiết"
                           >
                             <Eye
@@ -279,7 +247,6 @@ export default function BidderFormListPage() {
                             <>
                               <button
                                 className="p-1.5 lg:p-2 hover:bg-green-50 text-green-600 rounded-lg transition-colors border border-green-200"
-                                onClick={() => handleAccept(item.id)}
                                 title="Chấp nhận"
                               >
                                 <Check
@@ -289,7 +256,6 @@ export default function BidderFormListPage() {
                               </button>
                               <button
                                 className="p-1.5 lg:p-2 hover:bg-red-50 text-red-500 rounded-lg transition-colors border border-red-200"
-                                onClick={() => handleReject(item.id)}
                                 title="Từ chối"
                               >
                                 <X
@@ -309,7 +275,7 @@ export default function BidderFormListPage() {
           </div>
           {filteredList.length === 0 && (
             <div className="py-8 lg:py-10 text-center text-gray-500 text-sm lg:text-base">
-              Không có form nào phù hợp bộ lọc
+              Không có dữ liệu
             </div>
           )}
         </div>
@@ -363,15 +329,6 @@ export default function BidderFormListPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <span className="text-gray-500 font-medium">
-                      Số điện thoại:
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {item.phone}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
                     <span className="text-gray-500 font-medium">Ngày gửi:</span>
                     <span className="text-gray-700">
                       {formatDate(item.created_at)}
@@ -381,10 +338,7 @@ export default function BidderFormListPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
-                  <button
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
-                    onClick={() => handleView(item.id)}
-                  >
+                  <button className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
                     <Eye size={16} className="flex-shrink-0" />
                     <span className="font-medium text-xs sm:text-sm">
                       Xem chi tiết
@@ -393,20 +347,14 @@ export default function BidderFormListPage() {
 
                   {item.status === "pending" && (
                     <div className="grid grid-cols-2 gap-2">
-                      <button
-                        className="flex items-center justify-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-200"
-                        onClick={() => handleAccept(item.id)}
-                      >
+                      <button className="flex items-center justify-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-200">
                         <Check size={16} className="flex-shrink-0" />
                         <span className="font-medium text-xs sm:text-sm">
                           Chấp nhận
                         </span>
                       </button>
 
-                      <button
-                        className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200"
-                        onClick={() => handleReject(item.id)}
-                      >
+                      <button className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200">
                         <X size={16} className="flex-shrink-0" />
                         <span className="font-medium text-xs sm:text-sm">
                           Từ chối
@@ -421,7 +369,7 @@ export default function BidderFormListPage() {
 
           {filteredList.length === 0 && (
             <div className="col-span-full bg-white rounded-lg sm:rounded-xl border border-gray-200 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-base">
-              Không có form nào phù hợp bộ lọc
+              Không có dữ liệu
             </div>
           )}
         </div>

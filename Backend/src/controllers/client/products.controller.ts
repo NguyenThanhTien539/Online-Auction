@@ -25,7 +25,6 @@ export async function getProductsPageList(req: Request, res: Response){
         
         return res.status(500).json({message: "Error in fetching products"});
     }
-    console.log("Products fetched: ", result);
     let {data, numberOfPages} = result;
     return  res.status(200).json({message: "Success", data: data, numberOfPages: numberOfPages});
 
@@ -81,11 +80,7 @@ export async function postNewProduct (req: Request, res: Response) {
             
             file.path = uploadResult.secure_url; // Update file path to Cloudinary URL
         }
-        console.log ("Uploaded files:", files);
-        console.log("Received request to post new product");
-        console.log (req.body);
         const user = (req as any).user;
-        console.log("Authenticated user:", user);
 
 
 
@@ -105,7 +100,6 @@ export async function postNewProduct (req: Request, res: Response) {
             product_images: files.map(file => file.path) // Assuming 'path' contains the file URL or path
 
         }
-        console.log("New product data to be saved:", newProductData);
         await productsModel.postNewProduct(newProductData);
         return res.status(201).json({
             status: "success",
@@ -128,7 +122,6 @@ export async function getMyProductsList (req: Request, res: Response) {
         const user = (req as any).user;
         const type = req.query.type as string;
         const page = parseInt(req.query.page as string) || 1;
-        console.log("Fetching my products list for user:", user, "Type:", type, "Page:", page);
         let result;
         switch (type) {
             case "my-favorites":    
