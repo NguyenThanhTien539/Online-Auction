@@ -9,3 +9,5 @@ export function parsePrice(formattedPrice?: string): number | null {
     const price = parseFloat(numericString);
     return isNaN(price) ? null : price;
 }
+
+

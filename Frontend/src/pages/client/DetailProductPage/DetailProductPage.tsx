@@ -1,5 +1,6 @@
 import React, { useState , useEffect} from 'react';
-import { formatPrice, parsePrice } from '@/utils/format_price';
+// import { formatPrice, parsePrice } from '@/utils/format_price';
+import { NumericFormat } from 'react-number-format';
 import {useNavigate, useParams} from "react-router-dom";
 import {toast} from "sonner"
 import {DateTime} from "luxon";
@@ -103,10 +104,10 @@ function DetailProductPage() {
 
       // Lấy thời điểm hiện tại đúng timezone
       const present_time = DateTime.now().setZone("Asia/Ho_Chi_Minh");
-      console.log("Time hiện tại: ",present_time.toFormat("dd-MM-yyyy HH-mm-ss"))
+
       // Parse endDate nếu chưa parse
 
-      console.log("Time kết thúc: ",(end_time).toFormat("dd-MM-yyyy HH-mm-ss"))
+
  
       const diff = (end_time).diff(present_time, ["days", "hours", "minutes", "seconds"]).toObject();
 
@@ -244,12 +245,27 @@ function DetailProductPage() {
             <div className="space-y-0">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium text-gray-700">Giá hiện tại:</span>  
-                <span className="text-2xl font-bold text-green-600">{formatPrice(Number(products?.current_price.toFixed(2)))} VND</span>
+                <span className="text-2xl font-bold text-green-600">
+                  
+                  <NumericFormat 
+                      value={products?.current_price ?? 0}
+                      displayType={'text'}
+                      thousandSeparator={true}
+                      suffix={' đồng'}
+                  ></NumericFormat>
+                </span>
               </div>
               {products?.buy_now_price && (
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-medium text-gray-700">Giá mua ngay:</span>
-                  <span className="text-xl font-semibold text-blue-600">{formatPrice(Number(products?.buy_now_price?.toFixed(2)))} VND</span>
+                  <span className="text-xl font-semibold text-blue-600">
+                    <NumericFormat 
+                        value={products?.buy_now_price ?? 0}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        suffix={' đồng'}
+                    ></NumericFormat>
+                  </span>
                 </div>
               )}
             </div>

@@ -7,6 +7,6 @@ const route = express.Router();
 
 route.get("/page_list",  productsController.getProductsPageList);
 route.get("/detail", productsController.getProductDetailBySlugId);
-route.post("/post_product", verifyToken, verifyRole("seller", "admin"), upload.array("product_images", 10) ,productsController.postNewProduct);
+route.post("/post-product", verifyToken, verifyRole("seller", "admin"), upload.array("product_images", 10) ,productsController.postNewProduct);
 route.get("/my-products", verifyToken, productsController.getMyProductsList);
 export default route;

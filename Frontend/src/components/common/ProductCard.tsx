@@ -1,11 +1,10 @@
-import Cristiano from "@/assets/images/Cristiano.jpg";
 import LoveIcon from "@/assets/icons/love.svg";
 import {cn} from "@/lib/utils"
 import {DateTime} from "luxon";
 import {useState, useEffect} from "react";
-import {formatPrice} from "@/utils/format_price";
 import {useNavigate} from "react-router-dom";
 import {slugify} from "@/utils/make_slug";
+import {NumericFormat} from "react-number-format";
 type Products = {
     product_id? : number,
     product_image ?: string,
@@ -120,13 +119,23 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
                     <div className = "font-semibold text-gray-500">
                         Giá:
                     </div>
-                    {formatPrice(current_price) ?? "0"} đồng 
+                    <NumericFormat 
+                        value={current_price ?? 0}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        suffix={' đồng'}
+                    ></NumericFormat> 
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Giá mua ngay:
                     </div>
-                    {formatPrice(buy_now_price) ?? "0"} đồng 
+                    <NumericFormat 
+                        value={buy_now_price ?? 0}
+                        displayType={'text'}
+                        thousandSeparator={true}
+                        suffix={' đồng'}
+                    ></NumericFormat>
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">

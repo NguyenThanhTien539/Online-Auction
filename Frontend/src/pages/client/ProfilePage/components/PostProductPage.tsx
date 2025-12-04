@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, use } from 'react';
-import {formatPrice, parsePrice} from "@/utils/format_price";
+
 import TinyMCEEditor from '@/components/editor/TinyMCEEditor';
 import JustValidate from "just-validate";
 import DatePicker from 'react-datepicker';
@@ -10,6 +10,9 @@ import SelectMenu from '@/components/common/Select';
 import { usePreventBodyLock } from '@/hooks/usePreventBodyLock';
 import formatToUTC from '@/utils/format_time';
 import { toast } from 'sonner';
+import {NumericFormat} from 'react-number-format';
+
+
 
 
 type CatType = {
@@ -19,23 +22,16 @@ type CatType = {
 function PostProductPage(){
     usePreventBodyLock ();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
-        product_name: '',
-        product_images: [] as File[],
-        start_price: '',
-        step_price: '',
-        buy_now_price: '',
-        start_time: null as Date | null,
-        end_time: null as Date | null,
-        description: '',
-        autoExtend: false,
-        cat1_id: 0,
-        cat2_id: 0,
-    });
+    const [productImages, setProductImages] = useState<File[]>([]);
+    const [startTime, setStartTime] = useState<Date | null>(null);
+    const [endTime, setEndTime] = useState<Date | null>(null);
+    const [selectedCat1, setSelectedCat1] = useState<number>(0);
+    const [selectedCat2, setSelectedCat2] = useState<number>(0);
+
+    const [catlv1, setCatlv1] = useState<CatType[]>();
+    const [catlv2, setCatlv2] = useState<CatType[]>();
 
 
-    const [catlv1, setCatlv1] = useState<CatType[]> ();
-    const [catlv2, setCatlv2] = useState<CatType[]> ();
 
 
     useEffect(() => {
@@ -47,20 +43,31 @@ function PostProductPage(){
         })
     }, [])
 
-    useEffect (()=>{
-        if (formData.cat1_id) {
-            fetch(`http://localhost:5000/api/categories/level2/noslug?cat_id=${formData.cat1_id}`)
-            .then (res => res.json())
-            .then (data=> {
-                setCatlv2 (data.data);
-              
+    useEffect(() => {
+        if (selectedCat1) {
+            fetch(`http://localhost:5000/api/categories/level2/noslug?cat_id=${selectedCat1}`)
+            .then(res => res.json())
+            .then(data => {
+                setCatlv2(data.data);
             })
         } else {
             setCatlv2([]);
         }
-    }, [formData.cat1_id])
+    }, [selectedCat1])
 
-    
+    // Đồng bộ hidden inputs khi state thay đổi
+    useEffect (() => {
+        console.log ("Selected Cat1 changed: ", selectedCat1);
+        console.log ("Selected Cat2 changed: ", selectedCat2);
+        
+        const cat1Input = document.getElementById("cat1_id") as HTMLInputElement;
+        const cat2Input = document.getElementById("cat2_id") as HTMLInputElement;
+        
+        if (cat1Input) cat1Input.value = selectedCat1.toString();
+        if (cat2Input) cat2Input.value = selectedCat2.toString();
+        
+        console.log("Hidden inputs synced - cat1:", selectedCat1, "cat2:", selectedCat2);
+    }, [selectedCat1, selectedCat2])
     useEffect (()=>{
         const validate = new JustValidate ("#PostProductForm");
         validate.addField("#product_name", [
@@ -81,18 +88,26 @@ function PostProductPage(){
                 errorMessage: "Vui lòng nhập bước giá!"
             }
         ])
-        validate.addField("#cat1_id", [
+        validate.addField(`[name="cat1_id"]`, [
             {
-                validator: (value: any) => value.trim() != 0,
+                validator: (value: any) => {
+                    // Lấy giá trị trực tiếp từ DOM thay vì state
+                    const cat1Input = document.getElementById("cat1_id") as HTMLInputElement;
+                    return Number(cat1Input.value) > 0;
+                },
                 errorMessage: "Vui lòng chọn danh mục chính!"
             }
-        ]),
-        validate.addField("#cat2_id", [
+        ])
+        validate.addField(`[name="cat2_id"]`, [
             {
-                validator: (value: any) => value.trim() != 0,
+                validator: (value: any) => {
+                    // Lấy giá trị trực tiếp từ DOM thay vì state
+                    const cat2Input = document.getElementById("cat2_id") as HTMLInputElement;
+                    return Number(cat2Input.value) > 0;
+                },
                 errorMessage: "Vui lòng chọn danh mục phụ!"
             }
-        ]),
+        ])
         validate.addField ("#start_time", [
             {
                 rule: "required",
@@ -104,172 +119,188 @@ function PostProductPage(){
                 rule: "required",   
                 errorMessage: "Vui lòng chọn thời gian kết thúc!"
             }
-        ])   
+        ])
+        validate.addField("#product_images", [
+            {
+                validator : (value: any, fields: any) => {
+                    const inputElement = document.getElementById("product_images") as HTMLInputElement;
+                    return inputElement.files && inputElement.files.length >= 1;
+                },
+                errorMessage: "Vui lòng chọn ít nhất 1 hình ảnh!"
+            },
+            {
+                validator: (value: any, fields: any) => {
+                    const inputElement = document.getElementById("product_images") as HTMLInputElement;
+                    return inputElement.files && inputElement.files.length >= 3;
+                },
+                errorMessage: "Nên thêm ít nhất 3 hình ảnh để thu hút người mua!"
+            }
+        ]),
+        validate.addField ("#description", [
+            {
+                rule: "required",
+                errorMessage: "Vui lòng nhập mô tả sản phẩm!"
+            }
+        ])
         .onSuccess ((event : any) => {
             event.preventDefault();
+            console.log ("Form validated successfully!");
+            if (isSubmitting) return; // Prevent multiple submissions
+            setIsSubmitting(true);
+
+
+
+            // const formPayload = new FormData();
+            // formPayload.append("product_name", formData.product_name);
+            // // formPayload.append("cat1_id", formData.cat1_id.toString());
+            // formPayload.append("cat2_id", formData.cat2_id.toString());
+            // formPayload.append("start_price", formData.start_price.toString());
+            // formPayload.append("step_price", formData.step_price.toString());
+            // formPayload.append("buy_now_price", formData.buy_now_price.toString());
+            // formPayload.append("start_time", formData.start_time ? formatToUTC(formData.start_time, "datetime") : '');
+            // formPayload.append("end_time", formData.end_time ? formatToUTC(formData.end_time, "datetime") : '');
+            // formPayload.append("description", formData.description);
+            // formPayload.append("auto_extended", formData.autoExtend ? "true" : "false");
+
+            const formPayLoad = new FormData();
+            const form = event.target as HTMLFormElement;
+            
+            formPayLoad.append("product_name", form.product_name.value);
+            formPayLoad.append("cat2_id", form.cat2_id.value);
+            formPayLoad.append("start_price", (form.start_price.value.split(",").join("")));
+            formPayLoad.append("step_price", form.step_price.value.split(",").join(""));
+            formPayLoad.append("buy_now_price", form.buy_now_price.value.split(",").join(""));
+            formPayLoad.append("start_time",  form.start_time.value ? formatToUTC(form.start_time.value, "datetime") : '');
+            formPayLoad.append("end_time", form.end_time.value ? formatToUTC(form.end_time.value, "datetime") : '');
+            formPayLoad.append("description", form.description.value);
+            formPayLoad.append("auto_extended", form.auto_extended.checked ? "true" : "false");
+            if (form.product_images.files) {
+                for (let i = 0; i < form.product_images.files.length; i++) {
+                    formPayLoad.append("product_images", form.product_images.files[i]);
+                }
+            }
+           
+
+            
+            // Check formData correctness before submit
+            const apiData = {
+                product_name: form.product_name.value,
+                cat2_id: form.cat2_id.value,
+                start_price: (form.start_price.value).split(",").join(""),
+                step_price: (form.step_price.value),
+                buy_now_price: (form.buy_now_price.value),
+                start_time: form.start_time.value ? formatToUTC(form.start_time.value, "datetime") : '',
+                end_time: form.end_time.value ? formatToUTC(form.end_time.value, "datetime") : '',
+                description: form.description.value,
+                auto_extended: form.auto_extended.checked ? true : false,
+                product_images: form.product_images.files
+
+                
+
+            }
+            console.log("Prepared API Data:", apiData);
+        
+
+
+        
+            
+            // Handle form submission here - send apiData to backend
+            // console.log("Submitting data to API:", formPayLoad);
+            
+            fetch("http://localhost:5000/api/products/post-product", {
+                method: "POST",
+                credentials: "include",
+                body: formPayLoad
+            })
+            .then (res => res.json())
+            .then (data => {
+                setIsSubmitting(false);
+                if (data.status === "success") {
+                    toast.success("Đăng sản phẩm thành công!");
+                    // reload form after 2 seconds
+                    setTimeout (()=> {
+                        window.location.reload();
+                    }, 2000);
+
+                    
+                } else {
+                    toast.error(data.message || "Đăng sản phẩm thất bại!");
+                }
+            })
+            .catch (err => {
+                setIsSubmitting(false);
+                console.error("Error submitting product:", err);
+                toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+            })
+            .finally (()=> {
+                setIsSubmitting(false);
+            });
         })
 
     }, [])
 
 
     const editorRef = useRef<any>(null);
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        
-        if (type === 'checkbox') {
-            const checked = (e.target as HTMLInputElement).checked;
-            setFormData(prev => ({
-                ...prev,
-                [name]: checked
-            }));
-        } else {
-            // For category selects, value is already the ID from option value
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        }
-    };
-
-    const handleCurrencyChange = (e : any) => {
-        const { name, value } = e.target;
-        const numericValue = parsePrice(value);
-        setFormData(prev => ({
-            ...prev,
-            [name]: numericValue
-        }));
-    };
+    // Không cần handlers phức tạp - sử dụng DOM values trực tiếp
 
 
 
 
     const handleStartTimeChange = (date: Date | null) => {
-        setFormData(prev => {
-            if (!date) return prev;
-            
-            const newData = {
-                ...prev,
-                start_time: date  // Store the original Date object
-            };
-            
-            // Automatically set end time to 7 days after start time if no end time is set
-            if (date && !prev.end_time) {
-                const endTime = new Date(date);
-                endTime.setDate(endTime.getDate() + 7); // Add 7 days
-                newData.end_time = endTime;
-            }
-            
-            return newData;
-        });
+        setStartTime(date);
+        // Automatically set end time to 7 days after start time if no end time is set
+        if (date && !endTime) {
+            const autoEndTime = new Date(date);
+            autoEndTime.setDate(autoEndTime.getDate() + 7);
+            setEndTime(autoEndTime);
+        }
     };
 
     const handleEndTimeChange = (date: Date | null) => {
-        if (!date) return;
-        
-        console.log("End date selected:", date);
-        console.log("Will format to UTC for API:", formatToUTC(date, "datetime"));
-        
-        setFormData(prev => ({
-            ...prev,
-            end_time: date  // Store the original Date object
-        }));
+        setEndTime(date);
     };
 
-    const handleSelectCatChange = (name : any) => (value :any) => {
-        if (name === "cat1_id"){
-            setFormData (prev => ({
-                ...prev,
-                cat2_id: 0, // Reset cat2_id when cat1_id changes
-                [name]: value
-            })) 
-            return;
-        }
-        setFormData (prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
+    const handleCat1Change = (value: any) => {
+        const catId = Number(value);
+        setSelectedCat1(catId);
+        setSelectedCat2(0); // Reset cat2 when cat1 changes
+        
+        // Đồng bộ hidden inputs
+        const cat1Input = document.getElementById("cat1_id") as HTMLInputElement;
+        const cat2Input = document.getElementById("cat2_id") as HTMLInputElement;
+        if (cat1Input) cat1Input.value = catId.toString();
+        if (cat2Input) cat2Input.value = "0";
+        
+        console.log("Cat1 changed to:", catId, "Hidden input updated");
+    };
+
+    const handleCat2Change = (value: any) => {
+        const catId = Number(value);
+        setSelectedCat2(catId);
+        
+        // Đồng bộ hidden input
+        const cat2Input = document.getElementById("cat2_id") as HTMLInputElement;
+        if (cat2Input) cat2Input.value = catId.toString();
+        
+        console.log("Cat2 changed to:", catId, "Hidden input updated");
+    };
 
     const handleEditorChange = (content: string) => {
-        let description = document.getElementById("description") as HTMLInputElement;
+        const description = document.getElementById("description") as HTMLInputElement;
         description.value = content;
-        setFormData(prev => ({
-            ...prev,
-            description: content
-        }));
-    }
-
- 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (isSubmitting) return; // Prevent multiple submissions
-        setIsSubmitting(true);
-        
-
-        if (formData.product_images.length < 3){
-            toast.warning("Nên thêm ít nhất 3 hình ảnh để thu hút người mua!");
-            setIsSubmitting(false);
-            return;
-        }
-        if (formData.description.trim() === ''){
-            toast.error("Vui lòng nhập mô tả sản phẩm!");
-            setIsSubmitting(false);
-            return;
-        }
-
-
-        const formPayload = new FormData();
-        formPayload.append("product_name", formData.product_name);
-        // formPayload.append("cat1_id", formData.cat1_id.toString());
-        formPayload.append("cat2_id", formData.cat2_id.toString());
-        formPayload.append("start_price", formData.start_price.toString());
-        formPayload.append("step_price", formData.step_price.toString());
-        formPayload.append("buy_now_price", formData.buy_now_price.toString());
-        formPayload.append("start_time", formData.start_time ? formatToUTC(formData.start_time, "datetime") : '');
-        formPayload.append("end_time", formData.end_time ? formatToUTC(formData.end_time, "datetime") : '');
-        formPayload.append("description", formData.description);
-        formPayload.append("auto_extended", formData.autoExtend ? "true" : "false");
-
-        formData.product_images.forEach((file, index) => {
-            formPayload.append("product_images", file);
-        }
-        );
-
-
-       
-        
-        // Handle form submission here - send apiData to backend
-        console.log("Submitting data to API:", formPayload);
-
-        fetch("http://localhost:5000/api/products/post_product", {
-            method: "POST",
-            credentials: "include",
-            body: formPayload
-        })
-        .then (res => res.json())
-        .then (data => {
-            setIsSubmitting(false);
-            if (data.status === "success") {
-                toast.success("Đăng sản phẩm thành công!");
-                // reload form after 2 seconds
-                setTimeout (()=> {
-                    window.location.reload();
-                }, 2000);
-
-                
-            } else {
-                toast.error(data.message || "Đăng sản phẩm thất bại!");
-            }
-        })
-        .catch (err => {
-            setIsSubmitting(false);
-            console.error("Error submitting product:", err);
-            toast.error("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
-        });
-
-
-
     };
+
+    const handleUploadImageChange = (images: File[]) => {
+        setProductImages(images);
+        // Sync to hidden input for validation
+        const imageInput = document.getElementById("product_images") as HTMLInputElement;
+        const dt = new DataTransfer();
+        images.forEach(image => {
+            dt.items.add(image);
+        });
+        imageInput.files = dt.files;
+    };
+
 
     return (
         <div className="min-h-screen 100 py-8">
@@ -277,7 +308,7 @@ function PostProductPage(){
                 <div className="bg-white rounded-lg shadow-lg shadow-blue-200 p-8 border-2 border-gray-200">
                     <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Đăng sản phẩm đấu giá</h1>
                     
-                    <form onSubmit={handleSubmit} className="space-y-6" id = "PostProductForm">
+                    <form  className="space-y-6" id = "PostProductForm">
                         {/* Product Name */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -286,9 +317,7 @@ function PostProductPage(){
                             <input
                                 type="text"
                                 name="product_name"
-                                id ="product_name"
-                                value={formData.product_name}
-                                onChange={handleInputChange}
+                                id="product_name"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="Nhập tên sản phẩm..."
                                 required
@@ -305,10 +334,11 @@ function PostProductPage(){
                                 Thêm hình ảnh để thu hút người mua. Ảnh đầu tiên sẽ được sử dụng làm ảnh đại diện.
                             </p>
                             <UploadImage
-                                images={formData.product_images}
-                                onImagesChange={(images : any) => setFormData(prev => ({ ...prev, product_images: images }))}
+                                images={productImages}
+                                onImagesChange={handleUploadImageChange}
                                 maxFiles={10}
                             />
+                            <input type= "file" id = "product_images" name = "product_images" className = "hidden"></input>
                         </div>
                         
 
@@ -319,16 +349,12 @@ function PostProductPage(){
                                     Giá khởi điểm <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <NumericFormat
+                                        thousandSeparator=","
                                         name="start_price"
-                                        id ="start_price"
-                                        value={formatPrice(Number(formData.start_price) || 0)}
-                                        onChange={handleCurrencyChange}
-                                        className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="0"
-                                        required
-                                    />
+                                        id="start_price"
+                                        className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    ></NumericFormat>
                                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">VNĐ</span>
                                 </div>
                             </div>
@@ -338,16 +364,12 @@ function PostProductPage(){
                                     Bước giá <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <NumericFormat
+                                        thousandSeparator=","
                                         name="step_price"
-                                        id ="step_price"
-                                        value={formatPrice(Number(formData.step_price) || 0)}
-                                        onChange={handleCurrencyChange}
-                                        className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="0"
-                                        required
-                                    />
+                                        id="step_price"
+                                        className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    ></NumericFormat>
                                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">VNĐ</span>
                                 </div>
                             </div>
@@ -357,15 +379,12 @@ function PostProductPage(){
                                     Giá mua ngay (tùy chọn)
                                 </label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <NumericFormat
+                                        thousandSeparator=","
                                         name="buy_now_price"
-                                        id ="buy_now_price"
-                                        value={formatPrice(Number(formData.buy_now_price) || 0)}
-                                        onChange={handleCurrencyChange}
-                                        className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        placeholder="0"
-                                    />
+                                        id="buy_now_price"
+                                        className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    ></NumericFormat>
                                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">VNĐ</span>
                                 </div>
                             </div>
@@ -385,9 +404,9 @@ function PostProductPage(){
                                 </label>
                                 <div className="relative">
                                     <DatePicker
-                                        id = "start_time"
-                                        name = "start_time"
-                                        selected={formData.start_time}
+                                        id="start_time"
+                                        name="start_time"
+                                        selected={startTime}
                                         onChange={handleStartTimeChange}
                                         showTimeSelect
                                         timeFormat="HH:mm"
@@ -418,9 +437,9 @@ function PostProductPage(){
                                 </label>
                                 <div className="relative">
                                     <DatePicker
-                                        id = "end_time"
-                                        name ="end_time"
-                                        selected={formData.end_time}
+                                        id="end_time"
+                                        name="end_time"
+                                        selected={endTime}
                                         onChange={handleEndTimeChange}
                                         showTimeSelect
                                         timeFormat="HH:mm"
@@ -429,7 +448,7 @@ function PostProductPage(){
                                         dateFormat="dd/MM/yyyy HH:mm"
                                         placeholderText="Chọn ngày và giờ kết thúc"
                                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                        minDate={formData.start_time || new Date()}
+                                        minDate={startTime || new Date()}
                                         required
                                         withPortal
                                         portalId="end-time-portal"
@@ -451,14 +470,13 @@ function PostProductPage(){
                                     Danh mục chính <span className="text-red-500">*</span>
                                 </label>
                                 <SelectMenu
-                                    value={formData.cat1_id}
-                                    setState={handleSelectCatChange("cat1_id")}
-                                    name ="cat1_id"
-                                    items={catlv1?.map(cat => ({ value: cat.id.toString(), content: cat.name })) || []}
+                                    value={selectedCat1}
+                                    setState={handleCat1Change}
+                                    items={catlv1?.map(cat => ({ value: cat.id, content: cat.name })) || []}
                                     placeholder="Chọn danh mục chính"
                                     className=""
                                 />
-                                <input type="hidden" name="cat1_id" id="cat1_id" value={formData.cat1_id} />
+                                <input type="hidden" name="cat1_id" id="cat1_id" value={selectedCat1} />
                             </div>
                             
                             <div>
@@ -467,29 +485,26 @@ function PostProductPage(){
                                 </label>
               
                                 <SelectMenu
-                                    value={formData.cat2_id}
-                                    setState={handleSelectCatChange("cat2_id")}
-                                    name="cat2_id"
-                                    items={catlv2?.map(cat => ({ value: cat.id.toString(), content: cat.name })) || []}
-                                    placeholder={formData.cat1_id ? "Chọn danh mục phụ" : "Chọn danh mục chính trước"}
-                                    disabled={!formData.cat1_id}
+                                    value={selectedCat2}
+                                    setState={handleCat2Change}
+                                    items={catlv2?.map(cat => ({ value: cat.id, content: cat.name })) || []}
+                                    placeholder={selectedCat1 ? "Chọn danh mục phụ" : "Chọn danh mục chính trước"}
+                                    disabled={!selectedCat1}
                                 />
-                                <input type="hidden" name="cat2_id" id="cat2_id" value={formData.cat2_id} />
+                                <input type="hidden" name="cat2_id" id="cat2_id" value={selectedCat2} />
                             </div>
                         </div>
 
                         {/* Description */}
                         <div className = "text-xl">Mô tả sản phẩm <span className="text-red-500">*</span></div>
                         <TinyMCEEditor editorRef = {editorRef} onEditChange = {handleEditorChange}/>
-                        <input type="hidden" name="description" id = "description" value={formData.description} />
+                        <input type="hidden" name="description" id="description" />
 
                         {/* Auto Extend Option */}
                         <div className="flex items-center">
                             <input
                                 type="checkbox"
-                                name="autoExtend"
-                                checked={formData.autoExtend}
-                                onChange={handleInputChange}
+                                name="auto_extended"
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                 id="autoExtend"
                             />

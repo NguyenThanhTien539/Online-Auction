@@ -1,4 +1,17 @@
-const formatToUTC = (date: Date, options: "datetime" | "date" | "time" = "datetime") => {
+const formatToUTC = (date: Date | string, options: "datetime" | "date" | "time" = "datetime") => {
+  if (!date) return "";
+  
+  if (typeof date === 'string') {
+    // Parse dd/MM/yyyy HH:mm format
+    const [datePart, timePart] = date.split(' ');
+    if (!datePart || !timePart) return "";
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+    date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
+  }
+  
+  if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+  
   const pad = (n: number) => n.toString().padStart(2, "0");
   
   const year = date.getUTCFullYear();

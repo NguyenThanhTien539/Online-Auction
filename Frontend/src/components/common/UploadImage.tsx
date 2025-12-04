@@ -12,7 +12,7 @@ export default function UploadImage({
   images,
   onImagesChange,
   maxFiles = 10,
-}: Props) {
+}: UploadImageProps) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);

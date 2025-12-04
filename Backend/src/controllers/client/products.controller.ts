@@ -92,9 +92,9 @@ export async function postNewProduct (req: Request, res: Response) {
             buy_now_price: parseFloat(req.body.buy_now_price),
             current_price: parseFloat(req.body.start_price),
             cat2_id : parseInt(req.body.cat2_id),
-            start_time: new Date(req.body.start_time),
+            start_time: (req.body.start_time),
             bid_turns : 0,
-            end_time: new Date(req.body.end_time),
+            end_time: (req.body.end_time),
             description: req.body.description,
             auto_extended: req.body.auto_extended === "true" ? true : false,
             product_images: files.map(file => file.path) // Assuming 'path' contains the file URL or path
