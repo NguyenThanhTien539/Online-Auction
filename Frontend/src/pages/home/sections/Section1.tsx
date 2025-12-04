@@ -5,65 +5,95 @@ import HorizontalBar from "@/components/common/HorizontalBar"
 import heroImage from "@/assets/images/hero-section-background.png"
 import loveIcon from "@/assets/icons/love.svg"
 
+
+
+const WelcomeText = () => {
+  return (
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-16 px-6 rounded-2xl shadow-lg mx-4 my-8">
+      <div className="max-w-4xl mx-auto text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-6">
+          🌟 Khám Phá Thế Giới Đấu Giá Trực Tuyến
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+          Chào mừng bạn đến với nền tảng đấu giá online hàng đầu, nơi mọi món đồ quý giá đều chờ đợi chủ nhân mới!
+          Từ đồ cổ xưa đến công nghệ hiện đại, chúng tôi mang đến trải nghiệm đấu giá thú vị, công bằng và an toàn.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Nhanh Chóng & Dễ Dàng</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Đăng ký tài khoản và bắt đầu đấu giá chỉ trong vài phút. Giao diện thân thiện, hướng dẫn rõ ràng.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="text-4xl mb-4">🔒</div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">An Toàn & Bảo Mật</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Hệ thống mã hóa cao, thanh toán bảo mật. Đảm bảo quyền lợi cho cả người bán và người mua.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="text-4xl mb-4">🎯</div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Đa Dạng Sản Phẩm</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Từ nghệ thuật, đồ cổ đến điện tử, thời trang. Luôn có thứ gì đó phù hợp với sở thích của bạn.
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-10">
+          <p className="text-base text-gray-500 dark:text-gray-400 italic">
+            "Đấu giá không chỉ là mua bán, mà là cuộc phiêu lưu tìm kiếm kho báu!" 🏆
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Hero = () => {
   return (
     <>
       
-      <div className="relative pl-[30px] pb-[110px] pt-[120px] dark:bg-dark lg:pt-[100px] mb-[50px]">
-        <div className="container">
+      <div className="relative pl-[30px] pb-[110px] pt-[120px] bg-gradient-to-br from-blue-300 via-blue-200 to-white dark:from-gray-800 dark:to-gray-900 lg:pt-[100px] mb-[50px] overflow-hidden border border-blue-200/50 shadow-2xl shadow-blue-300/30 backdrop-blur-sm">
+        {/* Floating shapes for fun */}
+        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-300 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-20 right-20 w-16 h-16 bg-white rounded-full opacity-30 animate-pulse"></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-blue-200 rounded-full opacity-25 animate-ping"></div>
+        
+        <div className="container relative z-10">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 lg:w-5/12">
               <div className="hero-content">
-                <h1 className="mb-5 text-4xl font-bold !leading-[1.208] text-dark dark:text-white sm:text-[42px] lg:text-[40px] xl:text-5xl">
-                  Online Auction MarketPlace
+                <h1 className="mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl">
+                  🏆 Sàn Đấu Giá Trực Tuyến
                 </h1>
-                <p className="mb-8 max-w-[480px] text-base text-body-color dark:text-dark-6">
-                  Looking for something extraordinary? Our experts have curated a selection of the very best. Go ahead, indulge yourself.
+                <p className="mb-8 max-w-[480px] text-base text-gray-800 dark:text-dark-6 font-medium">
+                  🔥 Đang tìm kiếm điều gì đó đặc biệt? Các chuyên gia của chúng tôi đã tuyển chọn những món đồ tốt nhất. Hãy cứ tự thưởng cho mình đi nào! 🚀
                 </p>
                 <ul className="flex flex-wrap items-center gap-[10px] pt-5">
                   <li>
                     <a
                       href="/#"
-                      className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-center text-base font-medium text-white hover:bg-blue-dark lg:px-7\
-                      hover:scale-105 hover:shadow-md hover:shadow-gray-500 transition-all duration-300"
+                      className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-8 py-4 text-center text-base font-bold hover:bg-blue-800 lg:px-10 transition-all duration-700 transform hover:scale-110 hover:shadow-2xl hover:shadow-blue-400"
                     >
-                      About us
+                      📖 Về chúng tôi
                     </a>
                   </li>
                   <li>
                     <a
                       href="/#"
-                      className="inline-flex items-center justify-center px-5 py-3 text-center text-base font-medium text-[#464646] hover:text-primary dark:text-white\
-                      hover:scale-105 hover:shadow-md hover:shadow-red-400 transition-all duration-300 rounded-2xl shadow-md shadow-gray-200"
+                      className="inline-flex items-center justify-center px-6 py-4 text-center text-base font-bold text-white hover:text-blue-200 dark:text-white transition-all duration-700 rounded-full shadow-lg shadow-gray-400 hover:shadow-xl hover:shadow-blue-400 transform hover:scale-110 bg-gradient-to-r from-rose-300 to-rose-500"
                     >
-                      <span><img src = {loveIcon} className = "w-[30px] flex mr-1"></img></span>
-                      Your Favorite
+                      <span><img src={loveIcon} className="w-[30px] flex mr-2 animate-spin" style={{animationDuration: '3s'}}></img></span>
+                      ❤️ Yêu thích của bạn
                     </a>
                   </li>
                 </ul>
-                {/* <div className="clients pt-16">
-                  <h6 className="mb-6 flex items-center text-xs font-normal text-body-color dark:text-dark-6">
-                    Some Of Our Clients
-                    <span className="ml-3 inline-block h-px w-8 bg-body-color"></span>
-                  </h6>
-
-                  <div className="flex items-center space-x-4">
-                    <SingleImage
-                      href="#"
-                      imgSrc="https://cdn.tailgrids.com/assets/images/marketing/brands/ayroui.svg"
-                    />
-
-                    <SingleImage
-                      href="#"
-                      imgSrc="https://cdn.tailgrids.com/assets/images/marketing/brands/graygrids.svg"
-                    />
-
-                    <SingleImage
-                      href="#"
-                      imgSrc="https://cdn.tailgrids.com/assets/images/marketing/brands/uideck.svg"
-                    />
-                  </div>
-                </div> */}
               </div>
             </div>
             <div className="hidden px-4 lg:block lg:w-1/12"></div>
@@ -73,7 +103,7 @@ const Hero = () => {
                   <img
                     src={heroImage}
                     alt="hero"
-                    className="max-w-full lg:ml-auto rounded-4xl shadow-[20px_10px_15px_rgb(0,0,255,0.5)]"
+                    className="max-w-full lg:ml-auto lg:h-[450px] rounded-4xl shadow-[20px_10px_15px_rgb(59,130,246,0.5)] hover:shadow-[30px_20px_25px_rgb(59,130,246,0.7)] transition-shadow duration-700"
                   />
                   <span className="absolute -bottom-8 -left-8 z-[-1]">
                     <svg
@@ -82,31 +112,31 @@ const Hero = () => {
                       viewBox="0 0 93 93"
                       fill="none"
                     >
-                      <circle cx="2.5" cy="2.5" r="2.5" fill="#3056D3" />
-                      <circle cx="2.5" cy="24.5" r="2.5" fill="#3056D3" />
-                      <circle cx="2.5" cy="46.5" r="2.5" fill="#3056D3" />
-                      <circle cx="2.5" cy="68.5" r="2.5" fill="#3056D3" />
-                      <circle cx="2.5" cy="90.5" r="2.5" fill="#3056D3" />
-                      <circle cx="24.5" cy="2.5" r="2.5" fill="#3056D3" />
-                      <circle cx="24.5" cy="24.5" r="2.5" fill="#3056D3" />
-                      <circle cx="24.5" cy="46.5" r="2.5" fill="#3056D3" />
-                      <circle cx="24.5" cy="68.5" r="2.5" fill="#3056D3" />
-                      <circle cx="24.5" cy="90.5" r="2.5" fill="#3056D3" />
-                      <circle cx="46.5" cy="2.5" r="2.5" fill="#3056D3" />
-                      <circle cx="46.5" cy="24.5" r="2.5" fill="#3056D3" />
-                      <circle cx="46.5" cy="46.5" r="2.5" fill="#3056D3" />
-                      <circle cx="46.5" cy="68.5" r="2.5" fill="#3056D3" />
-                      <circle cx="46.5" cy="90.5" r="2.5" fill="#3056D3" />
-                      <circle cx="68.5" cy="2.5" r="2.5" fill="#3056D3" />
-                      <circle cx="68.5" cy="24.5" r="2.5" fill="#3056D3" />
-                      <circle cx="68.5" cy="46.5" r="2.5" fill="#3056D3" />
-                      <circle cx="68.5" cy="68.5" r="2.5" fill="#3056D3" />
-                      <circle cx="68.5" cy="90.5" r="2.5" fill="#3056D3" />
-                      <circle cx="90.5" cy="2.5" r="2.5" fill="#3056D3" />
-                      <circle cx="90.5" cy="24.5" r="2.5" fill="#3056D3" />
-                      <circle cx="90.5" cy="46.5" r="2.5" fill="#3056D3" />
-                      <circle cx="90.5" cy="68.5" r="2.5" fill="#3056D3" />
-                      <circle cx="90.5" cy="90.5" r="2.5" fill="#3056D3" />
+                      <circle cx="2.5" cy="2.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="2.5" cy="24.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="2.5" cy="46.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="2.5" cy="68.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="2.5" cy="90.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="24.5" cy="2.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="24.5" cy="24.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="24.5" cy="46.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="24.5" cy="68.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="24.5" cy="90.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="46.5" cy="2.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="46.5" cy="24.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="46.5" cy="46.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="46.5" cy="68.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="46.5" cy="90.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="68.5" cy="2.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="68.5" cy="24.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="68.5" cy="46.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="68.5" cy="68.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="68.5" cy="90.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="90.5" cy="2.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="90.5" cy="24.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="90.5" cy="46.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="90.5" cy="68.5" r="2.5" fill="#3B82F6" />
+                      <circle cx="90.5" cy="90.5" r="2.5" fill="#3B82F6" />
                     </svg>
                   </span>
                 </div>
@@ -123,13 +153,16 @@ const Hero = () => {
 
 
 
+
 function Section1(){
   return (
     <div>
       {/* Title */}
-      <HorizontalBar className = "bg-blue-200"/>
-
+      
       <Hero></Hero>
+      <WelcomeText />
+      
+      
     </div>
   );
 }

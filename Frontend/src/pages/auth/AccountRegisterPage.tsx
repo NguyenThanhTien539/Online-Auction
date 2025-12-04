@@ -114,17 +114,22 @@ function AccountRegister() {
   }, []);
   return (
     <>
-      <div className="relative min-h-screen flex items-center justify-center">
-        <img
-          src={bg}
-          alt="hình nền"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-300 via-white to-indigo-300 overflow-hidden">
+        {/* Decorative shapes */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-20 right-20 w-24 h-24 bg-indigo-500 rounded-full opacity-30 animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-purple-300 rounded-full opacity-25 "></div>
+        <div className="absolute bottom-10 right-10 w-16 h-16 bg-pink-200 rounded-full opacity-20 animate-pulse"></div>
+        
+        {/* Floating icons */}
+        <div className="absolute top-1/4 left-1/4 text-6xl opacity-50 animate-bounce">🔐</div>
+        <div className="absolute top-1/3 right-1/4 text-5xl opacity-100 animate-pulse">🚀</div>
+        <div className="absolute bottom-1/4 left-1/4 text-4xl opacity-50 animate-bounce">💎</div>
 
         <form
           id="registerForm"
           action=""
-          className="relative z-10 bg-[white] w-[490px] min-h-[600px] p-8 rounded-4xl"
+          className="relative z-10 bg-white/70 w-[490px] min-h-[600px] p-8 rounded-4xl"
         >
           <div className="text-center font-bold font-sans text-[30px]">
             <h1>Đăng ký</h1>
