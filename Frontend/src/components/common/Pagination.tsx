@@ -89,7 +89,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
     console.log(arrayPages); 
 
     return(
-        <div>
+        numberOfPages != 0 && <div>
             <Pagination>
             <PaginationContent>
                 <PaginationItem className = "">

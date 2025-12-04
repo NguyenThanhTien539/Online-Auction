@@ -8,6 +8,10 @@ export type AuthType = {
   email: string;
   full_name: string;
   role: string;
+  rating: number;
+  rating_count: number;
+  address: string;
+  date_of_birth: string;
 };
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthType | null>(null);

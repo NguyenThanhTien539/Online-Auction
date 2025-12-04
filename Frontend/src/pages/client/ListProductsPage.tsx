@@ -9,6 +9,7 @@ import {slugify} from "@/utils/make_slug";
 
 
 
+
 type Products = {
     product_id : number,
     product_images : string[],
@@ -30,10 +31,31 @@ function ListProductsPage() {
     const [price, setFilterPrice] = useState(searchParams.get("price") || "");
     const [time, setFilterTime] = useState(searchParams.get("time") || "");
     const[currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+    const [numberOfPages, setNumberOfPages] = useState(1);
     
 
     const [products, setProducts] = useState<Products[]>();
     const [isLoading, setLoading] = useState(true);
+    const [nameCat2, setNameCat2] = useState("");
+    useEffect (() => {
+        const cat2_id = searchParams.get("cat2_id");
+        fetch (`http://localhost:5000/api/categories/cat2?cat2_id=${cat2_id}`)
+        .then (response => {
+            if (!response.ok){
+                toast.error("Có lỗi khi lấy tên danh mục");
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then (data => {
+            setNameCat2(data.data.name);
+        })
+        .catch (error => {
+            toast.error (error.message || "Lỗi kết nối máy chủ");
+        });
+    })
+
+
 
     useEffect(()=>{
 
@@ -60,6 +82,7 @@ function ListProductsPage() {
                 toast.success("Tải trang thành công");
                 setLoading(false);
                 setProducts(data.data);
+                setNumberOfPages(data.numberOfPages);
                     
                 }
                 catch(e){
@@ -74,7 +97,7 @@ function ListProductsPage() {
     useEffect(()=>{
         const newParams = new URLSearchParams(searchParams);
         newParams.set("page", String(currentPage));
-        setSeachParams(newParams);
+        setSeachParams(newParams, { replace: currentPage === 1 });
     }, [currentPage])
 
     const filterPrice = [
@@ -128,14 +151,14 @@ function ListProductsPage() {
         <>
             {/* Name cat2 of these products */}
             <div className = "text-5xl font-semibold text-gray-500 mt-10 ml-5">
-                Thời Trang
+                {nameCat2}
             </div>
 
             {/* Filter */}
 
             <div className = "flex ml-[50%] gap-2">
-                <SelectComponent items = {filterPrice} placeholder = "Giá" state = {price} setState = {setFilterPrice}/>
-                <SelectComponent items = {filterTime} placeholder = "Thời gian" state = {time} setState = {setFilterTime}/>
+                <SelectComponent items = {filterPrice} placeholder = "Giá" value = {price} setState = {setFilterPrice}/>
+                <SelectComponent items = {filterTime} placeholder = "Thời gian" value = {time} setState = {setFilterTime}/>
                 <button type = "submit" className = "bg-black text-white p-1 px-5 rounded-xl hover:cursor-pointer hover:shadow-2xl hover:shadow-blue-500"
                     onClick = {handleSubmitFilter}>
                     Filter
@@ -163,7 +186,7 @@ function ListProductsPage() {
             
             </div>
 
-            <PaginationComponent numberOfPages = {5} currentPage = {currentPage} controlPage = {setCurrentPage}/>
+            <PaginationComponent numberOfPages = {numberOfPages} currentPage = {currentPage} controlPage = {setCurrentPage}/>
 
             <div className = "mb-[50px]"></div>
 

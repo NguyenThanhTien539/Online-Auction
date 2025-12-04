@@ -64,6 +64,7 @@ function Navbar() {
             </div>
           ) : (
             <ProfileMenu></ProfileMenu>
+            
           )}
         </div>
       </div>
@@ -97,7 +98,7 @@ function ProfileMenu() {
       <div
         className="relative w-fit h-fit justify-end flex m-6"
         onClick={() => {
-          navigate(`/profile/${auth?.user_id}`);
+          navigate(`/profile/`);
         }}
       >
         <a

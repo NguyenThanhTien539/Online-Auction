@@ -181,7 +181,7 @@ function PostProductPage(){
                 ...prev,
                 cat2_id: 0, // Reset cat2_id when cat1_id changes
                 [name]: value
-            }))
+            })) 
             return;
         }
         setFormData (prev => ({

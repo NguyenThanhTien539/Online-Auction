@@ -20,7 +20,11 @@ import ProductListPage from "@/pages/admin/ProductListPage";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
 import UserListPage from "@/pages/admin/UserListPage";
 import BidderFormListPage from "@/pages/admin/BidderFormListPage";
-import PostProductPage from "@/pages/client/PostProductPage";
+import PostProductPage from "@/pages/client/ProfilePage/components/PostProductPage";
+import ProfilePage from "@/pages/client/ProfilePage/ProfilePage";
+import MyProductsPage from "@/pages/client/ProfilePage/components/MyProductsPage";
+import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
+import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -53,8 +57,24 @@ const routers = createBrowserRouter([
       {
         path: "products/post",
         element: <PostProductPage />,
+      },
+      {
+        path: "my-products",
+        element: <MyProductsPage />,
+      },
+      {
+        path: "register-seller",
+        element: <RegisterSellerPage />,
+      },
+      {
+        path: "profile/edit",
+        element : <EditProfilePage />
       }
     ],
+  },
+  {
+    path: "/profile",
+    element: <AuthProvider><ProfilePage /></AuthProvider>,
   },
   {
     path: "/test",
