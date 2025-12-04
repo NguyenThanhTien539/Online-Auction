@@ -59,47 +59,48 @@ export default function EditProfilePage() {
         { rule: 'required', errorMessage: 'Họ và tên là bắt buộc' },
         { rule: 'minLength', value: 3, errorMessage: 'Họ và tên phải có ít nhất 3 ký tự' }
       ])
-    .onSuccess ((e : React.FormEvent)=> {
-        e.preventDefault();
-    
-  })
+    .onSuccess ((event : any) => {
+        event.preventDefault();
+        if (isSubmitting) return; // Prevent multiple submissions
+        const formSubmit = {
+            email: event.target.email.value,
+            full_name: event.target.full_name.value,
+            address: event.target.address.value,
+            date_of_birth: event.target.date_of_birth.value
+        }
+        setIsSubmitting(true);
+        fetch ("http://localhost:5000/api/profile/edit", {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify (formSubmit)
+        })
+        .then (res => {
+            if (!res.ok){
+                return res.json().then (data => {
+                    throw new Error (data.message || "Có lỗi xảy ra");
+                });
+            }
+            return res.json();
+        }
+        )
+        .then (data => {
+            toast.success (data.message || "Cập nhật thông tin thành công");
+        
+            navigate ("/profile");
+        })
+        .catch (err => {
+            toast.error (err.message || "Có lỗi xảy ra khi cập nhật thông tin");
+
+        })
+        .finally (()=> {
+            setIsSubmitting(false);
+        });
+    })
   }, []);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSubmitting) return; // Prevent multiple submissions
-    console.log ("Submitting form with data:", formData);
-    setIsSubmitting(true);
-    fetch ("http://localhost:5000/api/profile/edit", {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify (formData)
-    })
-    .then (res => {
-        if (!res.ok){
-            return res.json().then (data => {
-                throw new Error (data.message || "Có lỗi xảy ra");
-            });
-        }
-        return res.json();
-    }
-    )
-    .then (data => {
-        toast.success (data.message || "Cập nhật thông tin thành công");
-    
-        navigate ("/profile");
-    })
-    .catch (err => {
-        toast.error (err.message || "Có lỗi xảy ra khi cập nhật thông tin");
-
-    })
-    .finally (()=> {
-        setIsSubmitting(false);
-    });
-  }
 
   
   
@@ -141,7 +142,7 @@ export default function EditProfilePage() {
           </div>
 
           {/* Form Content */}
-          <form id = "edit-profile-form" className="p-8" onSubmit ={onSubmit}>
+          <form id = "edit-profile-form" className="p-8">
             <div className="space-y-6">
               {/* Email */}
               <div>

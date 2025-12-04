@@ -25,14 +25,12 @@ interface UserInfo {
 export default function RegisterSellerPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reason, setReason] = useState('');
   const auth = useAuth();
   const editor = useRef<any>(null);
   const handleEditorChange = (content: string) => {
     const reasonContent = document.getElementById('reason') as HTMLInputElement;
     reasonContent.value = content;
-    setReason(content);
-    console.log("Editor content changed:", reason);
+
   }
   // Sample user data - in real app, get from auth context or API
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -58,53 +56,45 @@ export default function RegisterSellerPage() {
             rule: "required",
             errorMessage: "Lý do không được để trống",
         },
-        {
-            rule: "minLength",
-            value: 20,
-            errorMessage: "Lý do cần ít nhất 20 ký tự",
-        },
       ])
-      .onSuccess ((e : React.FormEvent)=> {
+      .onSuccess ((e : any)=> {
         e.preventDefault();
+        setIsSubmitting(true);
+        
+        console.log("Submitting seller registration with reason:", e.target.reason.value);
+        fetch ("http://localhost:5000/api/profile/register-seller", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                reason: e.target.reason.value
+            })
+
+        })
+        .then (res => {
+            if (!res.ok){
+                return res.json().then (data => {
+                    throw new Error (data.message || "Có lỗi xảy ra");
+                });
+            }
+            return res.json();
+        })
+        .then (data => {
+            toast.success (data.message || "Gửi yêu cầu thành công");
+            navigate ("/profile");
+        })
+        .catch (error => {
+            toast.error (error.message || "Lỗi kết nối máy chủ");
+        })
+        .finally (() => {
+            setIsSubmitting(false);
+        });
       })
       
 
   }, [])
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    console.log("Submitting seller registration with reason:", reason);
-    fetch ("http://localhost:5000/api/profile/register-seller", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            reason: reason.trim()
-        })
-
-    })
-    .then (res => {
-        if (!res.ok){
-            return res.json().then (data => {
-                throw new Error (data.message || "Có lỗi xảy ra");
-            });
-        }
-        return res.json();
-    })
-    .then (data => {
-        toast.success (data.message || "Gửi yêu cầu thành công");
-        navigate ("/profile");
-    })
-    .catch (error => {
-        toast.error (error.message || "Lỗi kết nối máy chủ");
-    })
-    .finally (() => {
-        setIsSubmitting(false);
-    });
-  }
- 
   
 
    
@@ -116,7 +106,7 @@ export default function RegisterSellerPage() {
         <div className="text-center mb-8">
           <button
             onClick={() => navigate('/profile')}
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+            className="inline-flex items-center cursor-pointer text-blue-600 hover:text-blue-800 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Quay lại Profile
@@ -142,7 +132,7 @@ export default function RegisterSellerPage() {
           </div>
 
           {/* Form Content */}
-          <form id = "register-seller-form" className="p-8" onSubmit ={handleSubmit}>
+          <form id = "register-seller-form" className="p-8">
             {/* User Information Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -217,7 +207,7 @@ export default function RegisterSellerPage() {
                   editorRef={editor}
                   onEditChange={handleEditorChange}
                 />
-                <input id = "reason" type = "hidden"></input>
+                <input id = "reason" name = "reason" type = "hidden"></input>
               </div>
             </div>
 

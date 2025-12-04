@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import auction from "@/assets/logos/auction-logo.svg";
 import { Link } from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
+import { User, Heart, PlusCircle, LogOut, Settings, List, Box } from 'lucide-react';
 
 function Navbar() {
   // const [open, setOpen] = useState(false);
@@ -92,22 +93,27 @@ function SearchBar() {
 function ProfileMenu() {
   const navigate = useNavigate();
   const auth = useAuth();
+ 
+
+
+
+  const initials = auth?.full_name ? auth.full_name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase() : (auth?.username ? auth.username[0].toUpperCase() : 'U');
 
   return (
-    <div>
-      <div
-        className="relative w-fit h-fit justify-end flex m-6"
-        onClick={() => {
-          navigate(`/profile/`);
-        }}
+    <div className="relative flex items-center">
+      <button
+        onClick={() => navigate("/profile")}
+        className="flex items-center cursor-pointer space-x-3 px-3 py-1 rounded-full hover:shadow-md transition-all duration-200 bg-white/90 ml-4 mr-4"
+
       >
-        <a
-          className="rounded-full flex w-fit p-2 justify-center items-center font-semibold shadow-[0px_5px_10px] shadow-blue-100 \
-                hover:scale-105 cursor-pointer transition-all duration-300"
-        >
-          {auth?.username}
-        </a>
-      </div>
+        <div className="w-10 h-10 rounded-full bg-blue-300 flex items-center justify-center text-white font-semibold">{initials}</div>
+        <div className="hidden md:flex flex-col text-left">
+          <span className="text-sm font-semibold text-gray-700">{auth?.full_name || auth?.username}</span>
+          <span className="text-xs text-gray-400">{auth?.email}</span>
+        </div>
+      </button>
+
+      
     </div>
   );
 }
