@@ -16,7 +16,8 @@ import {
   LogOut, 
   UserPlus,
   Plus,
-  Edit3
+  Edit3,
+  ArrowBigLeft
 } from 'lucide-react';
 
 interface UserProfile {
@@ -105,6 +106,11 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
+        <a href = "/" className = "flex items-center text-blue-600 font-semibold hover:text-blue-800 mb-4 transition-colors w-fit">
+          <ArrowBigLeft className = ""></ArrowBigLeft>
+          <span>Trở lại Home</span>
+        </a>
+        
         <div className="text-center mb-8">
           <div className="relative inline-block">
             <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
