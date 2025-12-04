@@ -8,7 +8,11 @@ interface UploadImageProps {
   maxFiles?: number;
 }
 
-export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: UploadImageProps) {
+export default function UploadImage({
+  images,
+  onImagesChange,
+  maxFiles = 10,
+}: Props) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -16,8 +20,8 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
   // Create previews when images change
   useEffect(() => {
     // Clean up old previews
-    previews.forEach(url => {
-      if (url.startsWith('blob:')) {
+    previews.forEach((url) => {
+      if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
       }
     });
@@ -36,7 +40,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
         if (e.target?.result) {
           newPreviews[index] = e.target.result as string;
           loadedCount++;
-          
+
           if (loadedCount === images.length) {
             setPreviews([...newPreviews]);
           }
@@ -46,7 +50,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
         console.error(`Error reading file: ${file.name}`);
         loadedCount++;
         if (loadedCount === images.length) {
-          setPreviews([...newPreviews.filter(p => p)]);
+          setPreviews([...newPreviews.filter((p) => p)]);
         }
       };
       reader.readAsDataURL(file);
@@ -56,38 +60,41 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
   // Handle ESC key for modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && imageModalOpen) {
+      if (e.key === "Escape" && imageModalOpen) {
         setImageModalOpen(false);
       }
     };
-    
+
     if (imageModalOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
     }
-    
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     };
   }, [imageModalOpen]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      previews.forEach(url => {
-        if (url.startsWith('blob:')) {
+      previews.forEach((url) => {
+        if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
         }
       });
     };
   }, []);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const remainingSlots = maxFiles - images.length;
-    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
-    onImagesChange([...images, ...filesToAdd]);
-  }, [images, onImagesChange, maxFiles]);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const remainingSlots = maxFiles - images.length;
+      const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+      onImagesChange([...images, ...filesToAdd]);
+    },
+    [images, onImagesChange, maxFiles]
+  );
 
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
@@ -101,14 +108,15 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
     onImagesChange(newImages);
   };
 
-  const {getRootProps, getInputProps, isDragActive, isDragReject} = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
-    },
-    maxFiles: maxFiles - images.length,
-    disabled: images.length >= maxFiles
-  });
+  const { getRootProps, getInputProps, isDragActive, isDragReject } =
+    useDropzone({
+      onDrop,
+      accept: {
+        "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
+      },
+      maxFiles: maxFiles - images.length,
+      disabled: images.length >= maxFiles,
+    });
 
   return (
     <div className="w-full">
@@ -118,48 +126,59 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
         className={`
           relative p-6 border-2 border-dashed rounded-xl cursor-pointer
           transition-all duration-300 ease-in-out
-          ${isDragActive && !isDragReject 
-            ? 'border-blue-500 bg-blue-50 scale-[1.02] shadow-lg' 
-            : isDragReject 
-            ? 'border-red-500 bg-red-50' 
-            : images.length >= maxFiles 
-            ? 'border-gray-300 bg-gray-50 cursor-not-allowed opacity-80'
-            : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+          ${
+            isDragActive && !isDragReject
+              ? "border-blue-500 bg-blue-50 scale-[1.02] shadow-lg"
+              : isDragReject
+              ? "border-red-500 bg-red-50"
+              : images.length >= maxFiles
+              ? "border-gray-300 bg-gray-50 cursor-not-allowed opacity-80"
+              : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
           }
         `}
       >
         <input {...getInputProps()} />
-        
+
         {/* Upload Area - Show when no images or when dragging */}
         {(images.length === 0 || isDragActive) && (
           <div className="text-center py-8">
-            <div className={`
+            <div
+              className={`
               w-16 h-16 mx-auto rounded-full flex items-center justify-center transition-all duration-300 mb-4
-              ${isDragActive && !isDragReject 
-                ? 'bg-blue-500 text-white' 
-                : isDragReject 
-                ? 'bg-red-500 text-white'
-                : 'bg-gray-100 text-gray-400'
+              ${
+                isDragActive && !isDragReject
+                  ? "bg-blue-500 text-white"
+                  : isDragReject
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-100 text-gray-400"
               }
-            `}>
+            `}
+            >
               {isDragReject ? (
                 <X className="w-8 h-8" />
               ) : (
                 <Upload className="w-8 h-8" />
               )}
             </div>
-            
+
             <div>
               {isDragActive && !isDragReject ? (
-                <p className="text-blue-600 font-semibold">Thả hình ảnh vào đây!</p>
+                <p className="text-blue-600 font-semibold">
+                  Thả hình ảnh vào đây!
+                </p>
               ) : isDragReject ? (
-                <p className="text-red-600 font-semibold">Chỉ chấp nhận file hình ảnh!</p>
+                <p className="text-red-600 font-semibold">
+                  Chỉ chấp nhận file hình ảnh!
+                </p>
               ) : images.length >= maxFiles ? (
-                <p className="text-gray-500">Đã đạt giới hạn {maxFiles} hình ảnh</p>
+                <p className="text-gray-500">
+                  Đã đạt giới hạn {maxFiles} hình ảnh
+                </p>
               ) : (
                 <>
                   <p className="text-gray-600 font-semibold mb-2">
-                    Kéo thả hình ảnh vào đây hoặc <span className="text-blue-500">nhấn để chọn</span>
+                    Kéo thả hình ảnh vào đây hoặc{" "}
+                    <span className="text-blue-500">nhấn để chọn</span>
                   </p>
                   <p className="text-sm text-gray-400">
                     Hỗ trợ: JPG, PNG, GIF, WEBP (Tối đa {maxFiles} hình)
@@ -182,13 +201,17 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                 <span>{maxFiles} hình ảnh</span>
                 <span className="ml-2 text-gray-400">• Click để thêm hình</span>
               </div>
-              
+
               <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  if (window.confirm(`Bạn có chắc muốn xóa tất cả ${images.length} hình ảnh?`)) {
+                  if (
+                    window.confirm(
+                      `Bạn có chắc muốn xóa tất cả ${images.length} hình ảnh?`
+                    )
+                  ) {
                     onImagesChange([]);
                   }
                 }}
@@ -206,8 +229,8 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                   <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-50 cursor-pointer">
                     {previews[index] ? (
                       <>
-                        <img 
-                          src={previews[index]} 
+                        <img
+                          src={previews[index]}
                           alt={`Preview ${index + 1}`}
                           className="w-full h-full object-cover transition-all duration-300"
                           onClick={(e) => {
@@ -216,7 +239,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                             setImageModalOpen(true);
                           }}
                         />
-                        
+
                         {/* Action buttons */}
                         <div className="absolute top-1 right-1 flex flex-col space-y-1">
                           <button
@@ -232,13 +255,13 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                           >
                             <Eye className="w-3 h-3 text-gray-600" />
                           </button>
-                          
+
                           <button
                             type="button"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              if (window.confirm('Xóa hình ảnh này?')) {
+                              if (window.confirm("Xóa hình ảnh này?")) {
                                 removeImage(index);
                               }
                             }}
@@ -261,7 +284,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                         {index + 1}
                       </span>
                     </div>
-                    
+
                     {index === 0 && (
                       <div className="absolute bottom-1 left-1">
                         <span className="bg-green-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm">
@@ -270,9 +293,12 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                       </div>
                     )}
                   </div>
-                  
+
                   {/* File name - compact */}
-                  <p className="mt-1 text-xs text-gray-500 truncate text-center" title={images[index]?.name}>
+                  <p
+                    className="mt-1 text-xs text-gray-500 truncate text-center"
+                    title={images[index]?.name}
+                  >
                     {images[index]?.name}
                   </p>
                 </div>
@@ -280,9 +306,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
 
               {/* Add more button */}
               {images.length < maxFiles && (
-                <div 
-                  className="aspect-square rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all duration-200 flex items-center justify-center"
-                >
+                <div className="aspect-square rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all duration-200 flex items-center justify-center">
                   <div className="text-center">
                     <Upload className="w-6 h-6 mx-auto text-gray-400 mb-1" />
                     <p className="text-xs text-gray-500">Thêm hình</p>
@@ -296,8 +320,14 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
 
       {/* Image Preview Modal */}
       {imageModalOpen && selectedImage && (
-        <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/50 bg-opacity-80 backdrop-blur-sm animate-fadeIn" onClick={() => setImageModalOpen(false)}>
-          <div className="relative max-w-6xl max-h-full bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/50 bg-opacity-80 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setImageModalOpen(false)}
+        >
+          <div
+            className="relative max-w-6xl max-h-full bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-500 to-white text-white">
               <h3 className="text-lg font-semibold flex items-center">
@@ -312,7 +342,7 @@ export default function UploadImage({ images, onImagesChange, maxFiles = 10 }: U
                 <X className="w-5 h-5 bg-red-300" />
               </button>
             </div>
-            
+
             {/* Modal Body */}
             <div className="p-6 bg-gray-50">
               <div className="relative bg-white rounded-lg p-4 shadow-inner">

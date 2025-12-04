@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { slugify } from "@/utils/make_slug";
 import { useBuildTree } from "@/hooks/useCategory";
 import { toast } from "sonner";
+import UploadImage from "@/components/common/UploadImage";
 
 type FlatOption = {
   id: number;
@@ -167,6 +168,7 @@ export default function CategoryCreate() {
               </div>
             </div>
 
+            
             {/* Mô tả */}
             <div className="w-full">
               <label className="mb-2 block text-sm font-medium text-gray-700">

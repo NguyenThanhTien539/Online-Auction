@@ -20,6 +20,9 @@ import ProductListPage from "@/pages/admin/ProductListPage";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
 import UserListPage from "@/pages/admin/UserListPage";
 import BidderFormListPage from "@/pages/admin/BidderFormListPage";
+
+import UserDetailPage from "@/pages/admin/UserDetailPage";
+import BidderFormDetailPage from "@/pages/admin/BidderFormDetailPage";
 import PostProductPage from "@/pages/client/ProfilePage/components/PostProductPage";
 import ProfilePage from "@/pages/client/ProfilePage/ProfilePage";
 import MyProductsPage from "@/pages/client/ProfilePage/components/MyProductsPage";
@@ -143,8 +146,16 @@ const routers = createBrowserRouter([
         element: <UserListPage />,
       },
       {
+        path: "user/detail/:id",
+        element: <UserDetailPage />,
+      },
+      {
         path: "bidder/form/list",
         element: <BidderFormListPage />,
+      },
+      {
+        path: "bidder/form/detail/:id",
+        element: <BidderFormDetailPage />,
       },
     ],
   },

@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { Eye, Check, X } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
-
+import { useNavigate } from "react-router-dom";
 type BidderForm = {
   id: number;
   full_name: string;
@@ -27,7 +27,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function BidderFormListPage() {
-  // ========= DỮ LIỆU GIẢ =========
+  const navigate = useNavigate();
   const [list] = useState<BidderForm[]>([
     {
       id: 1,
@@ -267,12 +267,12 @@ export default function BidderFormListPage() {
                         <div className="flex items-center justify-center gap-1 lg:gap-2">
                           <button
                             className="p-1.5 lg:p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"
-                            onClick={() => handleView(item.id)}
+                            onClick={() => navigate(`/admin/bidder/form/detail/${item.id}`)}
                             title="Xem chi tiết"
                           >
                             <Eye
                               size={16}
-                              className="lg:w-[18px] lg:h-[18px]"
+                              className="lg:w-[18px] lg:h-[18px] cursor-pointer"
                             />
                           </button>
                           {item.status === "pending" && (

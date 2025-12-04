@@ -2,20 +2,20 @@
 import { useMemo, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
+import { useNavigate } from "react-router-dom";
+
+type UserStatus = "active" | "inactive" | "all";
 
 type UserItem = {
   id: number;
   full_name: string;
   avatar: string;
   email: string;
-  phone: string;
+  role: string;
   status: "active" | "inactive";
 };
 
 export default function UserListPage() {
-  // ============================
-  // ⭐ DỮ LIỆU GIẢ
-  // ============================
   const [users] = useState<UserItem[]>([
     {
       id: 1,
@@ -23,7 +23,7 @@ export default function UserListPage() {
       avatar:
         "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&w=80",
       email: "levana@gmail.com",
-      phone: "01234567890",
+      role: "Người bán",
       status: "active",
     },
     {
@@ -32,7 +32,7 @@ export default function UserListPage() {
       avatar:
         "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&w=80",
       email: "nguyenthib@example.com",
-      phone: "0987654321",
+      role: "Người đấu giá",
       status: "inactive",
     },
     {
@@ -41,7 +41,7 @@ export default function UserListPage() {
       avatar:
         "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&w=80",
       email: "tranvanc@example.com",
-      phone: "0123456789",
+      role: "Người bán",
       status: "active",
     },
     {
@@ -50,17 +50,12 @@ export default function UserListPage() {
       avatar:
         "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&w=80",
       email: "phamthid@example.com",
-      phone: "0987654322",
+      role: "Người đấu giá",
       status: "active",
     },
   ]);
 
-  // ============================
-  // ⭐ FILTER STATE
-  // ============================
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "inactive"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<UserStatus>("all");
 
   const [search, setSearch] = useState<string>("");
 
@@ -78,7 +73,7 @@ export default function UserListPage() {
           if (
             !user.full_name.toLowerCase().includes(key) &&
             !user.email.toLowerCase().includes(key) &&
-            !user.phone.toLowerCase().includes(key)
+            !user.role.toLowerCase().includes(key)
           ) {
             return false;
           }
@@ -94,9 +89,6 @@ export default function UserListPage() {
     setSearch("");
   };
 
-  // ============================
-  // ⭐ STATE CHECKBOX
-  // ============================
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const toggleOne = (id: number) => {
@@ -126,14 +118,10 @@ export default function UserListPage() {
     console.log("View user", id);
   };
 
-  const handleEdit = (id: number) => {
-    console.log("Edit user", id);
-  };
-
   const handleDelete = (id: number) => {
     console.log("Delete user", id);
   };
-
+  const navigate = useNavigate();
   return (
     <div className="w-full min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
       <div className="max-w-[1600px] mx-auto">
@@ -143,7 +131,7 @@ export default function UserListPage() {
 
         <FilterBar
           statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
+          setStatusFilter={(v: string) => setStatusFilter(v as UserStatus)}
           statusOptions={[
             { value: "all", label: "Trạng thái" },
             { value: "active", label: "Hoạt động" },
@@ -183,7 +171,7 @@ export default function UserListPage() {
                     Email
                   </th>
                   <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Số điện thoại
+                    Quyền người dùng
                   </th>
                   <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
                     Trạng thái
@@ -229,7 +217,7 @@ export default function UserListPage() {
                         </div>
                       </td>
                       <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
-                        {user.phone}
+                        {user.role}
                       </td>
                       <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
                         <span
@@ -245,18 +233,10 @@ export default function UserListPage() {
                       <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
                         <div className="flex items-center justify-center gap-1 lg:gap-2">
                           <button
-                            className="p-1.5 lg:p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"
-                            onClick={() => handleView(user.id)}
-                            title="Xem chi tiết"
-                          >
-                            <Eye
-                              size={16}
-                              className="lg:w-[18px] lg:h-[18px]"
-                            />
-                          </button>
-                          <button
-                            className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            onClick={() => handleEdit(user.id)}
+                            className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                            onClick={() =>
+                              navigate(`/admin/user/detail/${user.id}`)
+                            }
                             title="Chỉnh sửa"
                           >
                             <Pencil
@@ -340,10 +320,10 @@ export default function UserListPage() {
 
                   <div className="flex flex-col gap-1">
                     <span className="text-gray-500 font-medium">
-                      Số điện thoại:
+                      Quyền người dùng:
                     </span>
                     <span className="font-medium text-gray-900">
-                      {user.phone}
+                      {user.role}
                     </span>
                   </div>
                 </div>
@@ -351,16 +331,8 @@ export default function UserListPage() {
                 {/* Buttons - Vertical on mobile, Horizontal on larger screens */}
                 <div className="flex flex-col xs:flex-row gap-2 pt-3 sm:pt-4 border-t border-gray-100">
                   <button
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
-                    onClick={() => handleView(user.id)}
-                  >
-                    <Eye size={16} className="flex-shrink-0" />
-                    <span className="font-medium text-xs sm:text-sm">Xem</span>
-                  </button>
-
-                  <button
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                    onClick={() => handleEdit(user.id)}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                    onClick={() => navigate(`/admin/user/detail/${user.id}`)}
                   >
                     <Pencil size={16} className="flex-shrink-0" />
                     <span className="font-medium text-xs sm:text-sm">Sửa</span>
