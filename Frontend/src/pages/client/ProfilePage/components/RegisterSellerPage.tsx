@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   User,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/routes/ProtectedRouter";
+import justValidate from "just-validate";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 
 interface UserInfo {
@@ -24,15 +25,20 @@ export default function RegisterSellerPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reason, setReason] = useState("");
-  const editorRef = useRef<any>(null);
   const auth = useAuth();
-
+  const editor = useRef<any>(null);
+  const handleEditorChange = (content: string) => {
+    const reasonContent = document.getElementById("reason") as HTMLInputElement;
+    reasonContent.value = content;
+    setReason(content);
+    console.log("Editor content changed:", reason);
+  };
+  // Sample user data - in real app, get from auth context or API
   const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
     email: "",
     full_name: "",
   });
-
   useEffect(() => {
     if (auth) {
       setUserInfo({
@@ -43,19 +49,28 @@ export default function RegisterSellerPage() {
     }
   }, [auth]);
 
+  useEffect(() => {
+    const validator = new justValidate("#register-seller-form");
+    validator
+      .addField("#reason", [
+        {
+          rule: "required",
+          errorMessage: "Lý do không được để trống",
+        },
+        {
+          rule: "minLength",
+          value: 20,
+          errorMessage: "Lý do cần ít nhất 20 ký tự",
+        },
+      ])
+      .onSuccess((e: React.FormEvent) => {
+        e.preventDefault();
+      });
+  }, []);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const editorContent = editorRef.current?.getContent() || "";
-
-    const textContent = editorContent.replace(/<[^>]*>/g, "").trim();
-
-    if (!textContent || textContent.length < 20) {
-      toast.error("Lý do cần ít nhất 20 ký tự");
-      return;
-    }
-
     setIsSubmitting(true);
+    console.log("Submitting seller registration with reason:", reason);
     fetch("http://localhost:5000/api/profile/register-seller", {
       method: "POST",
       credentials: "include",
@@ -63,7 +78,7 @@ export default function RegisterSellerPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        reason: editorContent,
+        reason: reason.trim(),
       }),
     })
       .then((res) => {
@@ -125,7 +140,11 @@ export default function RegisterSellerPage() {
           </div>
 
           {/* Form Content */}
-          <form onSubmit={handleSubmit} className="p-8">
+          <form
+            id="register-seller-form"
+            className="p-8"
+            onSubmit={handleSubmit}
+          >
             {/* User Information Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -184,7 +203,7 @@ export default function RegisterSellerPage() {
               </div>
             </div>
 
-            {/* Reason Section with TinyMCE */}
+            {/* Reason Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-green-500" />
@@ -197,19 +216,11 @@ export default function RegisterSellerPage() {
                   của chúng tôi
                   <span className="text-red-500 ml-1">*</span>
                 </label>
-
-                <div className="border border-gray-300 rounded-lg overflow-hidden">
-                  <TinyMCEEditor
-                    editorRef={editorRef}
-                    value={reason}
-                    isReadOnly={false}
-                  />
-                </div>
-
-                <p className="text-sm text-gray-500 mt-2">
-                  Tối thiểu 20 ký tự. Bạn có thể sử dụng định dạng văn bản để
-                  làm nổi bật nội dung.
-                </p>
+                <TinyMCEEditor
+                  editorRef={editor}
+                  onEditChange={handleEditorChange}
+                />
+                <input id="reason" type="hidden"></input>
               </div>
             </div>
 

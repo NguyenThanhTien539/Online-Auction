@@ -306,7 +306,7 @@ function PostProductPage(){
                             </p>
                             <UploadImage
                                 images={formData.product_images}
-                                onImagesChange={(images) => setFormData(prev => ({ ...prev, product_images: images }))}
+                                onImagesChange={(images : any) => setFormData(prev => ({ ...prev, product_images: images }))}
                                 maxFiles={10}
                             />
                         </div>
