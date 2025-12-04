@@ -24,6 +24,7 @@ export default function TinyMCEEditor(props: {
             editor.mode.set("readonly");
           }
         }}
+        onEditorChange={props.onEditChange}
         initialValue={value}
         disabled={isReadOnly}
         init={{

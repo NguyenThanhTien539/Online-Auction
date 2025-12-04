@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   User, 
@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import {useAuth} from "@/routes/ProtectedRouter";
 import justValidate from "just-validate";
+import TinyMCEEditor from '@/components/editor/TinyMCEEditor';
 
 interface UserInfo {
   username: string;
@@ -26,7 +27,13 @@ export default function RegisterSellerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reason, setReason] = useState('');
   const auth = useAuth();
-
+  const editor = useRef<any>(null);
+  const handleEditorChange = (content: string) => {
+    const reasonContent = document.getElementById('reason') as HTMLInputElement;
+    reasonContent.value = content;
+    setReason(content);
+    console.log("Editor content changed:", reason);
+  }
   // Sample user data - in real app, get from auth context or API
   const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
@@ -59,41 +66,44 @@ export default function RegisterSellerPage() {
       ])
       .onSuccess ((e : React.FormEvent)=> {
         e.preventDefault();
-        setIsSubmitting(true);
-        fetch ("http://localhost:5000/api/profile/register-seller", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              reason: reason.trim()
-            })
-
-        })
-        .then (res => {
-            if (!res.ok){
-                return res.json().then (data => {
-                    throw new Error (data.message || "Có lỗi xảy ra");
-                });
-            }
-            return res.json();
-        })
-        .then (data => {
-            toast.success (data.message || "Gửi yêu cầu thành công");
-            navigate ("/profile");
-        })
-        .catch (error => {
-            toast.error (error.message || "Lỗi kết nối máy chủ");
-        })
-        .finally (() => {
-            setIsSubmitting(false);
-        });
-
       })
       
 
   }, [])
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    console.log("Submitting seller registration with reason:", reason);
+    fetch ("http://localhost:5000/api/profile/register-seller", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            reason: reason.trim()
+        })
+
+    })
+    .then (res => {
+        if (!res.ok){
+            return res.json().then (data => {
+                throw new Error (data.message || "Có lỗi xảy ra");
+            });
+        }
+        return res.json();
+    })
+    .then (data => {
+        toast.success (data.message || "Gửi yêu cầu thành công");
+        navigate ("/profile");
+    })
+    .catch (error => {
+        toast.error (error.message || "Lỗi kết nối máy chủ");
+    })
+    .finally (() => {
+        setIsSubmitting(false);
+    });
+  }
  
   
 
@@ -132,7 +142,7 @@ export default function RegisterSellerPage() {
           </div>
 
           {/* Form Content */}
-          <form id = "register-seller-form" className="p-8">
+          <form id = "register-seller-form" className="p-8" onSubmit ={handleSubmit}>
             {/* User Information Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -203,23 +213,11 @@ export default function RegisterSellerPage() {
                   Vui lòng chia sẻ lý do bạn muốn trở thành seller trên nền tảng của chúng tôi
                   <span className="text-red-500 ml-1">*</span>
                 </label>
-                <textarea
-                  value={reason}
-                  id = "reason"
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Ví dụ: Tôi có nhiều kinh nghiệm bán hàng online và muốn mở rộng kinh doanh trên nền tảng đấu giá. Tôi cam kết sẽ cung cấp sản phẩm chất lượng và dịch vụ tốt nhất cho khách hàng..."
-                  rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none transition-colors"
-                  required
+                <TinyMCEEditor
+                  editorRef={editor}
+                  onEditChange={handleEditorChange}
                 />
-                <div className="flex justify-between mt-2">
-                  <p className="text-sm text-gray-500">
-                    Tối thiểu 20 ký tự
-                  </p>
-                  <p className={`text-sm ${reason.length >= 20 ? 'text-green-600' : 'text-gray-400'}`}>
-                    {reason.length}/500
-                  </p>
-                </div>
+                <input id = "reason" type = "hidden"></input>
               </div>
             </div>
 
@@ -251,7 +249,7 @@ export default function RegisterSellerPage() {
               
               <button
                 type="submit"
-                disabled={isSubmitting || reason.trim().length < 20}
+                disabled={isSubmitting}
                 className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:hover:scale-100"
               >
                 {isSubmitting ? (
