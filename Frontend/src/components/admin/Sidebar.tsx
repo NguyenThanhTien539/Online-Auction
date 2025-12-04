@@ -28,9 +28,13 @@ export default function Sidebar() {
   const isUserActive = pathname.startsWith(
     `/${import.meta.env.VITE_PATH_ADMIN}/user`
   );
-  const isBidderFormActive = pathname.startsWith(
-    `/${import.meta.env.VITE_PATH_ADMIN}/bidder/form`
-  );
+  const isBidderFormActive =
+    pathname.startsWith(
+      `/${import.meta.env.VITE_PATH_ADMIN}/seller/applications`
+    ) ||
+    pathname.startsWith(
+      `/${import.meta.env.VITE_PATH_ADMIN}/seller/application/`
+    );
 
   return (
     <nav className="p-3 space-y-1">
@@ -76,7 +80,7 @@ export default function Sidebar() {
       </NavLink>
 
       <NavLink
-        to={`/${import.meta.env.VITE_PATH_ADMIN}/bidder/form/list`}
+        to={`/${import.meta.env.VITE_PATH_ADMIN}/seller/applications`}
         className={() =>
           `${baseLinkClass} ${isBidderFormActive ? activeClass : normalClass}`
         }

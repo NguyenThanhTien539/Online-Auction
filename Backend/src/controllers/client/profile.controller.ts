@@ -4,7 +4,6 @@ import * as profileModel from "../../models/profile.model.ts";
 export async function registerSellerRequest(req : Request, res : Response){
     const {reason} = req.body;
     const user =  (req as any).user;
-    console.log("Received seller registration request from user:", user.user_id, "Reason:", reason);
     // check if they have already sent a request
     const existingRequest = await profileModel.checkRegisterSellerRequest(user.user_id);
     if (existingRequest){

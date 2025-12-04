@@ -18,14 +18,16 @@ export const updatePassword = async (email: string, newPassword: string) => {
 
 export const findAcountById = async (user_id: number) => {
   // const sql = db("users").select("*").where({ user_id }).first();
-  const results = await db.raw(`
+  const results = await db.raw(
+    `
     select *, TO_CHAR(date_of_birth, 'YYYY-MM-DD') as date_of_birth
     from users
     where user_id = ?
-  `, [user_id]);
-  console.log("findAccountById results:", results.rows[0]);
+  `,
+    [user_id]
+  );
   return results.rows[0];
-}
+};
 
 export const insertOtpAndEmail = async (email: string, otp: string) => {
   return db("otp_codes").insert({ email: email, otp: otp });

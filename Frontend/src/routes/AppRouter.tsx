@@ -19,15 +19,16 @@ import CategoryEdit from "@/pages/admin/CategoryEditPage";
 import ProductListPage from "@/pages/admin/ProductListPage";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
 import UserListPage from "@/pages/admin/UserListPage";
-import BidderFormListPage from "@/pages/admin/BidderFormListPage";
+import BidderFormListPage from "@/pages/admin/SellerApplicationPage";
 
 import UserDetailPage from "@/pages/admin/UserDetailPage";
-import BidderFormDetailPage from "@/pages/admin/BidderFormDetailPage";
+import BidderFormDetailPage from "@/pages/admin/SellerApplicationDetailPage";
 import PostProductPage from "@/pages/client/ProfilePage/components/PostProductPage";
 import ProfilePage from "@/pages/client/ProfilePage/ProfilePage";
 import MyProductsPage from "@/pages/client/ProfilePage/components/MyProductsPage";
 import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
 import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
+import SellerApplicationDetailPage from "@/pages/admin/SellerApplicationDetailPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -150,12 +151,12 @@ const routers = createBrowserRouter([
         element: <UserDetailPage />,
       },
       {
-        path: "bidder/form/list",
+        path: "seller/applications",
         element: <BidderFormListPage />,
       },
       {
-        path: "bidder/form/detail/:id",
-        element: <BidderFormDetailPage />,
+        path: "seller/application/detail/:id",
+        element: <SellerApplicationDetailPage />,
       },
     ],
   },

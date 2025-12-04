@@ -202,7 +202,6 @@ export const loginPost = async (req: Request, res: Response) => {
     });
     return;
   }
-  console.log("Login success for user: ", existedAccount);
   const accessToken = generateAccessToken(
     { user_id: existedAccount.user_id, role: existedAccount.role },
     req.body.rememberMe
