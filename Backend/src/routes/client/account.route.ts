@@ -20,6 +20,8 @@ route.post("/reset-password", accountController.resetPassword);
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
+route.post("/logout", accountController.logoutPost);
+
 // route.post("/refresh-token", accountController.refreshToken);
 
 export default route;

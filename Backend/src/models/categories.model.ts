@@ -50,6 +50,17 @@ export const getAllCategoriesLv2 = async (catId: number, slug: string) => {
   return data;
 };
 
+export const getCategoryLv2ById = async (cat2_id: number) => {
+  const result = await db.raw("select * from categories where id = ?", [
+    cat2_id,
+  ]);
+  const data = result.rows[0];
+  if (!data) {
+    return null;
+  }
+  return data;;
+}
+
 export const getAllCategories = async () => {
 
   const result = await db.raw(

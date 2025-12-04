@@ -22,6 +22,12 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     }
     
     console.log("Order By Clauses: ", orderBy);
+    let numberOfPages = await db.raw(`
+        SELECT COUNT(*) AS total
+        FROM products
+        WHERE cat2_id = ?`
+    , [cat2_id]);
+    console.log("Number of Pages Query Result: ", numberOfPages);
     let query = await db.raw(`
         SELECT 
             p.*, u.username AS price_owner_username
@@ -37,7 +43,6 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     console.log("Raw Products: ", results);
     // Format start_time and end_time
     results = results.map((product: any) => {
-        console.log("Original Times: ", typeof(product.start_time));
         return {
             ...product,
             start_time: normVietNamTime(product.start_time),
@@ -45,13 +50,176 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
         };
     })
     console.log("Formatted Products: ", results);
-
+    
     if (results) {
-        return results;
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
     }
     
     return null;
 }
+
+export async function getMyFavoriteProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let numberOfPages = await db.raw(`
+        select count(*) as total
+        from love_products lp
+        where lp.user_id = ?`, [user_id]);
+    let query = await db.raw(`
+        select p.*, u.username as price_owner_username
+        from products p
+        left join love_products lp on p.product_id = lp.product_id
+        left join users u on p.price_owner_id = u.user_id
+        where lp.user_id = ?
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    results = results.map((product: any) => {
+        return {
+            ...product,
+            start_time: normVietNamTime(product.start_time),
+            end_time: normVietNamTime(product.end_time)
+        };
+    });
+    if (results){
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
+    }
+} 
+
+export async function getMySellingProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let numberOfPages = await db.raw(`
+        select count(*) as total
+        from products p
+        where p.seller_id = ? and p.end_time > now()`, [user_id]);
+    let query = await db.raw(`
+        select p.*, u.username as price_owner_username
+        from products p
+        left join users u on p.price_owner_id = u.user_id
+        where p.seller_id = ? and p.end_time > now()
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    results = results.map((product: any) => {
+        return {
+            ...product,
+            start_time: normVietNamTime(product.start_time),
+            end_time: normVietNamTime(product.end_time)
+        };
+    });
+    if (results){
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
+    }
+} 
+
+export async function getMySoldProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let numberOfPages = await db.raw(`
+        select count(*) as total
+        from products p
+        where p.seller_id = ? and p.end_time < now() and p.price_owner_id is not null`, [user_id]);
+    let query = await db.raw(`
+        select p.*, u.username as price_owner_username
+        from products p
+        left join users u on p.price_owner_id = u.user_id
+        where p.seller_id = ? and p.end_time < now() and p.price_owner_id is not null
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    results = results.map((product: any) => {
+        return {
+            ...product,
+            start_time: normVietNamTime(product.start_time),
+            end_time: normVietNamTime(product.end_time)
+        };
+    });
+    if (results){
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
+    }
+} 
+
+export async function getMyWonProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let numberOfPages = await db.raw(`
+        select count(*) as total
+        from products p
+        where p.price_owner_id = ? and p.end_time < now()`, [user_id]);
+    let query = await db.raw(`
+        select p.*, u.username as price_owner_username
+        from products p
+        left join users u on p.price_owner_id = u.user_id
+        where p.price_owner_id = ? and p.end_time < now()
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    results = results.map((product: any) => {
+        return {
+            ...product,
+            start_time: normVietNamTime(product.start_time),
+            end_time: normVietNamTime(product.end_time)
+        };
+    });
+    if (results){
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
+    }
+} 
+
+export async function getMyBiddingProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let numberOfPages = await db.raw(`
+        select count(*) as total
+        from products p
+        join bidding_history bh on p.product_id = bh.product_id
+        where bh.user_id = ? and p.end_time > now()`, [user_id]
+        );
+
+    let query = await db.raw(`
+        select distinct p.*, u.username as price_owner_username
+        from products p
+        join bidding_history bh on p.product_id = bh.product_id
+        left join users u on p.price_owner_id = u.user_id
+        where bh.user_id = ? and p.end_time > now()
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    results = results.map((product: any) => {
+        return {
+            ...product,
+            start_time: normVietNamTime(product.start_time),
+            end_time: normVietNamTime(product.end_time)
+        };
+    });
+    if (results){
+        return {
+            data: results,
+            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+        }
+    }
+} 
+
+
+
+
+
 export async function getProductDetail(product_id: string, product_slug: string) {
     // Check slug matches
     let queryName = await db.raw(`

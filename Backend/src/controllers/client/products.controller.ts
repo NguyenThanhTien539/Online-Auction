@@ -12,7 +12,8 @@ export async function getProductsPageList(req: Request, res: Response){
     const page = parseInt(req.query.page as string) || 1;
     const priceFilter = req.query.price as string || "";
     const timeFilter = req.query.time as string || "";
-
+    
+    
     // Validate cat2_id
     if (!cat2_id){
         return res.status(400).json({message: "cat2_id is required"});
@@ -25,7 +26,8 @@ export async function getProductsPageList(req: Request, res: Response){
         return res.status(500).json({message: "Error in fetching products"});
     }
     console.log("Products fetched: ", result);
-    return  res.status(200).json({message: "Success", data: result});
+    let {data, numberOfPages} = result;
+    return  res.status(200).json({message: "Success", data: data, numberOfPages: numberOfPages});
 
 }
 
@@ -111,6 +113,71 @@ export async function postNewProduct (req: Request, res: Response) {
         });
 
   
+    }
+    catch (e){
+        console.error(e);
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+}
+
+export async function getMyProductsList (req: Request, res: Response) {
+    try {
+        const user = (req as any).user;
+        const type = req.query.type as string;
+        const page = parseInt(req.query.page as string) || 1;
+        console.log("Fetching my products list for user:", user, "Type:", type, "Page:", page);
+        let result;
+        switch (type) {
+            case "my-favorites":    
+                result = await productsModel.getMyFavoriteProducts(user.user_id, page);     
+                break;
+            case "my-selling":
+                if (user.role !== "seller" && user.role !== "admin"){
+                    return res.status(403).json({
+                        status: "error",
+                        message: "Access denied: insufficient permissions"
+                    });
+            }
+                result = await productsModel.getMySellingProducts(user.user_id, page);
+                break;
+            case "my-sold":
+                if (user.role !== "seller" && user.role !== "admin"){
+                    return res.status(403).json({
+                        status: "error",
+                        message: "Access denied: insufficient permissions"
+                    });
+                }
+                result = await productsModel.getMySoldProducts(user.user_id, page);
+                break;
+            case "my-won":
+                result = await productsModel.getMyWonProducts(user.user_id, page);
+                break;
+            case "my-bidding":
+                result = await productsModel.getMyBiddingProducts(user.user_id, page);
+                break;
+            default: 
+                return res.status(400).json({
+                    status: "error",
+                    message: "Invalid type parameter"
+                });
+        }
+
+        if (!result){
+            return res.status(404).json({
+                status: "error",
+                message: "No products found"
+            });
+        }
+        let {data, numberOfPages} = result ;
+        return  res.status(200).json({
+            status: "success",
+            data: data,
+            numberOfPages: numberOfPages
+        });
+
     }
     catch (e){
         console.error(e);
