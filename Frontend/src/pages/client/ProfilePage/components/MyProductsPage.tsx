@@ -3,7 +3,7 @@ import PaginationComponent from "@/components/common/Pagination";
 import ProductCard from "@/components/common/ProductCard";
 import {useNavigate, useSearchParams} from "react-router-dom"
 import {toast} from "sonner"
-
+import Loading from "@/components/common/Loading";
 type Products = {
     product_id : number,
     product_images : string[],
@@ -24,6 +24,7 @@ export default function MyProductsPage() {
 
     const [searchParams, setSeachParams] = useSearchParams();
     const navigate = useNavigate();
+
 
     // Follow  URL to know current my products page such as /products/my-favorites, /products/my-selling, /products/my-sold, /products/my-bidding, /products/my-won
     const [myProductList, setMyProductList] = useState("");
@@ -107,6 +108,9 @@ export default function MyProductsPage() {
                 catch(e){
                     toast.error("Lỗi kết nối máy chủ")
                 }
+                finally {
+                    setLoading(false);
+                }
             }
         getData();
     }, [myProductList, currentPage])
@@ -129,7 +133,7 @@ export default function MyProductsPage() {
     }
 
     return(
-        <>
+        isLoading ? <Loading></Loading> :<>
             {/* Name cat2 of these products */}
 
             <div className = {`text-5xl font-semibold text-gray-500 mt-10 ml-5 ${getColorNameList(nameList)} inline-block px-4 py-2 rounded-lg`}>
@@ -146,7 +150,7 @@ export default function MyProductsPage() {
 
                     return(
                     <div className = "flex justify-center" key = {index}>
-                        <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""}
+                        <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""} product_id = {item.product_id}
                             product_name = {item.product_name} current_price = {item.current_price} buy_now_price = {item.buy_now_price}
                             start_time = {item.start_time} end_time = {item.end_time} price_owner_username = {item.price_owner_username}
                             bid_turns = {item.bid_turns} onClick = {()=> handleClickProduct(item.product_id, item.product_name)}
