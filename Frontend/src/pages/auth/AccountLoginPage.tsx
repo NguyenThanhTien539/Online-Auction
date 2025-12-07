@@ -78,80 +78,106 @@ function AccountLogin() {
         <form
           id="loginForm"
           action=""
-          className="relative z-10 bg-white/50 backdrop-blur-md w-[490px] min-h-[450px] p-8 rounded-4xl shadow-2xl shadow-blue-300/50 border border-white/20"
+          className="relative z-10 bg-white/95 backdrop-blur-lg w-[500px] min-h-[500px] p-10 rounded-3xl shadow-2xl shadow-blue-400/30 border border-white/30"
         >
-          <div className="text-center font-bold font-sans text-[30px]">
-            <h1>Đăng nhập</h1>
-            <p className="text-[13px] pt-1.5 font-medium ">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mb-4 shadow-lg">
+              <span className="text-2xl">🔐</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              Đăng nhập
+            </h1>
+            <p className="text-gray-600 text-sm font-medium">
               Vui lòng nhập email và mật khẩu để tiếp tục
             </p>
           </div>
-          <div className="flex flex-col gap-4 mt-[25px]">
+
+          {/* Form Fields */}
+          <div className="space-y-6">
+            {/* Email Field */}
             <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
-                Email*
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="email"
-                placeholder="Ví dụ: nva@gmail.com"
-                className="border border-gray-500 rounded-lg p-2 w-full  "
-              />
-              <div id="emailError" className="text-sm text-red"></div>
-            </div>
-            <div>
-              <label className="block font-[500] text-[14px] mb-[5px]">
-                Mật khẩu*
-              </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="******"
-                className="border border-gray-[500] rounded-lg p-2 w-full  "
-              />
-              <div id="passwordError" className="text-sm text-red"></div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="email"
+                  placeholder="Ví dụ: nva@gmail.com"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  📧
+                </div>
+              </div>
+              <div id="emailError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Mật khẩu <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="******"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  🔒
+                </div>
+              </div>
+              <div id="passwordError" className="text-sm text-red-500 mt-1"></div>
+            </div>
+
+            {/* Remember Password & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   id="rememberPassword"
                   type="checkbox"
-                  className="w-[20px] h-[20px]"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                 />
-                <label htmlFor="rememberPassword" className="ml-[10px]">
+                <label htmlFor="rememberPassword" className="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
                   Nhớ mật khẩu
                 </label>
               </div>
               <span
-                className="text-blue-500 cursor-pointer"
+                className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium transition-colors duration-200"
                 onClick={() => {
                   navigate("/accounts/forgot-password");
                 }}
               >
-                Quên mật khẩu
+                Quên mật khẩu?
               </span>
             </div>
 
-            <div className="text-center mt-[2px]">
+            {/* Submit Button */}
+            <div className="pt-4">
               <button
-                className=" bg-blue-500 border border-[#DEDEDE] rounded-lg w-[100px] h-[40px] font-[700] text-[16px] text-white cursor-pointer"
+                className="w-full cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-blue-500/50"
                 type="submit"
               >
-                Đăng nhập
+                🚀 Đăng nhập
               </button>
             </div>
 
-            <div className="text-center text-[14px]">
-              Bạn chưa có tài khoản?
-              <span
-                className="pl-1 text-blue-500 cursor-pointer hover:text-blue-700"
-                onClick={() => {
-                  navigate("/accounts/register");
-                }}
-              >
-                Tạo tài khoản
-              </span>
+            {/* Register Link */}
+            <div className="text-center pt-4">
+              <p className="text-sm text-gray-600">
+                Bạn chưa có tài khoản?
+                <span
+                  className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
+                  onClick={() => {
+                    navigate("/accounts/register");
+                  }}
+                >
+                  Tạo tài khoản ngay
+                </span>
+              </p>
             </div>
           </div>
         </form>

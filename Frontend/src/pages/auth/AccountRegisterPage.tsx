@@ -129,110 +129,137 @@ function AccountRegister() {
         <form
           id="registerForm"
           action=""
-          className="relative z-10 bg-white/70 w-[490px] min-h-[600px] p-8 rounded-4xl"
+          className="relative z-10 bg-white/95 backdrop-blur-lg w-[520px] min-h-[650px] p-10 rounded-3xl shadow-2xl shadow-blue-400/30 border border-white/30"
         >
-          <div className="text-center font-bold font-sans text-[30px]">
-            <h1>Đăng ký</h1>
-            {/* <p className="text-[13px] pt-1.5 font-medium ">
-              Tạo một tài khoản để tiếp tục
-            </p> */}
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mb-4 shadow-lg">
+              <span className="text-2xl">📝</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
+              Đăng ký tài khoản
+            </h1>
+            <p className="text-gray-600 text-sm font-medium">
+              Tạo tài khoản để tham gia đấu giá ngay!
+            </p>
           </div>
 
-          <div className="flex flex-col gap-4 mt-[25px]">
+          {/* Form Fields */}
+          <div className="space-y-5">
+            {/* Full Name Field */}
             <div>
-              <label
-                htmlFor="full_name"
-                className="block font-[500] text-[14px] mb-[5px]"
-              >
-                Họ Tên*
+              <label htmlFor="full_name" className="block text-sm font-semibold text-gray-700 mb-2">
+                Họ Tên <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="full_name"
-                placeholder="Ví dụ: Nguyễn Văn A"
-                className="border border-gray-500 rounded-lg p-2 w-full  "
-              />
-              <div id="full_nameError" className="text-sm text-red "></div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="full_name"
+                  placeholder="Ví dụ: Nguyễn Văn A"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  👤
+                </div>
+              </div>
+              <div id="full_nameError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
+            {/* Email Field */}
             <div>
-              <label
-                htmlFor="email"
-                className="block font-[500] text-[14px] mb-[5px]"
-              >
-                Email*
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                Email <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="email"
-                placeholder="Ví dụ: nva@gmail.com"
-                className="border border-gray-500 rounded-lg p-2 w-full  "
-              />
-              <div id="emailError" className="text-sm text-red"></div>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="email"
+                  placeholder="Ví dụ: nva@gmail.com"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  📧
+                </div>
+              </div>
+              <div id="emailError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
+            {/* Address Field */}
             <div>
-              <label
-                htmlFor="address"
-                className="block font-[500] text-[14px] mb-[5px]"
-              >
-                Địa chỉ*
+              <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-2">
+                Địa chỉ <span className="text-red-500">*</span>
               </label>
-              <input
-                id="address"
-                type="text"
-                placeholder="Ví dụ: Đ.Nguyễn Thông, Tân An, Long An"
-                className="border border-gray-500 rounded-lg p-2 w-full  "
-              />
-              <div id="addressError" className="text-sm text-red"></div>
+              <div className="relative">
+                <input
+                  id="address"
+                  type="text"
+                  placeholder="Ví dụ: Đ.Nguyễn Thông, Tân An, Long An"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  📍
+                </div>
+              </div>
+              <div id="addressError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
+            {/* Password Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="block font-[500] text-[14px] mb-[5px]"
-              >
-                Mật khẩu*
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                Mật khẩu <span className="text-red-500">*</span>
               </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="******"
-                className="border border-gray-[500] rounded-lg p-2 w-full  "
-              />
-              <div id="passwordError" className="text-sm text-red"></div>
-            </div>
-            {/* checkbox */}
-            <div>
-              <label className="flex items-center gap-2 mt-[3px] ml-[3.5px]">
-                <input id="agree" type="checkbox" className="w-4 h-4" />
-                <span>Tôi đồng ý với điều khoản</span>
-              </label>
-              <div
-                id="agreeError"
-                className="text-sm text-red ml-[28px] mt-[2px]"
-              ></div>
+              <div className="relative">
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="******"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  🔒
+                </div>
+              </div>
+              <div id="passwordError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
-            <div className="text-center mt-[2px]">
+            {/* Agree Checkbox */}
+            <div>
+              <label className="flex items-center gap-2 mt-2">
+                <input
+                  id="agree"
+                  type="checkbox"
+                  className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                />
+                <span className="text-sm text-gray-700 cursor-pointer">
+                  Tôi đồng ý với <span className="text-green-600 font-medium">điều khoản sử dụng</span>
+                </span>
+              </label>
+              <div id="agreeError" className="text-sm text-red-500 mt-1"></div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-4">
               <button
-                className=" bg-blue-500 border border-[#DEDEDE] rounded-lg w-[100px] h-[40px] font-[700] text-[16px] text-white cursor-pointer"
+                className="w-full cursor-pointer bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-green-500/50"
                 type="submit"
               >
-                Đăng ký
+                🌟 Đăng ký ngay
               </button>
             </div>
 
-            <div className="text-center text-[14px]">
-              Bạn đã có tài khoản?
-              <span
-                className="pl-1 text-blue-500 cursor-pointer hover:text-blue-700"
-                onClick={() => {
-                  navigate("/accounts/login");
-                }}
-              >
-                Đăng nhập
-              </span>
+            {/* Login Link */}
+            <div className="text-center pt-4">
+              <p className="text-sm text-gray-600">
+                Bạn đã có tài khoản?
+                <span
+                  className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
+                  onClick={() => {
+                    navigate("/accounts/login");
+                  }}
+                >
+                  Đăng nhập ngay
+                </span>
+              </p>
             </div>
           </div>
         </form>

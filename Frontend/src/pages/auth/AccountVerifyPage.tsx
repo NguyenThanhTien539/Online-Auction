@@ -101,52 +101,56 @@ function AccountVerify() {
       <form
         id="registerVerify"
         action=""
-        // onSubmit={(e) => e.preventDefault()}
-        className="relative z-20 mx-auto bg-white/70 w-[40%] min-h-[400px] rounded-[20%] p-6 shadow-2xl shadow-green-500"
+        className="relative z-20 bg-white/95 backdrop-blur-lg w-[500px] min-h-[500px] p-10 rounded-3xl shadow-2xl shadow-blue-400/30 border border-white/30"
       >
-        <div className="text-center font-bold font-sans text-[30px] p-[20px] text-gray-400">
-          <h1>Nhập mã OTP</h1>
-          <p className="font-medium text-[13px] mt-[10px]">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full mb-4 shadow-lg">
+            <span className="text-2xl">📱</span>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+            Nhập mã OTP
+          </h1>
+          <p className="text-gray-600 text-sm font-medium">
             Vui lòng nhập mã OTP để tiếp tục
           </p>
         </div>
 
-        <div className="flex flex-col px-5 gap-4">
-          <div className="flex flex-col items-center">
-            <div
-              id="otpInputWrapper"
-              tabIndex={0}
-              className="w-full flex flex-col items-center mt-[50px]"
-            >
-              <OTPForm
-                className="flex scale-150"
-                onChange={(val) => {
-                  setOtp(val);
-                }}
-              />
-            </div>
-            <div className="text-red-500 flex mt-10 ml-3">{error}</div>
+        {/* OTP Input */}
+        <div className="flex flex-col items-center space-y-6">
+          <div className="w-full flex flex-col items-center">
+            <OTPForm
+              className="flex scale-150"
+              onChange={(val) => {
+                setOtp(val);
+              }}
+            />
           </div>
+          <div className="text-red-500 text-sm">{error}</div>
         </div>
 
-        <div className="mt-[20px] text-center ">
+        {/* Submit Button */}
+        <div className="pt-6">
           <button
-            className=" mx-auto  bg-blue-300 hover:bg-green-300 hover:scale-105 transition-all duration-300 border  border-[#DEDEDE] rounded-lg px-4 py-2 font-bold text-[16px] text-white cursor-pointer"
+            className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-teal-500/50 cursor-pointer"
             type="submit"
             onClick={handleSubmit}
           >
-            Xác nhận mã OTP
+            ✅ Xác nhận mã OTP
           </button>
         </div>
 
-        <div className="text-center text-[14px] mt-2">
-          Quay lại trang đăng ký?
-          <span
-            className="pl-[10px] cursor-pointer underline"
-            onClick={() => navigate("/accounts/register")}
-          >
-            Đăng ký
-          </span>
+        {/* Back to Register Link */}
+        <div className="text-center pt-4">
+          <p className="text-sm text-gray-600">
+            Quay lại trang đăng ký?
+            <span
+              className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
+              onClick={() => navigate("/accounts/register")}
+            >
+              Đăng ký ngay
+            </span>
+          </p>
         </div>
       </form>
     </div>

@@ -137,67 +137,84 @@ function ResetPassword() {
         <form
           id="resetPasswordForm"
           action=""
-          className="relative z-20 bg-white/70 w-[550px] min-h-[420px] rounded-4xl"
+          className="relative z-20 bg-white/95 backdrop-blur-lg w-[500px] min-h-[480px] p-10 rounded-3xl shadow-2xl shadow-blue-400/30 border border-white/30"
         >
-          <div className="text-center font-bold font-sans text-[30px] p-[20px]">
-            <h1>Đặt lại mật khẩu</h1>
-            <p className="font-medium text-[13px] mt-[10px]">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full mb-4 shadow-lg">
+              <span className="text-2xl">🔒</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              Đặt lại mật khẩu
+            </h1>
+            <p className="text-gray-600 text-sm font-medium">
               Vui lòng nhập mật khẩu mới để tiếp tục
             </p>
           </div>
 
-          <div className="flex flex-col px-5 gap-4">
+          {/* Form Fields */}
+          <div className="space-y-5">
+            {/* Password Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="text-sm font-medium font-sans text-[20px]"
-              >
-                Mật khẩu mới
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                Mật khẩu mới <span className="text-red-500">*</span>
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Nhập mật khẩu mới"
-                className="border border-gray-500 rounded-lg p-2 w-full"
-              />
-              <div id="passwordError" className="text-sm text-red"></div>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Nhập mật khẩu mới"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  🔑
+                </div>
+              </div>
+              <div id="passwordError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
+            {/* Confirm Password Field */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium font-sans text-[20px]"
-              >
-                Xác nhận mật khẩu
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                Xác nhận mật khẩu <span className="text-red-500">*</span>
               </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                placeholder="Nhập lại mật khẩu"
-                className="border border-gray-500 rounded-lg p-2 w-full"
-              />
-              <div id="confirmPasswordError" className="text-sm text-red"></div>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Nhập lại mật khẩu"
+                  className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-200 transition-all duration-300 bg-gray-50 hover:bg-white"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  ✅
+                </div>
+              </div>
+              <div id="confirmPasswordError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
-            <div className="mt-[10px] text-center">
+            {/* Submit Button */}
+            <div className="pt-4">
               <button
-                className="bg-blue-500 border border-[#DEDEDE] rounded-lg px-4 py-2 font-bold text-[16px] text-white cursor-pointer"
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-purple-500/50 cursor-pointer"
                 type="submit"
               >
-                Xác nhận đổi mật khẩu
+                🔄 Xác nhận đổi mật khẩu
               </button>
             </div>
 
-            <div className="text-center text-[14px]">
-              Quay lại trang đăng nhập?
-              <span
-                className="pl-[10px] cursor-pointer underline"
-                onClick={() => navigate("/accounts/login")}
-              >
-                Đăng nhập
-              </span>
+            {/* Back to Login Link */}
+            <div className="text-center pt-4">
+              <p className="text-sm text-gray-600">
+                Quay lại trang đăng nhập?
+                <span
+                  className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
+                  onClick={() => navigate("/accounts/login")}
+                >
+                  Đăng nhập ngay
+                </span>
+              </p>
             </div>
           </div>
         </form>
