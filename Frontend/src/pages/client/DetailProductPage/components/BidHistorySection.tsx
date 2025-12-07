@@ -64,28 +64,33 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
   };
 
   return(
-    <div>
-      <h4 className="ml-4 font-bold text-red-500 text-lg mb-4">Lịch sử đấu giá</h4>
+    <div className="backdrop-blur-sm rounded-2xl "> 
+      <h4 className="font-bold text-xl ml-4 text-rose-400 mb-6 flex items-center gap-2">
+        Lịch sử đấu giá
+      </h4>
       {bidHistory.length > 0 ? (
-        <div className="overflow-x-auto w-full overflow-y-auto max-h-[200px]">
-          <table className="min-w-full bg-white rounded-lg shadow-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời gian</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người mua</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+        <div className="overflow-x-auto w-full overflow-y-auto max-h-[280px] rounded-xl border border-gray-100/80">
+          <table className="min-w-full bg-white/70 backdrop-blur-sm rounded-xl">
+            <thead className="bg-gradient-to-r from-blue-50 to-purple-50 sticky top-0 rounded-t-xl">
+              <tr className="border-b border-gray-200/50">
+                <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">Thời gian</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">Người mua</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">Giá</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {bidHistory.map((bid) => (
-                <tr key={bid.id}>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {bid.time.toLocaleDateString('vi-VN')} {bid.time.toLocaleTimeString('vi-VN')}
+            <tbody className="divide-y divide-gray-100/60">
+              {bidHistory.map((bid, index) => (
+                <tr key={bid.id} className={`hover:bg-gradient-to-r hover:from-blue-50/40 hover:to-purple-50/40 transition-colors duration-200 ${index % 2 === 0 ? 'bg-white/40' : 'bg-gray-50/30'}`}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                    <div className="flex flex-col">
+                      <span className="text-gray-900">{bid.time.toLocaleDateString('vi-VN')}</span>
+                      <span className="text-xs text-gray-500 font-normal">{bid.time.toLocaleTimeString('vi-VN')}</span>
+                    </div>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
                     {maskName(bid.buyer)}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-green-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-base font-bold text-green-600 bg-green-50/60 rounded-lg border border-green-200/40">
                     ${bid.price.toFixed(2)}
                   </td>
                 </tr>
@@ -94,7 +99,11 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
           </table>
         </div>
       ) : (
-        <p className="text-gray-600 ml-4">Chưa có lượt đấu giá nào.</p>
+        <div className="text-center py-12 bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-200">
+          <div className="text-gray-400 text-4xl mb-3">📊</div>
+          <p className="text-gray-600 font-medium text-lg">Chưa có lượt đấu giá nào.</p>
+          <p className="text-sm text-gray-500 mt-1">Hãy là người đầu tiên đấu giá!</p>
+        </div>
       )}
     </div>
   );

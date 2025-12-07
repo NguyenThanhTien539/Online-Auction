@@ -4,7 +4,7 @@ import {DateTime} from "luxon";
 import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {slugify} from "@/utils/make_slug";
-import {NumericFormat} from "react-number-format";
+
 type Products = {
     product_id? : number,
     product_image ?: string,
@@ -90,16 +90,17 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
 
     return (
         // Container
-        <div className = {cn("w-80 h-110 relative flex flex-col items-center  border border-gray-300 rounded-lg shadow-lg\
-        hover:scale-[103%] transition-all duration-300 bg-white hover:cursor-pointer hover:shadow-2xl hover:shadow-gray-400 shrink-0", data.className)}
+        <div className = {cn("w-80 h-110 relative flex flex-col items-center border border-gray-300 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-200/30 \
+        hover:scale-[103%] hover:-translate-y-1 transition-all duration-300 bg-white hover:cursor-pointer overflow-hidden group shrink-0", data.className)}
             onClick = {data.onClick ?? (() => {handleClickProduct(product_id?? 0, product_name?? "")})}>
             {/* Image */}
-            <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-lg justify-center">
-                <img src = {product_image} className = "flex object-cover w-full h-full"></img>
+            <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-t-xl justify-center relative">
+                <img src = {product_image} className = "flex object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"></img>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             {/* Add to Love */}
-            <div className = "absolute w-fit h-[42px] top-5 right-5 bg-gray-200/50 rounded-[10px] flex flex-row items-center gap-1\
-            hover:cursor-pointer hover:scale-105 transition-all duration-300 hover:bg-red-300/50 ">
+            <div className = "absolute w-fit h-[42px] top-5 right-5 bg-gray-200/50 backdrop-blur-sm rounded-xl flex flex-row items-center gap-1\
+            hover:cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 transition-all duration-300 hover:bg-red-300/50 border border-white/30">
                 {/* Love icon */}
                 <img src = {LoveIcon} className = "flex h-[70%] ml-1"></img>
                 {/* Number of love */}
@@ -110,7 +111,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
             <div className = "text-xl font-semibold mx-2  flex h-[15%] pt-2 grow-0 self-start limit-to-2-lines">
                 {product_name ?? "Ronaldo"}
             </div>
-            <div className = "block h-[1px] mt-1 w-[90%] bg-black"></div>
+            <div className = "block h-px mt-1 w-[90%] bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             {/* Product Details */}
             <div className = "flex-1 mx-2 w-full p-2 pt-1 grid grid-cols-2 gap-2 ">
 
@@ -119,23 +120,13 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
                     <div className = "font-semibold text-gray-500">
                         Giá:
                     </div>
-                    <NumericFormat 
-                        value={current_price ?? 0}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        suffix={' đồng'}
-                    ></NumericFormat> 
+                    {current_price?.toLocaleString() ?? "0"} đồng
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">
                         Giá mua ngay:
                     </div>
-                    <NumericFormat 
-                        value={buy_now_price ?? 0}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        suffix={' đồng'}
-                    ></NumericFormat>
+                    {buy_now_price?.toLocaleString() ?? "0"} đồng
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">

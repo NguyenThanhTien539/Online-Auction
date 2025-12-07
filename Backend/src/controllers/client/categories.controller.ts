@@ -47,22 +47,29 @@ export async function getAllCategoriesLv2(req: Request, res: Response) {
   // Handle select all categories level 2 with lv1 id
   
 
-  const resultData = await categoriesModel.getAllCategoriesLv2(
+  const result = await categoriesModel.getAllCategoriesLv2(
     Number(id),
     String(slug)
   );
-  
-  if (resultData === null) {
+  let data, cat1_name;
+  if (result){
+    data = result.data;
+    cat1_name = result.cat1_name;
+  }
+
+  if (data === null) {
     return res.status(400).json({
       code: "error",
       message: "Slug không khớp với tên danh mục cấp 1",
     });
   }
-  console.log("Fetched Level 2 Categories: ", resultData);
+
   return res.status(200).json({
     code: "success",
     message: "Lấy tất cả danh mục cấp 2 thành công",
-    data: resultData,
+    data: data,
+    cat1_name: cat1_name,
+    
   });
 }
 

@@ -8,8 +8,9 @@ import {useAuth} from "@/routes/ProtectedRouter";
 import PlayBidSection from './components/PlayBidSection';
 import BidHistorySection from './components/BidHistorySection';
 import QASection from './components/QASection';
-import { Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { Eye, Clock, Calendar, User, Star, Award, FileText } from 'lucide-react';
+import PreviewImage from './components/PreviewProductModal';
+import Loading from '@/components/common/Loading';
 type ProductType = {
   product_id : number,
   product_name : string,
@@ -20,6 +21,7 @@ type ProductType = {
   seller_rating: number,
 
   current_price: number,
+  step_price: number,
   buy_now_price?: number,
 
   price_owner_id?: number,
@@ -51,12 +53,14 @@ function DetailProductPage() {
   const [formattedStartTime, setFormatStartTime] =useState("");
   const [timeLeft, setTimeLeft] = useState("");
 
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch product data from API
     async function fetchProduct() {
       try{
         // param is slug-id
+        setLoading(true);
         const response = await fetch(`http://localhost:5000/api/products/detail?product_id=${product_id}&product_slug=${product_slug}`);
         const data = await response.json();
         if (!response.ok){
@@ -71,6 +75,7 @@ function DetailProductPage() {
         toast.error("Lỗi kết nối đến server");
         console.log(e);
       }
+      setLoading (false);
     }
     fetchProduct();
   },[]);
@@ -146,22 +151,12 @@ function DetailProductPage() {
     setImageModalOpen(true);
   };
 
-  const nextImage = () => {
-    if (products?.product_images) {
-      setModalImageIndex((prev) => (prev + 1) % products.product_images.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (products?.product_images) {
-      setModalImageIndex((prev) => (prev - 1 + products.product_images.length) % products.product_images.length);
-    }
-  };
+  
 
 
 
   return (
-    <div className=" mx-auto px-4 py-8">
+    isLoading ? <Loading></Loading> :<div className=" mx-auto px-4 py-8">
       {/* Product Name */}
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{products?.product_name}</h1>
 
@@ -202,35 +197,73 @@ function DetailProductPage() {
             </div>
           </div>
           {/* Auction Timing */}
-          <div className="p-6 rounded-lg w-full  shadow-[-5px_-5px_5px] shadow-gray-500/80 my-3 bg-linear-to-r from-gray-100 to-white">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">Thời gian đấu giá</h4>
-            <div className="space-y-2">
-              <p className="text-gray-600">
-                <span className="font-medium text-green-500 mr-2">Thời điểm đăng:</span> 
-                {formattedStartTime}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium text-red-500 mr-2">Thời điểm kết thúc:</span> 
-                {timeLeft}
-              </p>
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-800">
+                  Thời gian đấu giá
+                </h4>
+                <p className="text-sm text-gray-600">Theo dõi tiến trình phiên đấu giá</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* Start Time */}
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Calendar className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Thời điểm đăng sản phẩm</p>
+                  <p className="text-base font-semibold text-gray-800">{formattedStartTime}</p>
+                </div>
+              </div>
+
+              {/* End Time */}
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <Clock className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Thời gian còn lại</p>
+                  <p className="text-base font-bold text-red-600">{timeLeft}</p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Description */}
-          <div className= "p-0 rounded-lg w-full my-6">
-            <div className = "h-[1px] w-[70%] bg-black rounded-3xl mb-5"></div>
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">Mô tả sản phẩm</h4>
-            {/* <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>{products?.description}</p> */}
-            <p
-              className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}
-              dangerouslySetInnerHTML={{ __html: products?.description || '' }}
-            />
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-2 text-blue-600 hover:text-blue-800 font-medium"
-            >
-              {isExpanded ? 'Thu gọn' : 'Xem thêm'}
-            </button>
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-500 rounded-lg">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-800">
+                  Mô tả sản phẩm
+                </h4>
+                <p className="text-sm text-gray-600">Thông tin chi tiết về sản phẩm</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div
+                className={`text-gray-700 leading-relaxed ${isExpanded ? '' : 'line-clamp-4'}`}
+                dangerouslySetInnerHTML={{ __html: products?.description || '' }}
+              />
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-3 px-3 py-2 cursor-pointer"
+              >
+                {isExpanded ? 'Thu gọn ▲' : 'Xem thêm ▼'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -272,43 +305,105 @@ function DetailProductPage() {
           </div>
 
           {/* Seller Info */}
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm shadow-black/30">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">Thông tin người bán</h4>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 font-bold">{products?.seller_username?.charAt(0)}</span>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-indigo-500 rounded-lg">
+                <User className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">{products?.seller_username}</p>
-                <p className="text-sm text-gray-600">Điểm đánh giá: 
-                  <span className="ml-2 font-semibold text-yellow-500">{products?.seller_rating}
+                <h4 className="text-lg font-bold text-gray-800">
+                  Người bán
+                </h4>
+                <p className="text-sm text-gray-600">Thông tin người bán sản phẩm</p>
+              </div>
+            </div>
+
+            {/* Seller Details */}
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="relative">
+                <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">{products?.seller_username?.charAt(0).toUpperCase()}</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+              </div>
+              <div className="flex-1">
+                <h5 className="text-base font-bold text-gray-900 mb-1">{products?.seller_username}</h5>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-3 h-3 ${
+                          i < Math.floor(products?.seller_rating || 0)
+                            ? 'text-yellow-400 fill-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">
+                    {products?.seller_rating?.toFixed(1)}/5.0
                   </span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Highest Bidder Info */}
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm shadow-black/30">
-            <h4 className="text-xl font-semibold text-gray-800 mb-3">Người đặt giá cao nhất</h4>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 font-bold">{products?.price_owner_username?.charAt(0)}</span>
+          { (
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-amber-500 rounded-lg">
+                  <Award className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-gray-800">
+                    Người thắng cuộc
+                  </h4>
+                  <p className="text-sm text-gray-600">Người đặt giá cao nhất hiện tại</p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-gray-900">{products?.price_owner_username}</p>
-                <p className="text-sm text-gray-600">Điểm đánh giá: 
-                  <span className="ml-2 font-semibold text-yellow-500">
-                    {products?.price_owner_rating}
-                  </span>
-                </p>
+
+              {/* Bidder Details */}
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">{products?.price_owner_username?.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <Award className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h5 className="text-base font-bold text-gray-900 mb-1">{products?.price_owner_username}</h5>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${
+                            i < Math.floor(products?.price_owner_rating || 0)
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {products?.price_owner_rating?.toFixed(1)}/5.0
+                    </span>
+                  </div>
+                  <p className="text-xs text-amber-600 font-medium mt-1">🏆 Đang dẫn đầu đấu giá</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Bid Section */}
           <div className="bg-white border border-gray-200 py-6 px-1 rounded-lg shadow-sm">
-            <PlayBidSection product_id = {products?.product_id}></PlayBidSection>
+            <PlayBidSection product_id = {products?.product_id} current_price = {products?.current_price} step_price = {products?.step_price}></PlayBidSection>
           </div>
           {/* Bid History */}
         
@@ -326,76 +421,13 @@ function DetailProductPage() {
 
       {/* Image Preview Modal */}
       {imageModalOpen && products?.product_images && (
-        <div className="fixed inset-0 z-[10001] flex items-center justify-center p-2 bg-black/80 backdrop-blur-sm animate-fadeIn" onClick={() => setImageModalOpen(false)}>
-          <div className="relative w-[95vw] max-w-7xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-500 to-white text-white">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Eye className="w-5 h-5 mr-2" />
-                {products?.product_name} ({modalImageIndex + 1}/{products?.product_images.length})
-              </h3>
-              <button
-                onClick={() => setImageModalOpen(false)}
-                className="p-2 hover:bg-red-400 rounded-full transition-all duration-200"
-                title="Đóng"
-              >
-                <X className="w-5 h-5 bg-red-500 cursor-pointer" />
-              </button>
-            </div>
-            
-            {/* Modal Body */}
-            <div className="relative bg-gray-300">
-              <div className="relative p-6">
-                <img
-                  src={products?.product_images[modalImageIndex]}
-                  alt={`${products?.product_name} - Image ${modalImageIndex + 1}`}
-                  className="max-w-full max-h-[70vh] object-contain mx-auto rounded-lg shadow-lg"
-                />
-                
-                {/* Navigation Arrows */}
-                {products?.product_images.length > 1 && (
-                  <>
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-                      title="Hình trước"
-                    >
-                      <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-200 backdrop-blur-sm"
-                      title="Hình tiếp theo"
-                    >
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </>
-                )}
-              </div>
-              
-              {/* Thumbnail Navigation */}
-              {products?.product_images.length > 1 && (
-                <div className="p-4 bg-gray-100">
-                  <div className="flex justify-center space-x-2 overflow-x-auto">
-                    {products.product_images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`Thumbnail ${index + 1}`}
-                        className={`w-16 h-12 object-cover rounded cursor-pointer transition-all duration-200 flex-shrink-0 ${
-                          index === modalImageIndex 
-                            ? 'ring-2 ring-pink-500 ring-offset-2' 
-                            : 'opacity-70 hover:opacity-100'
-                        }`}
-                        onClick={() => setModalImageIndex(index)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <PreviewImage
+          images = {products.product_images}
+          name={products.product_name}
+          modalImageIndex={modalImageIndex}
+          setModalImageIndex={setModalImageIndex}
+          setImageModalOpen={setImageModalOpen}
+        />
       )}
       
     </div>

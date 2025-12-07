@@ -6,7 +6,7 @@ import {useState, useEffect} from "react"
 import {useNavigate, useSearchParams} from "react-router-dom"
 import {toast} from "sonner"
 import {slugify} from "@/utils/make_slug";
-
+import Loading from "@/components/common/Loading";
 
 
 
@@ -26,6 +26,7 @@ function ListProductsPage() {
     usePreventBodyLock();
     const [searchParams, setSeachParams] = useSearchParams();
     const navigate = useNavigate();
+
 
     // 3 parameters for this page 
     const [price, setFilterPrice] = useState(searchParams.get("price") || "");
@@ -148,10 +149,18 @@ function ListProductsPage() {
     }
 
     return(
-        <>
+        isLoading ? <Loading></Loading> : <div>  
             {/* Name cat2 of these products */}
-            <div className = "text-5xl font-semibold text-gray-500 mt-10 ml-5">
-                {nameCat2}
+            <div className="relative mt-16 mb-8 ml-5">
+                <div className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
+                    {nameCat2}
+                </div>
+                <div className="absolute -bottom-3 left-0 w-32 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
+                <div className="absolute -bottom-2 left-0 w-24 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse"></div>
+
+                {/* Decorative elements */}
+                <div className="absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full animate-ping opacity-60"></div>
+                <div className="absolute -bottom-4 -right-4 w-3 h-3 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full animate-bounce opacity-60"></div>
             </div>
 
             {/* Filter */}
@@ -190,7 +199,7 @@ function ListProductsPage() {
 
             <div className = "mb-[50px]"></div>
 
-        </>
+        </div>
     )
 };
 

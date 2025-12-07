@@ -47,7 +47,10 @@ export const getAllCategoriesLv2 = async (catId: number, slug: string) => {
   if (!data) {
     return null;
   }
-  return data;
+  return {
+    data: data,
+    cat1_name: lv1Data.name,
+  }
 };
 
 export const getCategoryLv2ById = async (cat2_id: number) => {

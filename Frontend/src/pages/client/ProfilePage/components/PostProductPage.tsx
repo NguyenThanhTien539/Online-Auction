@@ -167,9 +167,9 @@ function PostProductPage(){
             
             formPayLoad.append("product_name", form.product_name.value);
             formPayLoad.append("cat2_id", form.cat2_id.value);
-            formPayLoad.append("start_price", (form.start_price.value.split(",").join("")));
-            formPayLoad.append("step_price", form.step_price.value.split(",").join(""));
-            formPayLoad.append("buy_now_price", form.buy_now_price.value.split(",").join(""));
+            formPayLoad.append("start_price", (form.start_price.value.split(".").join("")));
+            formPayLoad.append("step_price", form.step_price.value.split(".").join(""));
+            formPayLoad.append("buy_now_price", form.buy_now_price.value.split(".").join(""));
             formPayLoad.append("start_time",  form.start_time.value ? formatToUTC(form.start_time.value, "datetime") : '');
             formPayLoad.append("end_time", form.end_time.value ? formatToUTC(form.end_time.value, "datetime") : '');
             formPayLoad.append("description", form.description.value);
@@ -186,9 +186,9 @@ function PostProductPage(){
             const apiData = {
                 product_name: form.product_name.value,
                 cat2_id: form.cat2_id.value,
-                start_price: (form.start_price.value).split(",").join(""),
-                step_price: (form.step_price.value),
-                buy_now_price: (form.buy_now_price.value),
+                start_price: (form.start_price.value).split(".").join(""),
+                step_price: (form.step_price.value).split(".").join(""),
+                buy_now_price: (form.buy_now_price.value).split(".").join(""),
                 start_time: form.start_time.value ? formatToUTC(form.start_time.value, "datetime") : '',
                 end_time: form.end_time.value ? formatToUTC(form.end_time.value, "datetime") : '',
                 description: form.description.value,
@@ -350,7 +350,8 @@ function PostProductPage(){
                                 </label>
                                 <div className="relative">
                                     <NumericFormat
-                                        thousandSeparator=","
+                                        thousandSeparator="."
+                                        decimalSeparator= ","
                                         name="start_price"
                                         id="start_price"
                                         className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -365,7 +366,8 @@ function PostProductPage(){
                                 </label>
                                 <div className="relative">
                                     <NumericFormat
-                                        thousandSeparator=","
+                                        thousandSeparator="."
+                                        decimalSeparator= ","
                                         name="step_price"
                                         id="step_price"
                                         className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -380,7 +382,8 @@ function PostProductPage(){
                                 </label>
                                 <div className="relative">
                                     <NumericFormat
-                                        thousandSeparator=","
+                                        thousandSeparator="."
+                                        decimalSeparator= ","
                                         name="buy_now_price"
                                         id="buy_now_price"
                                         className ="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
