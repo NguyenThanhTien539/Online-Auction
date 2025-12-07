@@ -69,11 +69,11 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
                 
                 <tr key={index} className={`hover:bg-gradient-to-r hover:from-blue-50/40 hover:to-purple-50/40 transition-colors duration-200 ${index % 2 === 0 ? 'bg-white/40' : 'bg-gray-50/30'}`}>
                   {/* STT */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
                     {index + 1}
                   </td>
                   {/* Username */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-bold">
                     {maskName(bid.username)}
                   </td>
                   {/* Max Price */}
@@ -85,7 +85,7 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
                     {bid.product_price.toLocaleString('vi-VN')} VNĐ
                   </td>
                   {/* Price Owner Username */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-500 font-medium">
                     {bid.price_owner_username || 'Chưa có'}
                   </td>
                   {/* Created At */}

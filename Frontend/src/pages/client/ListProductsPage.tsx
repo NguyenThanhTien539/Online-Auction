@@ -184,7 +184,7 @@ function ListProductsPage() {
 
                     return(
                     <div className = "flex justify-center" key = {index}>
-                        <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""}
+                        <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""} product_id = {item.product_id}
                             product_name = {item.product_name} current_price = {item.current_price} buy_now_price = {item.buy_now_price}
                             start_time = {item.start_time} end_time = {item.end_time} price_owner_username = {item.price_owner_username}
                             bid_turns = {item.bid_turns} onClick = {()=> handleClickProduct(item.product_id, item.product_name)}

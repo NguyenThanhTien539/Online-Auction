@@ -4,9 +4,9 @@ import {DateTime} from "luxon";
 import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {slugify} from "@/utils/make_slug";
-
+import AddToLove from "@/components/common/AddToLove";
 type Products = {
-    product_id? : number,
+    product_id : number,
     product_image ?: string,
     product_name ?: string,
     current_price ?: number,
@@ -34,7 +34,8 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
         }
     
 
-    // console.log(startDate);
+
+  
     
     const formatStartTime =() =>{
         if (start_time)
@@ -87,24 +88,26 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
     })
 
     
-
+    // Function to mask buyer name (hide half with ***)
+    const maskName = (name: string) => {
+        const len = name.length;
+        const thirdLen = Math.floor(len / 3);
+        return name.substring(0, len - thirdLen) + '***';
+    };
     return (
         // Container
         <div className = {cn("w-80 h-110 relative flex flex-col items-center border border-gray-300 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-purple-200/30 \
         hover:scale-[103%] hover:-translate-y-1 transition-all duration-300 bg-white hover:cursor-pointer overflow-hidden group shrink-0", data.className)}
             onClick = {data.onClick ?? (() => {handleClickProduct(product_id?? 0, product_name?? "")})}>
+            
             {/* Image */}
+            
             <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-t-xl justify-center relative">
                 <img src = {product_image} className = "flex object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"></img>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            {/* Add to Love */}
-            <div className = "absolute w-fit h-[42px] top-5 right-5 bg-gray-200/50 backdrop-blur-sm rounded-xl flex flex-row items-center gap-1\
-            hover:cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 transition-all duration-300 hover:bg-red-300/50 border border-white/30">
-                {/* Love icon */}
-                <img src = {LoveIcon} className = "flex h-[70%] ml-1"></img>
-                {/* Number of love */}
-                <div className = "text-xl text-white m-1">0</div>
+            <div onClick={(e) => e.stopPropagation()}>
+                <AddToLove product_id={product_id}/>
             </div>
 
             {/* Name Product */}
@@ -113,6 +116,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
             </div>
             <div className = "block h-px mt-1 w-[90%] bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             {/* Product Details */}
+            <div className = "text-black">Product id: {product_id}</div>
             <div className = "flex-1 mx-2 w-full p-2 pt-1 grid grid-cols-2 gap-2 ">
 
   
@@ -144,7 +148,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
                     <div className = "font-semibold text-gray-500">
                         Người giữ giá:
                     </div>
-                    {price_owner_username ?? "..."}
+                    {price_owner_username ? maskName(price_owner_username) : "..."}
                 </div>
                 <div className = "text-[85%]">
                     <div className = "font-semibold text-gray-500">

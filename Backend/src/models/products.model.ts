@@ -237,3 +237,52 @@ export async function searchProducts({query, page, limit} : {query: string, page
     }
 
 }
+
+export async function getLoveStatus(user_id: number | null, product_id: number) {
+    let query = await db.raw (`
+            select count(*) as total, (exists (
+                select 1 
+                from love_products 
+                where user_id = ? and product_id = ?
+            )) as is_loved
+            from love_products
+
+        `, [user_id, product_id]);
+    let result = await query.rows[0];
+
+    return {
+        total_loves: result.total,
+        is_loved: result.is_loved
+    };
+
+}
+
+export async function updateLoveStatus(user_id: number, product_id: number, love_status: boolean) {
+    // Check current status 
+    console.log ("Updating love status for user_id:", user_id, " product_id:", product_id, " to ", love_status);
+    const currentStatusQuery = await db.raw(`
+        select exists (
+            select 1 
+            from love_products 
+            where user_id = ? and product_id = ?
+        ) as is_loved
+    `, [user_id, product_id]);
+    const currentStatus = currentStatusQuery.rows[0].is_loved;
+    if (love_status && !currentStatus){
+        // Add to love
+        await db('love_products').insert({
+            user_id: user_id,
+            product_id: product_id
+        });
+    }
+    else if (!love_status && currentStatus){
+        // Remove from love
+        await db('love_products')
+            .where({
+                user_id: user_id,
+                product_id: product_id
+            })
+            .del();
+    }
+    return;
+}

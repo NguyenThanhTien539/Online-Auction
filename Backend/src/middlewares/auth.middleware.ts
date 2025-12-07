@@ -40,3 +40,25 @@ export function verifyRole(...allowedRoles: string[]) {
     next();
   };
 }
+
+export async function justDecodeToken(req: Request, _: Response, next: NextFunction) {
+  const token = req.cookies.accessToken;
+  if (!token) {
+    return next();
+  }
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as JwtPayload;
+    const account = await accountModel.findAcountById(decoded?.user_id);
+    if (account) {
+      (req as any).user = account;
+    }
+    next();
+  }
+  catch (e) {
+    next();
+  }
+}
+ 

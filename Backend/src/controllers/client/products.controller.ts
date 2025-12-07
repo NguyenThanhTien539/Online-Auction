@@ -204,3 +204,64 @@ export async function searchProducts (req: Request, res: Response) {
         });
     }
 }
+
+export async function getLoveStatus (req: Request, res: Response) {
+    try {
+        const user = (req as any).user;
+        const product_id = req.query.product_id as string;
+        console.log("Fetching love status for product_id: ", product_id, " and user: ", user ? user.user_id : "guest");
+        if (!product_id){
+            return res.status(400).json({
+                status: "error",
+                message: "product_id is required"
+            });
+        }
+        let isLoved = false;
+        let total = 0;
+        const loveStatus = await productsModel.getLoveStatus(user ? user.user_id : null, parseInt(product_id));
+        if (loveStatus){
+            isLoved = loveStatus.is_loved;
+            total = Number(loveStatus.total_loves);
+        }
+
+        
+        
+        return res.status(200).json({
+            status: "success",
+            data: {
+                is_loved: isLoved,
+                total_loves: total
+            }
+        });
+    }
+    catch (e){
+        console.error(e);
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+
+}
+
+
+export async function updateLoveStatus (req: Request, res: Response) {
+    try {
+        const user = (req as any).user;
+        const product_id = req.body.product_id as string;
+        const love_status = req.body.love_status as boolean;
+
+        await productsModel.updateLoveStatus(user.user_id, parseInt(product_id), love_status);
+        return res.status(200).json({
+            status: "success",
+            message: "Cập nhật trạng thái yêu thích thành công"
+        });
+    }
+    catch (e){
+        console.error(e);
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+}
