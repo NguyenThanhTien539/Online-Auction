@@ -152,13 +152,18 @@ function DetailProductPage() {
   };
 
   
-
+  // Function to mask buyer name (hide half with ***)
+  const maskName = (name: string) => {
+    const len = name.length;
+    const thirdLen = Math.floor(len / 3);
+    return name.substring(0, len - thirdLen) + '***';
+  };
 
 
   return (
     isLoading ? <Loading></Loading> :<div className=" mx-auto px-4 py-8">
       {/* Product Name */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{products?.product_name}</h1>
+      <h1 className="text-4xl font-bold text-gray-500 mb-6">{products?.product_name}</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-3">
         {/* Main Image and Related Images */}
@@ -278,26 +283,16 @@ function DetailProductPage() {
             <div className="space-y-0">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium text-gray-700">Giá hiện tại:</span>  
-                <span className="text-2xl font-bold text-green-600">
+                <span className="text-2xl font-bold text-blue-400">
                   
-                  <NumericFormat 
-                      value={products?.current_price ?? 0}
-                      displayType={'text'}
-                      thousandSeparator={true}
-                      suffix={' đồng'}
-                  ></NumericFormat>
+                  {products?.current_price.toLocaleString()} VNĐ
                 </span>
               </div>
               {products?.buy_now_price && (
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-medium text-gray-700">Giá mua ngay:</span>
-                  <span className="text-xl font-semibold text-blue-600">
-                    <NumericFormat 
-                        value={products?.buy_now_price ?? 0}
-                        displayType={'text'}
-                        thousandSeparator={true}
-                        suffix={' đồng'}
-                    ></NumericFormat>
+                  <span className="text-xl font-bold text-rose-500">
+                    {products.buy_now_price.toLocaleString()} VNĐ
                   </span>
                 </div>
               )}
@@ -377,7 +372,7 @@ function DetailProductPage() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h5 className="text-base font-bold text-gray-900 mb-1">{products?.price_owner_username}</h5>
+                  <h5 className="text-base font-bold text-gray-900 mb-1">{maskName(products?.price_owner_username || "")}</h5>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (

@@ -3,10 +3,10 @@ import {toast} from "sonner"
 import {NumericFormat} from "react-number-format";
 import { TrendingUp, AlertCircle, Zap } from "lucide-react";
 import JustValidate from "just-validate";
-
+import { useNavigate } from "react-router-dom";
 export default function PlayBidSection({product_id, current_price, step_price} : {product_id?: number, current_price?: number, step_price?: number}){
   const [isSubmit, setIsSubmit] = useState (false);
-
+  const navigate = useNavigate();
   useEffect (() => {
     const validate = new JustValidate ("#bidForm");
 
@@ -28,6 +28,18 @@ export default function PlayBidSection({product_id, current_price, step_price} :
         
       ]
     )
+    validate.addField(
+      "#max_price", [
+        {
+          validator : (value: string) => {
+            var numericValue = value.split('.').join('').split(',').join('.');
+            if (!step_price) return true;
+            return (parseFloat(numericValue) - (current_price ?? 0)) % step_price === 0;
+          },
+          errorMessage: `Giá đấu phải là bội số của ${step_price} VNĐ!`
+        }
+      ]
+    )
     .onSuccess ((event: any) => {
       event.preventDefault();
       const form = event.target;
@@ -37,9 +49,9 @@ export default function PlayBidSection({product_id, current_price, step_price} :
       fetch("http://localhost:5000/api/bid/play", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          
-          "credentials": "include"},
+          "Content-Type": "application/json", 
+        },
+        credentials: "include",
         body: JSON.stringify({
           product_id: product_id,
           max_price: parseFloat (maxPriceSubmit),
@@ -49,21 +61,26 @@ export default function PlayBidSection({product_id, current_price, step_price} :
       .then(res => {
         if (res.status == 403){
           toast.error ("Vui lòng đăng nhập để đặt giá!");
-          throw new Error ("Not logged in");
+          navigate ("/accounts/login");
+          
         }
+        if (res.status == 400){
+          throw new Error ("Giá đấu không hợp lệ!");
+        }
+
         return res.json();
       })
       .then (data => {
-        if (data.message === "Success"){
+        if (data.status === "success"){
           toast.success ("Đặt giá thành công!");
         } else {
-          toast.error (`Đặt giá thất bại: ${data.message}`);
+          toast.error (`Đặt giá thất bại`);
         }
       })
       .catch (e => {
         console.log (e);
         if (e.message !== "Not logged in"){
-          toast.error ("Lỗi kết nối đến server để đặt bid!");
+          toast.error (e.message || "Lỗi kết nối đến server để đặt bid!");
         }
       }
       );
@@ -98,7 +115,7 @@ export default function PlayBidSection({product_id, current_price, step_price} :
           <span className="text-sm font-medium text-amber-700">Giá tối thiểu có thể đặt:</span>
         </div>
         <p className="text-lg font-bold text-amber-800">
-          {(current_price ?? 0) + (step_price ?? 0)} VNĐ
+          {((current_price ?? 0) + (step_price ?? 0)).toLocaleString()} VNĐ
         </p>
         <p className="text-xs text-amber-600 mt-1">
           (Giá hiện tại + {current_price?.toLocaleString()} VNĐ)
@@ -139,7 +156,10 @@ export default function PlayBidSection({product_id, current_price, step_price} :
       {/* Helper Text */}
       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
         <p className="text-xs text-gray-600 text-center">
-          💡 Giá đấu phải cao hơn giá tối thiểu để được chấp nhận
+          💡 Giá đấu phải cao hơn hoặc bằng giá tối thiểu để được chấp nhận
+        </p>
+        <p className="text-xs text-rose-400 text-center">
+          Giá đấu phải là bội số của bước giá để được chấp nhận
         </p>
       </div>
     </div>

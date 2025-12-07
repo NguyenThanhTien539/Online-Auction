@@ -21,7 +21,6 @@ type Products = {
 export default function ListSearchProductPage() {
     const [searchParams, setSeachParams] = useSearchParams();
     const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
-    console.log("Search query: ", searchQuery);
     const navigate = useNavigate();
     const [products, setProducts] = useState<Products[]>();
     const [isLoading, setLoading] = useState(false);
@@ -44,7 +43,7 @@ export default function ListSearchProductPage() {
     useEffect (() => {
         setSearchQuery(searchParams.get("query") || "");
         setLoading(true);
-        fetch (`http://localhost:5000/api/products/search?query=${(searchQuery)}&page=${currentPage}`)
+        fetch (`http://localhost:5000/api/products/search?query=${searchParams.get("query")}&page=${currentPage}`)
         .then (response => {
             if (!response.ok){
                 toast.error("Có lỗi khi lấy sản phẩm");
@@ -64,7 +63,7 @@ export default function ListSearchProductPage() {
         .finally(() => {
             setLoading(false);
         });
-    }, [searchQuery, currentPage, searchParams]);
+    }, [searchParams]);
 
     return (
       isLoading ? <Loading></Loading> : <div>  
@@ -80,7 +79,7 @@ export default function ListSearchProductPage() {
                 <div className="absolute -bottom-4 -right-4 w-3 h-3 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full animate-bounce opacity-60"></div>
             </div>
             <div className="text-2xl md:text-3xl font-semibold mt-2 ml-4 text-gray-400 bg-clip-text relative inline-block">
-                    "{searchQuery}"
+                    "{searchQuery.trim()}"
             </div>
 
 

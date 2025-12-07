@@ -19,7 +19,7 @@ route.use("/api/products", productsRoutes);
 
 route.use("/api/me", meRoutes);
 
-route.use("/api/bid", bidRoutes);
+route.use("/api/bid", verifyToken, bidRoutes);
 
 route.use("/api/profile", verifyToken, profileRoutes);
 

@@ -34,17 +34,7 @@ interface UserProfile {
 export default function ProfilePage() {
   const navigate = useNavigate();
   
-  // Sample user data - in real app, this would come from API/context
-  // const [userProfile, setUserProfile] = useState<UserProfile>({
-  //   username: "john_doe",
-  //   full_name: "Nguyễn Văn John",
-  //   email: "john.doe@email.com",
-  //   address: "123 Đường ABC, Quận 1, TP.HCM",
-  //   role: "seller", // user | seller | admin
-  //   date_of_birth: "1990-05-15",
-  //   rating_score: 4.5,
-  //   rating_count: 127
-  // });
+
   const auth = useAuth();
   useEffect (() => {
     setUserProfile({
@@ -80,9 +70,6 @@ export default function ProfilePage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
 
   const getRoleLabel = (role: string) => {
     switch(role) {
@@ -222,7 +209,8 @@ export default function ProfilePage() {
                         </div>
                       </td>
                       <td className="py-4 font-semibold text-gray-900">
-                        {formatDate(userProfile.date_of_birth)}
+                        {/* {formatDate(userProfile.date_of_birth)} */}
+                        {new Date(userProfile.date_of_birth).toLocaleDateString('vi-VN')}
                       </td>
                     </tr>
                     

@@ -74,8 +74,6 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
     const [arrayPages, setArrayPages] = useState<number[]>([]);
     const pageRange = getPageRange(currentPage, numberOfPages, 3);
     const separator = findSeparator(pageRange);
-    console.log("Page range:", pageRange);
-    console.log("Separator:", separator);
     useEffect(()=>{
         const tempArray = [];
         for(let i = 0; i < numberOfPages; i++)
@@ -86,7 +84,7 @@ function PaginationComponent ({numberOfPages, currentPage, controlPage}
         
     }, [numberOfPages]);
     
-    console.log(arrayPages); 
+
 
     return(
         numberOfPages != 0 && <div>

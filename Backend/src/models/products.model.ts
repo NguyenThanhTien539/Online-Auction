@@ -215,17 +215,17 @@ export async function postNewProduct (productData: any) {
     }
 }
 
-
 export async function searchProducts({query, page, limit} : {query: string, page: number, limit: number}) {
 
     const offset = (page - 1) * limit;
-    const formatQuery = query.trim().replace(/\s+/g, ' & '); 
+    const formatQuery = query.trim();
+    console.log ("Formatted Search Query:", formatQuery, ":");
     let productsQuery = await db.raw(`
         SELECT 
             p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
             FROM products p
         LEFT JOIN users u ON p.price_owner_id = u.user_id
-        WHERE fts @@ to_tsquery(remove_accents(?))
+        WHERE fts @@ websearch_to_tsquery('english', remove_accents(?))
         ORDER BY p.product_id DESC
         LIMIT ? OFFSET ?
     `, [formatQuery, limit, offset])

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
 import {LucideSearch} from "lucide-react"
 
+
 function Navbar() {
 
   const navigate = useNavigate();

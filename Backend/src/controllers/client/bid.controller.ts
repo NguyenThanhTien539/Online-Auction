@@ -28,6 +28,7 @@ export async function playBid(req: Request, res: Response){
         console.log("Bid Result: ", result);
         return res.status(200).json({
             status: "success",
+            
         });
 
     }
@@ -45,10 +46,11 @@ export async function getBidHistoryByProductId (req: Request, res: Response) {
         const product_id = req.query.product_id;
         const user_id = (req as any).user.user_id;
         const isSeller = await bidModels.checkUserIsSeller(user_id, Number(product_id));
-        const bidHistory = await bidModels.getBidHistoryByProductId(Number(product_id), isSeller);
+        const bidHistory = await bidModels.getBidHistoryByProductId(Number(product_id));
         return res.status(200).json({
             status: "success",
-            data: bidHistory
+            data: bidHistory,
+            isSeller: isSeller
         })
     }
     catch (e)
