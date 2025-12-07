@@ -81,7 +81,7 @@ function AllCategoriesPage({level} : {level : number}){
         }
 
         fetchData();
-        setLoading(false);
+        
         
     }, [level, slugid]);
 

@@ -26,6 +26,7 @@ import BidderFormDetailPage from "@/pages/admin/SellerApplicationDetailPage";
 import PostProductPage from "@/pages/client/ProfilePage/components/PostProductPage";
 import ProfilePage from "@/pages/client/ProfilePage/ProfilePage";
 import MyProductsPage from "@/pages/client/ProfilePage/components/MyProductsPage";
+import ListSearchProductPage from "@/pages/client/ListSearchProductPage";
 import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
 import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
 import SellerApplicationDetailPage from "@/pages/admin/SellerApplicationDetailPage";
@@ -54,6 +55,11 @@ const routers = createBrowserRouter([
         path: "/products",
         element: <ListProductsPage />,
       },
+      {
+        path : "/products/search",
+        element: <ListSearchProductPage />
+      }
+      ,
       {
         path: "product/:slugid",
         element: <DetailProductPage />,

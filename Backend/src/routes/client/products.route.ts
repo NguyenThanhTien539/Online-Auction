@@ -9,4 +9,5 @@ route.get("/page_list",  productsController.getProductsPageList);
 route.get("/detail", productsController.getProductDetailBySlugId);
 route.post("/post-product", verifyToken, verifyRole("seller", "admin"), upload.array("product_images", 10) ,productsController.postNewProduct);
 route.get("/my-products", verifyToken, productsController.getMyProductsList);
+route.get("/search", productsController.searchProducts);
 export default route;

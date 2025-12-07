@@ -77,7 +77,7 @@ export default function PlayBidSection({product_id, current_price, step_price} :
 
 
   return(
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
+    <div className=" p-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-blue-500 rounded-lg">

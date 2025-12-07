@@ -1,6 +1,6 @@
-import { create } from "domain";
+
 import db from "../config/database.config.ts";
-import normVietNamTime from "../helpers/formatDateTime.helper.ts";
+
 import { slugify } from "../helpers/slug.helper.ts";
 
 export async function getProductsPageList(cat2_id : number, page: number, priceFilter: string, timeFilter: string) {
@@ -22,15 +22,10 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     }
     
     console.log("Order By Clauses: ", orderBy);
-    let numberOfPages = await db.raw(`
-        SELECT COUNT(*) AS total
-        FROM products
-        WHERE cat2_id = ?`
-    , [cat2_id]);
-    console.log("Number of Pages Query Result: ", numberOfPages);
+
     let query = await db.raw(`
         SELECT 
-            p.*, u.username AS price_owner_username
+            p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
             FROM products p
         LEFT JOIN users u ON p.price_owner_id = u.user_id
         WHERE p.cat2_id = ?
@@ -39,22 +34,14 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     `, [cat2_id, itemsPerPage, offset]);
     
     let results = await query.rows;
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
 
-    console.log("Raw Products: ", results);
-    // Format start_time and end_time
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    })
     console.log("Formatted Products: ", results);
     
     if (results) {
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: numberOfPages
         }
     }
     
@@ -64,12 +51,9 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
 export async function getMyFavoriteProducts(user_id: string, page: number){
     const itemsPerPage = 4;
     const offset = (page - 1) * itemsPerPage;
-    let numberOfPages = await db.raw(`
-        select count(*) as total
-        from love_products lp
-        where lp.user_id = ?`, [user_id]);
+
     let query = await db.raw(`
-        select p.*, u.username as price_owner_username
+        select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join love_products lp on p.product_id = lp.product_id
         left join users u on p.price_owner_id = u.user_id
@@ -77,17 +61,12 @@ export async function getMyFavoriteProducts(user_id: string, page: number){
         limit ? offset ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    });
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+
     if (results){
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: numberOfPages
         }
     }
 } 
@@ -95,61 +74,45 @@ export async function getMyFavoriteProducts(user_id: string, page: number){
 export async function getMySellingProducts(user_id: string, page: number){
     const itemsPerPage = 4;
     const offset = (page - 1) * itemsPerPage;
-    let numberOfPages = await db.raw(`
-        select count(*) as total
-        from products p
-        where p.seller_id = ? and p.end_time > now()`, [user_id]);
+
     let query = await db.raw(`
-        select p.*, u.username as price_owner_username
+        select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.seller_id = ? and p.end_time > now()
         limit ? offset ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    });
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
     if (results){
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: numberOfPages
         }
     }
+    return null;
 } 
 
 export async function getMySoldProducts(user_id: string, page: number){
     const itemsPerPage = 4;
     const offset = (page - 1) * itemsPerPage;
-    let numberOfPages = await db.raw(`
-        select count(*) as total
-        from products p
-        where p.seller_id = ? and p.end_time < now() and p.price_owner_id is not null`, [user_id]);
+
     let query = await db.raw(`
-        select p.*, u.username as price_owner_username
+        select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.seller_id = ? and p.end_time < now() and p.price_owner_id is not null
         limit ? offset ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    });
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
     if (results){
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: numberOfPages
         }
     }
+    return null;
 } 
 
 export async function getMyWonProducts(user_id: string, page: number){
@@ -167,19 +130,13 @@ export async function getMyWonProducts(user_id: string, page: number){
         limit ? offset ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    });
     if (results){
         return {
             data: results,
             numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
         }
     }
+    return null;
 } 
 
 export async function getMyBiddingProducts(user_id: string, page: number){
@@ -201,19 +158,13 @@ export async function getMyBiddingProducts(user_id: string, page: number){
         limit ? offset ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
-    results = results.map((product: any) => {
-        return {
-            ...product,
-            start_time: normVietNamTime(product.start_time),
-            end_time: normVietNamTime(product.end_time)
-        };
-    });
     if (results){
         return {
             data: results,
             numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
         }
     }
+    return null;
 } 
 
 
@@ -248,18 +199,7 @@ export async function getProductDetail(product_id: string, product_slug: string)
     let result = await query.rows[0];
 
 
-    // Format start_time and end_time
-    if (result){
-        result = {
-            ...result,
-
-            start_time: normVietNamTime(result.start_time),
-            end_time: normVietNamTime(result.end_time)
-        };
-        // console.log("Formatted Product Detail: ", result);
-        return result;
-    }
-    return null;
+    return result;
 
 }
 
@@ -273,4 +213,27 @@ export async function postNewProduct (productData: any) {
         console.error("Error inserting new product: ", e);
         throw e; // Re-throw to let controller handle the error
     }
+}
+
+
+export async function searchProducts({query, page, limit} : {query: string, page: number, limit: number}) {
+
+    const offset = (page - 1) * limit;
+    const formatQuery = query.trim().replace(/\s+/g, ' & '); 
+    let productsQuery = await db.raw(`
+        SELECT 
+            p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
+            FROM products p
+        LEFT JOIN users u ON p.price_owner_id = u.user_id
+        WHERE fts @@ to_tsquery(remove_accents(?))
+        ORDER BY p.product_id DESC
+        LIMIT ? OFFSET ?
+    `, [formatQuery, limit, offset])
+
+    let results = await productsQuery.rows;
+    return {
+        data: results,
+        numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / limit) : 0
+    }
+
 }

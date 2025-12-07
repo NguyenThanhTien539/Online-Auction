@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
-import { User, Heart, PlusCircle, LogOut, Settings, List, Box } from 'lucide-react';
+import {LucideSearch} from "lucide-react"
 
 function Navbar() {
-  // const [open, setOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const auth = useAuth();
@@ -74,18 +74,29 @@ function Navbar() {
 }
 export default Navbar;
 
+
 function SearchBar() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const handleSubmit = (e : any) => {
+    e.preventDefault();
+    navigate(`/products/search?query=${searchQuery}`);
+  }
+
 
   return (
-    <div className="flex-1 max-w-[500px] mx-4 ml-10 text-sm">
-      <input
-        type="text"
-        placeholder="Tìm kiếm..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full px-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
-      />
+    <div className="flex-1 max-w-[500px] mx-4 ml-10 text-sm relative">
+      <LucideSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <form onSubmit = {handleSubmit}>
+        <input
+          type="text"
+          placeholder="Tìm kiếm..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
+        />
+      </form>
+      
     </div>
   );
 }

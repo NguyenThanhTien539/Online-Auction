@@ -180,3 +180,27 @@ export async function getMyProductsList (req: Request, res: Response) {
         });
     }
 }
+
+export async function searchProducts (req: Request, res: Response) {
+    try {
+        const query = req.query.query as string;
+        console.log("Search query received: ", query);
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 4;
+        const result = await productsModel.searchProducts({query : query, page: page, limit: limit});
+        return res.status(200).json({
+            status: "success",
+            data: {
+                products: result.data,
+                total_pages: result.numberOfPages
+            }
+        });
+
+    }
+    catch (e){
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+}
