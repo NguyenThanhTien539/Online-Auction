@@ -1,9 +1,13 @@
-import React, {use, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import PaginationComponent from "@/components/common/Pagination";
 import ProductCard from "@/components/common/ProductCard";
 import {useNavigate, useSearchParams} from "react-router-dom"
 import {toast} from "sonner"
 import Loading from "@/components/common/Loading";
+import { Heart, Package, ShoppingCart, Trophy, TrendingUp, Archive } from "lucide-react";
+import speakingURL from "speakingurl";
+import LoginRequest from "@/components/common/LoginRequest";
+import {useAuth} from "@/routes/ProtectedRouter";
 type Products = {
     product_id : number,
     product_images : string[],
@@ -16,156 +20,241 @@ type Products = {
     bid_turns: string
 }
 
-
-
+type TabItem = {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    color: string;
+    bgColor: string;
+}
 
 export default function MyProductsPage() {
-    
-
-    const [searchParams, setSeachParams] = useSearchParams();
+    const {auth} = useAuth();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    console.log ("Search params: ", searchParams);
 
+    // Tab management
+    const [activeTab, setActiveTab] = useState(searchParams.get("type") || "my-favorites");
 
-    // Follow  URL to know current my products page such as /products/my-favorites, /products/my-selling, /products/my-sold, /products/my-bidding, /products/my-won
-    const [myProductList, setMyProductList] = useState("");
-    const [nameList, setNameList] = useState("");
-    const getColorNameList = (nameList : any) => {
-        switch (nameList) {
-            case "Sản phẩm yêu thích":
-                return "text-rose-600 bg-rose-100";
-            case "Sản phẩm đang bán":
-                return "text-yellow-500 bg-yellow-100";
-            case "Sản phẩm đã bán":
-                return "text-gray-600 bg-gray-100";
-            case "Sản phẩm bạn đang đấu giá":
-                return "text-neutral-600 bg-neutral-100";
-            case "Sản phẩm bạn đã thắng":
-                return "text-green-700 bg-green-100";
-    }
-    }
+    const tabs: TabItem[] = [
+        {
+            id: "my-favorites",
+            label: "Yêu thích",
+            icon: <Heart size={18} />,
+            color: "text-rose-600",
+            bgColor: "bg-rose-50"
+        },
+        {
+            id: "my-selling",
+            label: "Đang bán",
+            icon: <Package size={18} />,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50"
+        },
+        {
+            id: "my-inventory",
+            label: "Tồn kho",
+            icon: <Archive size={18} />,
+            color: "text-gray-600",
+            bgColor: "bg-gray-50"
+        },
+        {
+            id: "my-sold",
+            label: "Đã bán",
+            icon: <ShoppingCart size={18} />,
+            color: "text-green-600",
+            bgColor: "bg-green-50"
+        },
+        {
+            id: "my-bidding",
+            label: "Đang đấu giá",
+            icon: <TrendingUp size={18} />,
+            color: "text-orange-600",
+            bgColor: "bg-orange-50"
+        },
+        {
+            id: "my-won",
+            label: "Đã thắng",
+            icon: <Trophy size={18} />,
+            color: "text-purple-600",
+            bgColor: "bg-purple-50"
+        }
+    ];
 
-    useEffect (() => {
-        switch (searchParams.get("type")) {
-            case "my-favorites":
-                setMyProductList("my-favorites");
-                setNameList("Sản phẩm yêu thích");
-                break;
-            case "my-selling":
-                setMyProductList("my-selling");
-                setNameList("Sản phẩm đang bán");
-                break;
-            case "my-sold":
-                setMyProductList("my-sold");
-                setNameList("Sản phẩm đã bán");
-                break;
-            case "my-bidding":
-                setMyProductList("my-bidding");
-                setNameList("Sản phẩm bạn đang đấu giá");
-                break;
-            case "my-won":
-                setMyProductList("my-won");
-                setNameList("Sản phẩm bạn đã thắng");
-                break;
-            default:
-                navigate("/profile");
-    }
-    }, [searchParams, navigate])
+    const getActiveTabInfo = () => {
+        return tabs.find(tab => tab.id === activeTab) || tabs[0];
+    };
 
-    
-    
-    const[currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(searchParams.get("page") ? parseInt(searchParams.get("page") as string) : 1);
     const [numberOfPages, setNumberOfPages] = useState(1);
-    
+    const [quantity, setQuantity] = useState(0);
 
+    // Products data
     const [products, setProducts] = useState<Products[]>();
     const [isLoading, setLoading] = useState(true);
-    
-    useEffect(()=>{
-        // Only fetch data if myProductList is set (not empty string)
-        if (!myProductList) return;
 
+    // Fetch data when tab or page changes
+    useEffect(() => {
         const getData = async() => {
-            try{
+            try {
                 setLoading(true);
-                const response = await fetch (`http://localhost:5000/api/products/my-products?type=${myProductList}&page=${currentPage}`,{credentials: "include"})
+                const page = searchParams.get("page") ? parseInt(searchParams.get("page") as string) : 1;
+                const type = searchParams.get("type") || "my-favorites";
+                const response = await fetch(
+                    `http://localhost:5000/api/products/my-products?type=${type}&page=${page}`,
+                    { credentials: "include" }
+                );
                 const data = await response.json();
 
-                if (!response.ok)
-                {
-                    toast.error("Có lỗi khi lấy dữ liệu ");
+                if (!response.ok) {
+                    toast.error("Có lỗi khi lấy dữ liệu");
                     setLoading(false);
-                    if (response.status === 403){
+                    if (response.status === 403) {
                         navigate("/profile");
                     }
                     return;
                 }
+
                 toast.success("Tải trang thành công");
                 setLoading(false);
                 setProducts(data.data);
                 setNumberOfPages(data.numberOfPages);
-                    
-                }
-                catch(e){
-                    toast.error("Lỗi kết nối máy chủ")
-                }
-                finally {
-                    setLoading(false);
-                }
+                setQuantity(data.quantity);
+
+            } catch(e) {
+                toast.error("Lỗi kết nối máy chủ");
+                setLoading(false);
             }
+        };
+
         getData();
-    }, [myProductList, currentPage])
+    }, [searchParams, currentPage]);
 
-    useEffect(()=>{
+    const handleTabChange = (tabId: string) => {
+        setActiveTab(tabId);
+        setCurrentPage(1); // Reset to first page when changing tabs
+        setSearchParams({ type: tabId});
+
+    };
+    const handlePageChange = (page : number) => {
+        setCurrentPage(page);
         const newParams = new URLSearchParams(searchParams);
-        newParams.set("page", String(currentPage));
-        setSeachParams(newParams, { replace: currentPage === 1 });
-    }, [currentPage])
-
-
-  
-    
-
-
-
-    const handleClickProduct = (productId : number, productName : string) => {
-
-        
+        newParams.set("page", page.toString());
+        setSearchParams(newParams);
     }
 
-    return(
-        isLoading ? <Loading></Loading> :<>
-            {/* Name cat2 of these products */}
+    const handleClickProduct = (productId : number, productName : string) => {
+        const slug = speakingURL(productName);
+        navigate(`/product/${slug}-${productId}`);
+    };
 
-            <div className = {`text-5xl font-semibold text-gray-500 mt-10 ml-5 ${getColorNameList(nameList)} inline-block px-4 py-2 rounded-lg`}>
-                {nameList}
-            </div>
+    const activeTabInfo = getActiveTabInfo();
+    if (!auth) return <LoginRequest />;
 
-
-            {/* Products List */}
-
-            <div className = "grid grid-cols-1 md:grid-cols-2 gap-10 p-5 mt-[100px] mb-[100px] max-w-[1200px] mx-auto">
-                
-                {!isLoading && products && products.map((item, index) => {
-
-
-                    return(
-                    <div className = "flex justify-center" key = {index}>
-                        <ProductCard className = "w-[400px]" product_image = {item.product_images ? item.product_images[0] : ""} product_id = {item.product_id}
-                            product_name = {item.product_name} current_price = {item.current_price} buy_now_price = {item.buy_now_price}
-                            start_time = {item.start_time} end_time = {item.end_time} price_owner_username = {item.price_owner_username}
-                            bid_turns = {item.bid_turns} onClick = {()=> handleClickProduct(item.product_id, item.product_name)}
-                        />
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-sm border-b">
+                <div className="container mx-auto px-4 py-6">
+                    <div className="mb-6">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                            Sản phẩm của tôi
+                        </h1>
+                        <p className="text-gray-600">
+                            Quản lý và theo dõi các sản phẩm của bạn
+                        </p>
                     </div>
-                )
-                })}
-            
+
+                    {/* Tabs */}
+                    <div className="flex flex-wrap gap-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                    activeTab === tab.id
+                                        ? `${tab.color} ${tab.bgColor} shadow-sm`
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                }`}
+                            >
+                                {tab.icon}
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            <PaginationComponent numberOfPages = {numberOfPages} currentPage = {currentPage} controlPage = {setCurrentPage}/>
+            {/* Content */}
+            <div className="container mx-auto px-4 py-8">
+                {/* Tab Info */}
+                {quantity ? (<div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg mb-6 ${activeTabInfo.color} ${activeTabInfo.bgColor}`}>
+                    {activeTabInfo.icon}
+                    <span className="font-medium">{activeTabInfo.label}</span>
+                    {products && products.length > 0 && (
+                        <span className="text-sm opacity-75">({quantity} sản phẩm)</span>
+                    )}
+                
+                </div>)
+                : null
+                }
 
-            <div className = "mb-[50px]"></div>
+                {/* Products Grid */}
+                {isLoading ? (
+                    <Loading />
+                ) : quantity > 0 && products ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                            {products.map((item, index) => (
+                                <div key={index} className="flex justify-center">
+                                    <ProductCard
+                                        className="w-full max-w-sm"
+                                        product_image={item.product_images ? item.product_images[0] : ""}
+                                        product_id={item.product_id}
+                                        product_name={item.product_name}
+                                        current_price={item.current_price}
+                                        buy_now_price={item.buy_now_price}
+                                        start_time={item.start_time}
+                                        end_time={item.end_time}
+                                        price_owner_username={item.price_owner_username}
+                                        bid_turns={item.bid_turns}
+                                        onClick={() => handleClickProduct(item.product_id, item.product_name)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
 
+                        {/* Pagination */}
+                        <div className="flex justify-center mt-12">
+                            <PaginationComponent
+                                numberOfPages={5}
+                                currentPage={currentPage}
+                                controlPage={handlePageChange}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    /* Empty State */
+                    <div className="text-center py-16">
+                        <div className="max-w-md mx-auto">
 
-        </>
-    )
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                Chưa có sản phẩm nào
+                            </h3>
+                            <p className="text-gray-600">
+                                {activeTab === "my-favorites" && "Bạn chưa thêm sản phẩm nào vào danh sách yêu thích."}
+                                {activeTab === "my-selling" && "Bạn chưa đăng bán sản phẩm nào."}
+                                {activeTab === "my-inventory" && "Bạn chưa có sản phẩm tồn kho."}
+                                {activeTab === "my-sold" && "Bạn chưa bán được sản phẩm nào."}
+                                {activeTab === "my-bidding" && "Bạn chưa tham gia đấu giá sản phẩm nào."}
+                                {activeTab === "my-won" && "Bạn chưa thắng cuộc đấu giá nào."}
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };

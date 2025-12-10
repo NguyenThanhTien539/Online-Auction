@@ -1,15 +1,21 @@
-import HorizontalBar from "@/components/common/HorizontalBar"
-
-
-
+import { useEffect, useRef, useState } from "react"
+import { Zap, Shield, Target, Trophy, BookOpen, Heart } from "lucide-react"
+import useIntersectionObserver from "@/hooks/useIntersectionObserver"
+import {Link} from "react-router-dom"
 import heroImage from "@/assets/images/hero-section-background.png"
-import loveIcon from "@/assets/icons/love.svg"
 
 
 
 const WelcomeText = () => {
+  const { ref, hasIntersected } = useIntersectionObserver()
+
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-16 px-6 rounded-2xl shadow-lg mx-4 my-8">
+    <div
+      ref={ref}
+      className={`bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-16 px-6 rounded-2xl shadow-lg mx-4 my-8 transition-all duration-1000 ${
+        hasIntersected ? 'animate__animated animate__fadeInUp' : ''
+      }`}
+    >
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-6">
           🌟 Khám Phá Thế Giới Đấu Giá Trực Tuyến
@@ -20,24 +26,24 @@ const WelcomeText = () => {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-            <div className="text-4xl mb-4">⚡</div>
+          <div className={`bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-all delay-200 duration-500 ${hasIntersected ? 'animate__animated animate__fadeInLeft animate__slow' : ''}`}>
+            <div className="text-4xl mb-4 text-blue-500"><Zap size={48} /></div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Nhanh Chóng & Dễ Dàng</h3>
             <p className="text-gray-600 dark:text-gray-300">
               Đăng ký tài khoản và bắt đầu đấu giá chỉ trong vài phút. Giao diện thân thiện, hướng dẫn rõ ràng.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-            <div className="text-4xl mb-4">🔒</div>
+          <div className={`bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 delay-800 ${hasIntersected ? 'animate__animated animate__fadeInUp animate__slow' : ''}`}>
+            <div className="text-4xl mb-4 text-green-500"><Shield size={48} /></div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">An Toàn & Bảo Mật</h3>
             <p className="text-gray-600 dark:text-gray-300">
               Hệ thống mã hóa cao, thanh toán bảo mật. Đảm bảo quyền lợi cho cả người bán và người mua.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-            <div className="text-4xl mb-4">🎯</div>
+          <div className={`bg-white dark:bg-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 delay-500 ${hasIntersected ? 'animate__animated animate__fadeInRight animate__slow' : ''}`}>
+            <div className="text-4xl mb-4 text-purple-500"><Target size={48} /></div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">Đa Dạng Sản Phẩm</h3>
             <p className="text-gray-600 dark:text-gray-300">
               Từ nghệ thuật, đồ cổ đến điện tử, thời trang. Luôn có thứ gì đó phù hợp với sở thích của bạn.
@@ -47,7 +53,7 @@ const WelcomeText = () => {
         
         <div className="mt-10">
           <p className="text-base text-gray-500 dark:text-gray-400 italic">
-            "Đấu giá không chỉ là mua bán, mà là cuộc phiêu lưu tìm kiếm kho báu!" 🏆
+            "Đấu giá không chỉ là mua bán, mà là cuộc phiêu lưu tìm kiếm kho báu!" 
           </p>
         </div>
       </div>
@@ -56,42 +62,53 @@ const WelcomeText = () => {
 }
 
 const Hero = () => {
+  const { ref, hasIntersected } = useIntersectionObserver()
+
   return (
     <>
       
-      <div className="relative pl-[30px] pb-[110px] pt-[120px] bg-gradient-to-br from-blue-300 via-blue-200 to-white dark:from-gray-800 dark:to-gray-900 lg:pt-[100px] mb-[50px] overflow-hidden border border-blue-200/50 shadow-2xl shadow-blue-300/30 backdrop-blur-sm">
+      <div
+        ref={ref}
+        className={`relative pl-[30px] pb-[110px] pt-[120px] bg-gradient-to-br from-blue-300 via-blue-200 to-white dark:from-gray-800 dark:to-gray-900 lg:pt-[100px] mb-[50px] overflow-hidden border border-blue-200/50 shadow-2xl shadow-blue-300/30 backdrop-blur-sm transition-all duration-1000 ${
+          hasIntersected ? 'animate__animated animate__fadeInUp animate__slow' : 'opacity-0'
+        }`}
+      >
         {/* Floating shapes for fun */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-blue-300 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute top-20 right-20 w-16 h-16 bg-white rounded-full opacity-30 animate-pulse"></div>
-        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-blue-200 rounded-full opacity-25 animate-ping"></div>
+        <div className={`absolute top-10 left-10 w-20 h-20 bg-blue-300 rounded-full opacity-20 transition-all duration-1000 delay-300 ${hasIntersected ? 'animate-pulse' : 'scale-0'}`}></div>
+        <div className={`absolute top-20 right-20 w-16 h-16 bg-white rounded-full opacity-30 transition-all duration-1000 delay-500 ${hasIntersected ? 'animate-pulse' : 'scale-0'}`}></div>
+        <div className={`absolute bottom-20 left-1/4 w-12 h-12 bg-blue-200 rounded-full opacity-25 transition-all duration-1000 delay-700 ${hasIntersected ? 'animate-ping' : 'scale-0'}`}></div>
         
         <div className="container relative z-10">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 lg:w-5/12">
               <div className="hero-content">
-                <h1 className="mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl">
-                  🏆 Sàn Đấu Giá Trực Tuyến
+                <h1 className={`mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl transition-all duration-1000 delay-300 ${
+                  hasIntersected ? 'animate__animated animate__fadeInLeft' : ''
+                }`}>
+                  <Trophy className="inline mr-3 text-yellow-500" size={48} /> Sàn Đấu Giá Trực Tuyến
                 </h1>
-                <p className="mb-8 max-w-[480px] text-base text-gray-800 dark:text-dark-6 font-medium">
-                  🔥 Đang tìm kiếm điều gì đó đặc biệt? Các chuyên gia của chúng tôi đã tuyển chọn những món đồ tốt nhất. Hãy cứ tự thưởng cho mình đi nào! 🚀
+                <p className={`mb-8 max-w-[480px] text-base text-gray-800 dark:text-dark-6 font-medium transition-all duration-1000 delay-500 ${
+                  hasIntersected ? 'animate__animated animate__fadeInLeft' : ''
+                }`}>
+                  Đang tìm kiếm điều gì đó đặc biệt? Các chuyên gia của chúng tôi đã tuyển chọn những món đồ tốt nhất. Hãy cứ tự thưởng cho mình đi nào! 
                 </p>
-                <ul className="flex flex-wrap items-center gap-[10px] pt-5">
+                <ul className={`flex flex-wrap items-center gap-[10px] pt-5 transition-all duration-1000 delay-700 ${
+                  hasIntersected ? 'animate__animated animate__fadeInUp' : ''
+                }`}>
                   <li>
-                    <a
-                      href="/#"
+                    <Link to = "/about"
                       className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-8 py-4 text-center text-base font-bold hover:bg-blue-800 lg:px-10 transition-all duration-700 transform hover:scale-110 hover:shadow-2xl hover:shadow-blue-400"
                     >
-                      📖 Về chúng tôi
-                    </a>
+                      <BookOpen className="mr-2" size={20} /> Về chúng tôi
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/#"
+                    <Link to = "/my-products"
                       className="inline-flex items-center justify-center px-6 py-4 text-center text-base font-bold text-white hover:text-blue-200 dark:text-white transition-all duration-700 rounded-full shadow-lg shadow-gray-400 hover:shadow-xl hover:shadow-blue-400 transform hover:scale-110 bg-gradient-to-r from-rose-300 to-rose-500"
                     >
-                      <span><img src={loveIcon} className="w-[30px] flex mr-2 animate-spin" style={{animationDuration: '3s'}}></img></span>
-                      ❤️ Yêu thích của bạn
-                    </a>
+                      <Heart className="mr-2 animate-pulse" size={24} />
+                       Yêu thích của bạn
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -103,7 +120,9 @@ const Hero = () => {
                   <img
                     src={heroImage}
                     alt="hero"
-                    className="max-w-full lg:ml-auto lg:h-[450px] rounded-4xl shadow-[20px_10px_15px_rgb(59,130,246,0.5)] hover:shadow-[30px_20px_25px_rgb(59,130,246,0.7)] transition-shadow duration-700"
+                    className={`max-w-full lg:ml-auto lg:h-[450px] object-cover rounded-4xl shadow-[20px_10px_15px_rgb(59,130,246,0.5)] hover:shadow-[30px_20px_25px_rgb(59,130,246,0.7)] transition-all duration-1000 delay-900 ${
+                      hasIntersected ? 'animate__animated animate__fadeInRight' : 'opacity-0 translate-x-5'
+                    }`}
                   />
                   <span className="absolute -bottom-8 -left-8 z-[-1]">
                     <svg

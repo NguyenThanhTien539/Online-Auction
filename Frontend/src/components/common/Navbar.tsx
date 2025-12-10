@@ -4,14 +4,16 @@ import { Link } from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
-import {LucideSearch} from "lucide-react"
+import {LucideSearch, Heart} from "lucide-react"
+import ProfileDropdown from "@/components/common/ProfileDropdown";
+
 
 
 function Navbar() {
 
   const navigate = useNavigate();
 
-  const auth = useAuth();
+  const {auth}= useAuth();
   return (
     // Header section
 
@@ -21,12 +23,12 @@ function Navbar() {
         <div className="container lg:max-w-full ml-3 flex items-center ">
           {/* Logo */}
           <div
-            className="flex w-fit max-w-full h-full p-2 justify-center"
+            className="flex w-fit max-w-full h-full p-2 justify-center cursor-pointer"
             onClick={() => {
               navigate("/");
             }}
           >
-            <a href="# b" className="0 w-full flex items-center pl-2.5">
+            <div className="0 w-full flex items-center pl-2.5">
               <img
                 src={auction}
                 alt="logo"
@@ -35,7 +37,7 @@ function Navbar() {
               <span className="text-xl mx-2 font-bold w-full text-blue-500 hover:text-blue-300 transition-all duration-300">
                 Miracle
               </span>
-            </a>
+            </div>
           </div>
 
           <CatagoriseButton />
@@ -65,8 +67,17 @@ function Navbar() {
               </Link>
             </div>
           ) : (
-            <ProfileMenu></ProfileMenu>
-            
+      
+            <>
+              <Link to = "/my-products"
+                
+                className="cursor-pointer hover:shadow-[0px_0px_5px] p-2 rounded-full hover:shadow-gray-400 transition-all duration-200 mr-2"
+              >
+                <Heart size={20} className="text-gray-600 hover:text-red-500 transition-colors" />
+              </Link>
+              <ProfileDropdown />
+            </>
+
           )}
         </div>
       </div>
@@ -94,7 +105,7 @@ function SearchBar() {
           placeholder="Tìm kiếm..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
+          className="w-[150px] lg:w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200"
         />
       </form>
       
@@ -102,30 +113,3 @@ function SearchBar() {
   );
 }
 
-function ProfileMenu() {
-  const navigate = useNavigate();
-  const auth = useAuth();
- 
-
-
-
-  const initials = auth?.full_name ? auth.full_name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase() : (auth?.username ? auth.username[0].toUpperCase() : 'U');
-
-  return (
-    <div className="relative flex items-center">
-      <button
-        onClick={() => navigate("/profile")}
-        className="flex items-center cursor-pointer space-x-3 px-3 py-1 rounded-full hover:shadow-md transition-all duration-200 bg-white/90 ml-4 mr-4"
-
-      >
-        <div className="w-10 h-10 rounded-full bg-blue-300 flex items-center justify-center text-white font-semibold">{initials}</div>
-        <div className="hidden md:flex flex-col text-left">
-          <span className="text-sm font-semibold text-gray-700">{auth?.full_name || auth?.username}</span>
-          <span className="text-xs text-gray-400">{auth?.email}</span>
-        </div>
-      </button>
-
-      
-    </div>
-  );
-}

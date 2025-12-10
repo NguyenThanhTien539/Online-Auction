@@ -1,7 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/routes/ProtectedRouter";
 import Home from "@/pages/home/HomePage";
+import AboutPage from "@/pages/AboutPage"
 import MainLayout from "@/layouts/MainLayout";
+import AuthLayout from "@/layouts/AuthLayout";
 import AdminMainLayout from "@/layouts/AdminMainLayout";
 import AccountRegister from "@/pages/auth/AccountRegisterPage";
 import AccountVerify from "@/pages/auth/AccountVerifyPage";
@@ -44,6 +46,10 @@ const routers = createBrowserRouter([
         element: <Home />,
       },
       {
+        path : "/about",
+        element : <AboutPage/>
+      },
+      {
         path: "/categories/:slugid",
         element: <AllCategoriesPage level={2} />,
       },
@@ -77,14 +83,14 @@ const routers = createBrowserRouter([
         element: <RegisterSellerPage />,
       },
       {
+        path : "/profile/:username_id",
+        element : <ProfilePage />
+      },
+      {
         path: "profile/edit",
         element : <EditProfilePage />
       }
     ],
-  },
-  {
-    path: "/profile",
-    element: <AuthProvider><ProfilePage /></AuthProvider>,
   },
   {
     path: "/test",
@@ -92,6 +98,7 @@ const routers = createBrowserRouter([
   },
   {
     path: "/accounts",
+    element: <AuthLayout />,
     children: [
       {
         path: "register",

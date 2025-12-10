@@ -8,9 +8,11 @@ import {useAuth} from "@/routes/ProtectedRouter";
 import PlayBidSection from './components/PlayBidSection';
 import BidHistorySection from './components/BidHistorySection';
 import QASection from './components/QASection';
-import { Eye, Clock, Calendar, User, Star, Award, FileText } from 'lucide-react';
+import ProductDescriptionSection from './components/ProductDescriptionSection';
+import { Eye, Clock, Calendar, User, Star, Award, FileText, TrendingUp } from 'lucide-react';
 import PreviewImage from './components/PreviewProductModal';
 import Loading from '@/components/common/Loading';
+import AddToLove from '@/components/common/AddToLove';
 type ProductType = {
   product_id : number,
   product_name : string,
@@ -35,10 +37,10 @@ type ProductType = {
 function DetailProductPage() {
 
   // Auth user useContext
-  const authUser = useAuth();
+  const {auth} = useAuth();
 
   // Sample product data - in a real app, this would come from props or API
-  const [products, setProduct] = useState<ProductType | null>(null);
+  const [products, setProduct] = useState<ProductType>();
   const {slugid} = useParams();
   let product_id : number;
   let product_slug : string;
@@ -138,9 +140,9 @@ function DetailProductPage() {
 
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
+
 
   const handleImageClick = (index: number) => {
     setCurrentImageIndex(index);
@@ -163,9 +165,9 @@ function DetailProductPage() {
   return (
     isLoading ? <Loading></Loading> :<div className=" mx-auto px-4 py-8">
       {/* Product Name */}
-      <h1 className="text-4xl font-bold text-gray-500 mb-6">{products?.product_name}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">{products?.product_name}</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.85fr_1fr] gap-8">
         {/* Main Image and Related Images */}
         <div className="space-y-4">
           {/* Main Image */}
@@ -173,15 +175,19 @@ function DetailProductPage() {
             <img
               src={products?.product_images[currentImageIndex]}
               alt={products?.product_name}
-              className="w-full h-[500px] object-cover rounded-lg shadow-lg cursor-pointer"
+              className="w-full h-[600px] object-cover rounded-lg shadow-lg cursor-pointer"
               onClick={() => openImageModal(currentImageIndex)}
             />
+            <div onClick = {(e) => e.stopPropagation()}>
+                <AddToLove product_id = {products?.product_id || 0} className = "w-[100px] right-20 top-5"></AddToLove>
+            </div>
             <div 
-              className="absolute top-3 right-3 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 backdrop-blur-sm"
+              className="absolute top-5 right-5 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 backdrop-blur-sm"
               onClick={() => openImageModal(currentImageIndex)}
               title="Xem chi tiết hình ảnh"
             >
               <Eye className="w-5 h-5 text-white"/>
+              
             </div>
           </div>
 
@@ -193,7 +199,7 @@ function DetailProductPage() {
                   key={index}
                   src={image}
                   alt={`Image ${index + 1}`}
-                  className={`w-24 h-16 object-cover rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:scale-105 flex-shrink-0 ${
+                  className={`w-28 h-20 object-cover rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:scale-105 flex-shrink-0 ${
                     index === currentImageIndex ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'
                   }`}
                   onClick={() => handleImageClick(index)}
@@ -201,97 +207,27 @@ function DetailProductPage() {
               ))}
             </div>
           </div>
-          {/* Auction Timing */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-500 rounded-lg">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h4 className="text-xl font-bold text-gray-800">
-                  Thời gian đấu giá
-                </h4>
-                <p className="text-sm text-gray-600">Theo dõi tiến trình phiên đấu giá</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {/* Start Time */}
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Calendar className="w-4 h-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Thời điểm đăng sản phẩm</p>
-                  <p className="text-base font-semibold text-gray-800">{formattedStartTime}</p>
-                </div>
-              </div>
-
-              {/* End Time */}
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <Clock className="w-4 h-4 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Thời gian còn lại</p>
-                  <p className="text-base font-bold text-red-600">{timeLeft}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-emerald-500 rounded-lg">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h4 className="text-xl font-bold text-gray-800">
-                  Mô tả sản phẩm
-                </h4>
-                <p className="text-sm text-gray-600">Thông tin chi tiết về sản phẩm</p>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div
-                className={`text-gray-700 leading-relaxed ${isExpanded ? '' : 'line-clamp-4'}`}
-                dangerouslySetInnerHTML={{ __html: products?.description || '' }}
-              />
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-3 px-3 py-2 cursor-pointer"
-              >
-                {isExpanded ? 'Thu gọn ▲' : 'Xem thêm ▼'}
-              </button>
-            </div>
-          </div>
         </div>
 
-
-
-
-        {/* Product Details */}
-        <div className="space-y-3 min-w-0">
+        {/* Product Details - Right Column */}
+        <div className="space-y-4">
           {/* Pricing Section */}
-          <div className="bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Chi tiết giá:</h3>
-            <div className="space-y-0">
+          <div className="bg-white border border-gray-200 p-5 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Giá đấu giá</h3>
+            </div>
+            <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">Giá hiện tại:</span>  
-                <span className="text-2xl font-bold text-blue-400">
-                  
+                <span className="text-sm font-medium text-gray-600">Giá hiện tại:</span>  
+                <span className="text-2xl font-bold text-blue-600">
                   {products?.current_price.toLocaleString()} VNĐ
                 </span>
               </div>
               {products?.buy_now_price && (
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-medium text-gray-700">Giá mua ngay:</span>
-                  <span className="text-xl font-bold text-rose-500">
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                  <span className="text-sm font-medium text-gray-600">Giá mua ngay:</span>
+                  <span className="text-lg font-bold text-rose-600">
                     {products.buy_now_price.toLocaleString()} VNĐ
                   </span>
                 </div>
@@ -299,23 +235,37 @@ function DetailProductPage() {
             </div>
           </div>
 
-          {/* Seller Info */}
-          <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-indigo-500 rounded-lg">
-                <User className="w-5 h-5 text-white" />
+          {/* Auction Timing */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <h4 className="text-lg font-semibold text-gray-900">Thời gian đấu giá</h4>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <Calendar className="w-5 h-5 text-green-600" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 mb-1">Bắt đầu</p>
+                  <p className="text-sm font-semibold text-gray-900">{formattedStartTime}</p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-lg font-bold text-gray-800">
-                  Người bán
-                </h4>
-                <p className="text-sm text-gray-600">Thông tin người bán sản phẩm</p>
+              <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+                <Clock className="w-5 h-5 text-red-600" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 mb-1">Còn lại</p>
+                  <p className="text-lg font-bold text-red-600">{timeLeft}</p>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Seller Details */}
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+          {/* Seller Info */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="w-5 h-5 text-indigo-600" />
+              <h4 className="text-lg font-semibold text-gray-900">Người bán</h4>
+            </div>
+            <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-lg">{products?.seller_username?.charAt(0).toUpperCase()}</span>
@@ -323,7 +273,7 @@ function DetailProductPage() {
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div className="flex-1">
-                <h5 className="text-base font-bold text-gray-900 mb-1">{products?.seller_username}</h5>
+                <h5 className="text-base font-semibold text-gray-900 mb-1">{products?.seller_username}</h5>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
@@ -337,8 +287,8 @@ function DetailProductPage() {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {products?.seller_rating?.toFixed(1)}/5.0
+                  <span className="text-xs text-gray-600">
+                    {products?.seller_rating?.toFixed(1)}
                   </span>
                 </div>
               </div>
@@ -346,33 +296,23 @@ function DetailProductPage() {
           </div>
 
           {/* Highest Bidder Info */}
-          { (
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-amber-500 rounded-lg">
-                  <Award className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-gray-800">
-                    Người thắng cuộc
-                  </h4>
-                  <p className="text-sm text-gray-600">Người đặt giá cao nhất hiện tại</p>
-                </div>
+          {products?.price_owner_username && (
+            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Award className="w-5 h-5 text-amber-600" />
+                <h4 className="text-lg font-semibold text-gray-900">Người dẫn đầu</h4>
               </div>
-
-              {/* Bidder Details */}
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">{products?.price_owner_username?.charAt(0).toUpperCase()}</span>
+                    <span className="text-white font-bold text-lg">{products.price_owner_username.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center">
                     <Award className="w-3 h-3 text-white" />
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h5 className="text-base font-bold text-gray-900 mb-1">{maskName(products?.price_owner_username || "")}</h5>
+                  <h5 className="text-base font-semibold text-gray-900 mb-1">{maskName(products.price_owner_username)}</h5>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -386,33 +326,25 @@ function DetailProductPage() {
                         />
                       ))}
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {products?.price_owner_rating?.toFixed(1)}/5.0
+                    <span className="text-xs text-gray-600">
+                      {products?.price_owner_rating?.toFixed(1)}
                     </span>
                   </div>
-                  <p className="text-xs text-amber-600 font-medium mt-1">🏆 Đang dẫn đầu đấu giá</p>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Bid Section */}
-          <div className="bg-white border border-gray-200 py-6 px-1 rounded-lg shadow-sm">
-            <PlayBidSection product_id = {products?.product_id} current_price = {products?.current_price} step_price = {products?.step_price}></PlayBidSection>
-          </div>
-          {/* Bid History */}
-        
-          {authUser && <div className="bg-white border border-gray-200 py-6 px-1 rounded-lg shadow-sm">
-            
-            <BidHistorySection product_id = {products?.product_id}></BidHistorySection>
-          </div>}
-
         </div>
       </div>
 
+      {/* Bid Section - Full Width */}
+      <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <PlayBidSection product_id={products?.product_id} current_price={products?.current_price} step_price={products?.step_price} />
+      </div>
 
-      {/* Q&A Section */}
-      <QASection product_id = {products?.product_id}></QASection>
+      {/* Tab Section */}
+      <TabSection products={products} />
+      
 
       {/* Image Preview Modal */}
       {imageModalOpen && products?.product_images && (
@@ -426,6 +358,68 @@ function DetailProductPage() {
       )}
       
     </div>
+  );
+}
+
+function TabSection({products}: {products?: ProductType}) {
+  const authUser = useAuth();
+  const [activeTab, setActiveTab] = useState<'description' | 'bidHistory' | 'qa'>('description');
+  return (
+    <>
+      {/* Tabs Section */}
+      <div className="mt-8">
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button
+            onClick={() => setActiveTab('description')}
+            className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
+              activeTab === 'description'
+                ? 'border-b-2 b order-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Mô tả sản phẩm
+          </button>
+          <button
+            onClick={() => setActiveTab('bidHistory')}
+            className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
+              activeTab === 'bidHistory'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Lịch sử đấu giá
+          </button>
+          <button
+            onClick={() => setActiveTab('qa')}
+            className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
+              activeTab === 'qa'
+                ? 'border-b-2 border-blue-500 text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Hỏi đáp
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="min-h-fit pb-20">
+          {activeTab === 'description' && products?.description && (
+            <ProductDescriptionSection description={products.description} />
+          )}
+          {activeTab === 'bidHistory' && authUser && (
+            <div className="bg-white py-2 px-2 rounded-lg">
+              <BidHistorySection product_id={products?.product_id} />
+            </div>
+          )}
+          {activeTab === 'qa' && (
+            <div className="bg-white py-2 px-2 rounded-lg">
+              <QASection product_id={products?.product_id} />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

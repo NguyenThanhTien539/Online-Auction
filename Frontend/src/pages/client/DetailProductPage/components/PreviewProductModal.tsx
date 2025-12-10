@@ -27,10 +27,10 @@ export default function PreviewImage({images, name, modalImageIndex, setModalIma
     };
     return(
         <>
-          <div className="fixed inset-0 z-[10001] flex items-center justify-center p-2 bg-black/80 backdrop-blur-sm animate-fadeIn" onClick={() => setImageModalOpen(false)}>
-          <div className="relative w-[70vw] max-w-7xl max-h-[95vh] bg-white rounded-xl shadow-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 z-[10001] flex items-center justify-center p-2 bg-black/70 backdrop-blur-sm animate-fadeIn" onClick={() => setImageModalOpen(false)}>
+          <div className="relative w-[70vw] max-w-7xl max-h-[95vh] rounded-xl shadow-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-500 to-white text-white">
+            <div className="flex items-center justify-between p-4 bg-white/50 text-white">
               <h3 className="text-lg font-semibold flex items-center">
                 <Eye className="w-5 h-5 mr-2" />
                 {name} ({modalImageIndex + 1}/{images.length})
@@ -45,12 +45,12 @@ export default function PreviewImage({images, name, modalImageIndex, setModalIma
             </div>
             
             {/* Modal Body */}
-            <div className="relative bg-gray-300">
-              <div className="relative p-6">
+            <div className="relative bg-white/30">
+              <div className="relative p-6 py-2">
                 <img
                   src={images[modalImageIndex]}
                   alt={`${name} - Image ${modalImageIndex + 1}`}
-                  className="max-w-full max-h-[55vh] object-contain mx-auto rounded-lg shadow-lg"
+                  className="max-w-full max-h-[70vh] object-contain mx-auto rounded-lg shadow-lg"
                 />
                 
                 {/* Navigation Arrows */}
@@ -76,7 +76,7 @@ export default function PreviewImage({images, name, modalImageIndex, setModalIma
               
               {/* Thumbnail Navigation */}
               {images && (
-                <div className="p-4 bg-gray-100 h-[100px] ">
+                <div className="p-4 bg-gray-100/70 h-[100px] ">
                   <div className="flex justify-center space-x-2 py-2 overflow-x-auto">
                     {images.map((image, index) => (
                       <img

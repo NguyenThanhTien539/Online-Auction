@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-const AuthContext = createContext<AuthType | null>(null);
+const AuthContext = createContext<any>(null);
 export type AuthType = {
   user_id: number;
   username: string;
@@ -15,7 +15,7 @@ export type AuthType = {
 };
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthType | null>(null);
-  const location = useLocation();
+
   async function getUserData() {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
@@ -36,9 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("User data fetched:");
 
     getUserData();
-  }, [location.pathname]);
+  }, []);
 
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{auth :user, setAuth: setUser}}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -54,8 +54,8 @@ function DropDownMenuAlpha ({items = [
                       </svg>
 
                 </span>
-                <div className = {`flex flex-col shadow-[10px_15px_10px] shadow-black absolute bg-gray-700 w-full mt-4 ${open ? "top-full visible opacity-100" : " top-[150%] invisible opacity-0"} \
-                    transition-all duration-300 rounded-[5px] z-50`}>
+                <div className = {cn(`flex flex-col shadow-[10px_15px_10px] shadow-black absolute bg-gray-700 w-full mt-4 ${open ? "top-full visible opacity-100" : " top-[150%] invisible opacity-0"} \
+                    transition-all duration-300 rounded-[5px] z-50`, className)}>
                         {(items).map((item, index) => (
                             <a key = {index} href = {item.link} className = " p-1 w-full m-1 text-neutral-300 font-semibold hover:text-white">{item.option}</a>
                         ))}

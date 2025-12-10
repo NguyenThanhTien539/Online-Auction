@@ -1,6 +1,6 @@
 
 
-import { MessageCircle, User, HelpCircle, Plus } from "lucide-react";
+import { MessageCircle, User, HelpCircle, Plus, Send } from "lucide-react";
 
 export default function QASection({product_id} : {product_id?: number}){
 
@@ -14,71 +14,83 @@ export default function QASection({product_id} : {product_id?: number}){
     ],
   };
   return(
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border p-8 transition-all duration-300 mt-8">
+    <div className="bg-white">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl shadow-lg">
-          <MessageCircle className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <h4 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-            Hỏi đáp
-          </h4>
-          <p className="text-sm text-gray-600 mt-1">Giải đáp thắc mắc về sản phẩm</p>
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h3 className="text-xl font-semibold text-gray-900">Câu hỏi về sản phẩm</h3>
+        <p className="text-sm text-gray-600 mt-1">Hỏi và trả lời về sản phẩm này</p>
+      </div>
+
+      {/* Ask Question Form */}
+      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <div className="flex gap-3">
+          <div className="flex-shrink-0">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-blue-600" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <textarea
+              placeholder="Đặt câu hỏi của bạn..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows={2}
+            />
+            <div className="flex justify-end mt-2">
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <Send className="w-4 h-4" />
+                Gửi câu hỏi
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {product.qa.length > 0 ? (
-        <div className="space-y-6">
-          {product.qa.map((item) => (
-            <div key={item.id} className="bg-gradient-to-r from-white to-gray-50/50 p-6 rounded-xl border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-200">
+      {/* Questions List */}
+      <div className="divide-y divide-gray-200">
+        {product.qa.length > 0 ? (
+          product.qa.map((item) => (
+            <div key={item.id} className="px-6 py-6 hover:bg-gray-50 transition-colors duration-150">
               {/* Question */}
-              <div className="flex items-start gap-3 mb-4">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <HelpCircle className="w-4 h-4 text-blue-600" />
+              <div className="flex gap-3 mb-4">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <HelpCircle className="w-4 h-4 text-gray-600" />
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <User className="w-4 h-4 text-gray-500" />
-                    <span className="font-semibold text-gray-800">{item.asker}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-gray-900">{item.asker}</span>
+                    <span className="text-xs text-gray-500">• 2 ngày trước</span>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{item.question}</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">{item.question}</p>
                 </div>
               </div>
 
               {/* Answer */}
-              <div className="flex items-start gap-3 ml-8">
-                <div className="w-px h-8 bg-gradient-to-b from-green-400 to-blue-400 rounded-full"></div>
-                <div className="flex-1 bg-green-50/50 p-4 rounded-lg border-l-4 border-green-400">
-                  <div className="flex items-center gap-2 mb-2">
+              <div className="flex gap-3 ml-11">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="font-semibold text-green-700">Người bán trả lời:</span>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{item.answer}</p>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-gray-900">Người bán</span>
+                    <span className="text-xs text-gray-500">• 1 ngày trước</span>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">{item.answer}</p>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-200">
-          <div className="text-gray-400 text-4xl mb-3">💬</div>
-          <p className="text-gray-600 font-medium text-lg">Chưa có câu hỏi nào.</p>
-          <p className="text-sm text-gray-500 mt-1">Hãy là người đầu tiên đặt câu hỏi!</p>
-        </div>
-      )}
-
-      {/* Ask Question Button */}
-      <div className="mt-8 flex justify-center">
-        <button className="group bg-blue-300 cursor-pointer text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 hover:scale-105">
-          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-          Đặt câu hỏi
-        </button>
+          ))
+        ) : (
+          <div className="px-6 py-12 text-center">
+            <MessageCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-sm font-medium text-gray-900 mb-1">Chưa có câu hỏi nào</h3>
+            <p className="text-sm text-gray-500">Hãy là người đầu tiên đặt câu hỏi để nhận tư vấn từ người bán.</p>
+          </div>
+        )}
       </div>
-
-      {/* Decorative elements */}
-      <div className="absolute top-6 right-6 w-20 h-20 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-xl -z-10"></div>
-      <div className="absolute bottom-6 left-6 w-16 h-16 bg-gradient-to-br from-green-200/20 to-blue-200/20 rounded-full blur-lg -z-10"></div>
     </div>
   )
 

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+@import "animate.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -491,4 +491,18 @@ html {
 /* IE and Edge */
 .scrollbar-horizontal-only {
   -ms-overflow-style: auto; /* Hiện scrollbar ngang */
+}
+
+/* Shine animation for CategoryCard */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-out;
 }
