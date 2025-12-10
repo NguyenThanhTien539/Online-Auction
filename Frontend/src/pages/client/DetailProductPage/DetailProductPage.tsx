@@ -88,13 +88,11 @@ function DetailProductPage() {
 
   useEffect (() => {
     if (!socket)  return;
-    if (socket && products){
-        socket.on("new_bid", (data : any) => {
+    socket.on("new_bid", (data : any) => {
             console.log("Received new bid data via socket: ", data.data);
             // Update product data with new bid info
             setProduct(data.data);
         })
-    }
     return () => {
         if (socket) {
             socket.off("new_bid");

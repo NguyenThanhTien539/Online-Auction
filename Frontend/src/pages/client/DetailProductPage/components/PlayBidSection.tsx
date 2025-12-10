@@ -76,7 +76,11 @@ export default function PlayBidSection({product_id, current_price, step_price} :
 
     })
 
-  }, [])
+    return (()=>{
+      validate.destroy();
+    })
+
+  }, [product_id, current_price, step_price]);
 
 
 
