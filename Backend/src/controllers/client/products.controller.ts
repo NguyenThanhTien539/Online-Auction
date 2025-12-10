@@ -25,8 +25,8 @@ export async function getProductsPageList(req: Request, res: Response){
         
         return res.status(500).json({message: "Error in fetching products"});
     }
-    let {data, numberOfPages} = result;
-    return  res.status(200).json({message: "Success", data: data, numberOfPages: numberOfPages});
+    let {data, numberOfPages, quantity} = result;
+    return  res.status(200).json({message: "Success", data: data, numberOfPages: numberOfPages, quantity: quantity});
 
 }
 
@@ -122,27 +122,16 @@ export async function getMyProductsList (req: Request, res: Response) {
         const user = (req as any).user;
         const type = req.query.type as string;
         const page = parseInt(req.query.page as string) || 1;
+
         let result;
         switch (type) {
             case "my-favorites":    
                 result = await productsModel.getMyFavoriteProducts(user.user_id, page);     
                 break;
             case "my-selling":
-                if (user.role !== "seller" && user.role !== "admin"){
-                    return res.status(403).json({
-                        status: "error",
-                        message: "Access denied: insufficient permissions"
-                    });
-            }
                 result = await productsModel.getMySellingProducts(user.user_id, page);
                 break;
             case "my-sold":
-                if (user.role !== "seller" && user.role !== "admin"){
-                    return res.status(403).json({
-                        status: "error",
-                        message: "Access denied: insufficient permissions"
-                    });
-                }
                 result = await productsModel.getMySoldProducts(user.user_id, page);
                 break;
             case "my-won":
@@ -150,6 +139,9 @@ export async function getMyProductsList (req: Request, res: Response) {
                 break;
             case "my-bidding":
                 result = await productsModel.getMyBiddingProducts(user.user_id, page);
+                break;
+            case "my-inventory":
+                result = await productsModel.getMyInventoryProducts(user.user_id, page);
                 break;
             default: 
                 return res.status(400).json({
@@ -164,11 +156,12 @@ export async function getMyProductsList (req: Request, res: Response) {
                 message: "No products found"
             });
         }
-        let {data, numberOfPages} = result ;
+        let {data, numberOfPages, quantity} = result ;
         return  res.status(200).json({
             status: "success",
             data: data,
-            numberOfPages: numberOfPages
+            numberOfPages: numberOfPages,
+            quantity: quantity
         });
 
     }
@@ -209,7 +202,6 @@ export async function getLoveStatus (req: Request, res: Response) {
     try {
         const user = (req as any).user;
         const product_id = req.query.product_id as string;
-        console.log("Fetching love status for product_id: ", product_id, " and user: ", user ? user.user_id : "guest");
         if (!product_id){
             return res.status(400).json({
                 status: "error",

@@ -69,10 +69,10 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         //  just update max_price in bidding_history
         await db.raw(`
             update bidding_history
-            set max_price = ?
+            set max_price = ?, created_at = now()
             where product_id = ? and price_owner_id = ? and created_at = 
             (select MAX(created_at) from bidding_history where product_id = ? and price_owner_id = ?)
-        `, [max_price, product_id, user_id]);
+        `, [max_price, product_id, user_id, product_id, user_id]);
         return;
     }
 

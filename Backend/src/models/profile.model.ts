@@ -22,14 +22,16 @@ export async function checkRegisterSellerRequest(user_id: number) {
 }
 
 export async function editUserProfile(data: any) {
-  await db("users")
+  const sql = await db("users")
     .where({ user_id: data.user_id })
     .update({
+      username: data.username,
       email: data.email,
       full_name: data.full_name,
       address: data.address,
       date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : null,
-    });
+    }).returning("*");
+  return sql;
 }
 
 export async function getAllSellerApplications() {
@@ -37,4 +39,27 @@ export async function getAllSellerApplications() {
 }
 export async function getSellerApplicationById(id: number) {
   return await db("upgrade_to_sellers").select("*").where({ id }).first();
+}
+
+export async function getUserProfileDetail(params : {username : string, user_id : number, current_user_id : number | null}) {
+  const isOwner = params.current_user_id === params.user_id;
+  console.log("Fetching profile for username:", params.username, "user_id:", params.user_id, "isOwner:", isOwner);
+  const sql = 
+  `
+  select *
+  from users u
+  where u.username = ? and u.user_id = ?
+  `;
+  const result = await db.raw(sql, [params.username, params.user_id]);
+
+  const data = await result.rows[0];
+  console.log("Fetched user profile data: ", data);
+  if (!data){
+    return null;
+  }
+  return {
+    data : data,
+    is_owner : isOwner
+  }
+
 }

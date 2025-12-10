@@ -41,7 +41,8 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     if (results) {
         return {
             data: results,
-            numberOfPages: numberOfPages
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
     
@@ -58,7 +59,9 @@ export async function getMyFavoriteProducts(user_id: string, page: number){
         left join love_products lp on p.product_id = lp.product_id
         left join users u on p.price_owner_id = u.user_id
         where lp.user_id = ?
+        order by p.created_at desc
         limit ? offset ?
+        
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
     let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
@@ -66,7 +69,8 @@ export async function getMyFavoriteProducts(user_id: string, page: number){
     if (results){
         return {
             data: results,
-            numberOfPages: numberOfPages
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
 } 
@@ -80,14 +84,17 @@ export async function getMySellingProducts(user_id: string, page: number){
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.seller_id = ? and p.end_time > now()
+        order by p.created_at desc
         limit ? offset ?
+        
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
     let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
     if (results){
         return {
             data: results,
-            numberOfPages: numberOfPages
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
     return null;
@@ -102,14 +109,17 @@ export async function getMySoldProducts(user_id: string, page: number){
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.seller_id = ? and p.end_time < now() and p.price_owner_id is not null
+        order by p.created_at desc
         limit ? offset ?
+        
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
     let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
     if (results){
         return {
             data: results,
-            numberOfPages: numberOfPages
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
     return null;
@@ -118,22 +128,23 @@ export async function getMySoldProducts(user_id: string, page: number){
 export async function getMyWonProducts(user_id: string, page: number){
     const itemsPerPage = 4;
     const offset = (page - 1) * itemsPerPage;
-    let numberOfPages = await db.raw(`
-        select count(*) as total
-        from products p
-        where p.price_owner_id = ? and p.end_time < now()`, [user_id]);
+
     let query = await db.raw(`
-        select p.*, u.username as price_owner_username
+        select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.price_owner_id = ? and p.end_time < now()
+        order by p.created_at desc
         limit ? offset ?
+        
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
     if (results){
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
     return null;
@@ -142,34 +153,61 @@ export async function getMyWonProducts(user_id: string, page: number){
 export async function getMyBiddingProducts(user_id: string, page: number){
     const itemsPerPage = 4;
     const offset = (page - 1) * itemsPerPage;
-    let numberOfPages = await db.raw(`
-        select count(*) as total
-        from products p
-        join bidding_history bh on p.product_id = bh.product_id
-        where bh.user_id = ? and p.end_time > now()`, [user_id]
-        );
 
+
+
+
+    // Then get paginated results
     let query = await db.raw(`
-        select distinct p.*, u.username as price_owner_username
-        from products p
-        join bidding_history bh on p.product_id = bh.product_id
-        left join users u on p.price_owner_id = u.user_id
-        where bh.user_id = ? and p.end_time > now()
-        limit ? offset ?
+        SELECT
+            p.*,
+            u.username AS price_owner_username, count(*) OVER() AS total_count
+        FROM products p
+        LEFT JOIN users u ON p.price_owner_id = u.user_id
+        WHERE
+            p.end_time > NOW()
+            AND p.product_id IN (
+                SELECT DISTINCT product_id
+                FROM bidding_history
+                WHERE user_id = ?
+            )
+        ORDER BY p.created_at DESC
+        LIMIT ? OFFSET ?
         `, [user_id, itemsPerPage, offset])
     let results = await query.rows;
+
     if (results){
         return {
             data: results,
-            numberOfPages: Math.ceil(numberOfPages.rows[0].total / itemsPerPage)
+            numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0,
+            quantity: results.length > 0 ? results[0].total_count : 0
         }
     }
     return null;
-} 
+}
 
-
-
-
+export async function getMyInventoryProducts(user_id: string, page: number){
+    const itemsPerPage = 4;
+    const offset = (page - 1) * itemsPerPage;
+    let query = await db.raw(`
+        select p.*, u.username as price_owner_username, count(*) over() as total_count
+        from products p
+        left join users u on p.price_owner_id = u.user_id
+        where p.seller_id = ? and p.end_time < now() and p.price_owner_id is null
+        order by p.created_at desc
+        limit ? offset ?
+        `, [user_id, itemsPerPage, offset])
+    let results = await query.rows;
+    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+    if (results){
+        return {
+            data: results,
+            numberOfPages: numberOfPages,
+            quantity: results.length > 0 ? results[0].total_count : 0
+        }
+    }
+    return null;
+}
 
 export async function getProductDetail(product_id: string, product_slug: string) {
     // Check slug matches
@@ -246,8 +284,8 @@ export async function getLoveStatus(user_id: number | null, product_id: number) 
                 where user_id = ? and product_id = ?
             )) as is_loved
             from love_products
-
-        `, [user_id, product_id]);
+            where user_id = ? and product_id = ?
+        `, [user_id, product_id, user_id, product_id]);
     let result = await query.rows[0];
 
     return {
@@ -267,7 +305,7 @@ export async function updateLoveStatus(user_id: number, product_id: number, love
             where user_id = ? and product_id = ?
         ) as is_loved
     `, [user_id, product_id]);
-    const currentStatus = currentStatusQuery.rows[0].is_loved;
+    const currentStatus = await currentStatusQuery.rows[0].is_loved;
     if (love_status && !currentStatus){
         // Add to love
         await db('love_products').insert({

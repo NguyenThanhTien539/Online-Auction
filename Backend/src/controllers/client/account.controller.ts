@@ -319,5 +319,5 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const logoutPost = async (_: Request, res: Response) => {
   res.clearCookie("accessToken");
-  res.json({ code: "success", message: "Đăng xuất thành công" });
+  res.json({ code: "success", message: "Đăng xuất thành công" , data : null});
 };
