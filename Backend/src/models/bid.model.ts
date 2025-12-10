@@ -23,14 +23,16 @@ export async function isMaxPriceValid (product_id: number, max_price: number) {
         where product_id = ?
     `, [product_id]);
     const currentPrice = await findCurrentPrice.rows[0].current_price;
-    const stepPrice = await findCurrentPrice.rows[0].step_price;
+    let stepPrice = await findCurrentPrice.rows[0].step_price;
+    stepPrice = stepPrice ? stepPrice : 0;
 
     if (max_price < currentPrice + stepPrice){
         return false;
     }
-    if ((max_price - currentPrice) % stepPrice !== 0){
+    if (stepPrice && (max_price - currentPrice) % stepPrice !== 0){
         return false;
     }
+
     return true;
 }
 
@@ -59,7 +61,7 @@ export async function isCurrentPriceOwner (user_id: number, product_id: number) 
 export async function playBid (user_id: number, product_id: number, max_price: number) {
     
 
-
+    
     // Update current price in products table
     // find max_price in bidding_history (newest highest bid)
     const isPriceOwner = await isCurrentPriceOwner(user_id, product_id);

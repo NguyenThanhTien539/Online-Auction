@@ -38,7 +38,7 @@ export default function PlayBidSection({product_id, current_price, step_price} :
       const maxPriceSubmit = form.max_price.value.split('.').join('').split(',').join('.');
 
       setIsSubmit (true);
-      fetch("http://localhost:5000/api/bid/play", {
+      fetch(`${import.meta.env.VITE_API_URL}/api/bid/play`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", 
@@ -51,15 +51,11 @@ export default function PlayBidSection({product_id, current_price, step_price} :
 
       })
       .then(res => {
-        if (res.status == 403){
-          toast.error ("Vui lòng đăng nhập để đặt giá!");
-          navigate ("/accounts/login");
-          
+        if (!res.ok) {
+          return res.json().then (data => {
+            throw new Error (data.message || "Lỗi kết nối đến server để đặt bid!");
+          })
         }
-        if (res.status == 400){
-          throw new Error ("Giá đấu không hợp lệ!");
-        }
-
         return res.json();
       })
       .then (data => {

@@ -10,6 +10,7 @@ import BidHistorySection from './components/BidHistorySection';
 import QASection from './components/QASection';
 import ProductDescriptionSection from './components/ProductDescriptionSection';
 import { Eye, Clock, Calendar, User, Star, Award, FileText, TrendingUp } from 'lucide-react';
+import useSocketBidding from '@/hooks/useSocketBidding';
 import PreviewImage from './components/PreviewProductModal';
 import Loading from '@/components/common/Loading';
 import AddToLove from '@/components/common/AddToLove';
@@ -42,13 +43,15 @@ function DetailProductPage() {
   // Sample product data - in a real app, this would come from props or API
   const [products, setProduct] = useState<ProductType>();
   const {slugid} = useParams();
-  let product_id : number;
+  let product_id : number | undefined;
   let product_slug : string;
   if (slugid){
     const parts = slugid.split("-");
     product_id = Number(parts.pop());
     product_slug = parts.join("-");
   }
+  // Socket for bidding
+  const socket = useSocketBidding( product_id ||null);
 
   // Custome time
 
@@ -57,6 +60,7 @@ function DetailProductPage() {
 
   const [isLoading, setLoading] = useState(true);
 
+  // Initial loading data
   useEffect(() => {
     // Fetch product data from API
     async function fetchProduct() {
@@ -81,6 +85,24 @@ function DetailProductPage() {
     }
     fetchProduct();
   },[]);
+
+  useEffect (() => {
+    if (!socket)  return;
+    if (socket && products){
+        socket.on("new_bid", (data : any) => {
+            console.log("Received new bid data via socket: ", data.data);
+            // Update product data with new bid info
+            setProduct(data.data);
+        })
+    }
+    return () => {
+        if (socket) {
+            socket.off("new_bid");
+        }
+    }
+  }, [socket]);
+
+
 
   // Update time every second
   useEffect (() => {
@@ -409,7 +431,7 @@ function TabSection({products}: {products?: ProductType}) {
           )}
           {activeTab === 'bidHistory' && authUser && (
             <div className="bg-white py-2 px-2 rounded-lg">
-              <BidHistorySection product_id={products?.product_id} />
+              <BidHistorySection product={products} />
             </div>
           )}
           {activeTab === 'qa' && (

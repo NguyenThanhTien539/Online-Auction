@@ -8,6 +8,10 @@
     "types": ["node"],
 
     /* ================== Paths ================== */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "rootDir": "./src",
     "outDir": "./dist",
 

@@ -4,7 +4,7 @@ import {buildTree} from "../../helpers/category.helper.ts";
 export async function getAllCategoriesLv1(_: Request, res: Response) {
   // Handle select all categories level 1
   const resultData = await categoriesModel.getAllCategoriesLv1();
-  console.log("Fetched Level 1 Categories: ", resultData);
+
   if (resultData === null) {
     return res.status(500).json({
       code: "error",
@@ -20,10 +20,10 @@ export async function getAllCategoriesLv1(_: Request, res: Response) {
 }
 export async function getAllCategoriesLv2NoSlug(req: Request, res: Response) {
   const id = req.query.cat_id;
-  console.log("Category ID received: ", id);
+
   // Handle select all categories level 2 with lv1 id
   const resultData = await categoriesModel.getAllCategoriesLv2NoSlug( Number(id) );
-  console.log("Fetched Level 2 Categories: ", resultData);
+
   if (resultData === null) {
     return res.status(500).json({
       code: "error",
@@ -41,8 +41,6 @@ export async function getAllCategoriesLv2(req: Request, res: Response) {
   const id = req.query.cat_id;
   const slug = req.query.cat_slug;
 
-  console.log("Category ID received: ", id);
-  console.log("Category Slug received: ", slug);
 
   // Handle select all categories level 2 with lv1 id
   
@@ -76,10 +74,10 @@ export async function getAllCategoriesLv2(req: Request, res: Response) {
 
 export async function getCategoryLv2ById(req: Request, res: Response) {
   const cat2_id = req.query.cat2_id;
-  console.log("Category Level 2 ID received: ", cat2_id);
+
   // Handle select category level 2 by id
   const resultData = await categoriesModel.getCategoryLv2ById( Number(cat2_id) );
-  console.log("Fetched Level 2 Category: ", resultData);
+
   if (resultData === null) {
     return res.status(500).json({
       code: "error",
@@ -103,7 +101,7 @@ export async function getAll(_: Request, res: Response) {
 
 
   const formattedData = buildTree(resultData);
-  console.log (formattedData);
+
  
 
   return res.status(200).json({

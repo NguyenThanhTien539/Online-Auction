@@ -2,6 +2,33 @@
 import db from "../config/database.config.ts";
 
 import { slugify } from "../helpers/slug.helper.ts";
+export async function isProductInBiddingTime (product_id: number) {
+    // Set products with end_time >= now()
+    const resultQuery = await db.raw(`
+        select *
+        from products
+        where product_id = ? and end_time >= now()
+    `, [product_id]);
+    const result = await resultQuery.rows[0];
+
+    return result ? true : false;
+}
+
+export async function getProductById (product_id: number) {
+    let query = await db.raw(`
+        SELECT 
+            p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
+            u1.rating AS price_owner_rating,
+            u2.username AS seller_username, u2.user_id AS seller_id,
+            u2.rating AS seller_rating
+            FROM products p
+        LEFT JOIN users u1 ON p.price_owner_id = u1.user_id
+        LEFT JOIN users u2 on p.seller_id = u2.user_id
+        WHERE p.product_id = ?
+    `, [product_id]);
+    let result = await query.rows[0];
+    return result;
+}
 
 export async function getProductsPageList(cat2_id : number, page: number, priceFilter: string, timeFilter: string) {
     const itemsPerPage = 4;
@@ -20,8 +47,7 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     else if (timeFilter === "desc") {
         orderBy.push("p.end_time DESC");
     }
-    
-    console.log("Order By Clauses: ", orderBy);
+
 
     let query = await db.raw(`
         SELECT 
@@ -36,7 +62,7 @@ export async function getProductsPageList(cat2_id : number, page: number, priceF
     let results = await query.rows;
     let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
 
-    console.log("Formatted Products: ", results);
+
     
     if (results) {
         return {

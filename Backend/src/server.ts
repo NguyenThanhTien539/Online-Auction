@@ -1,4 +1,6 @@
 import express from "express";
+import {Server} from "socket.io";
+import {createServer} from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -10,7 +12,18 @@ import adminRoutes from "./routes/admin/index.route.ts";
 
 import variableConfig from "./config/variable.config.ts";
 import cookieParser from "cookie-parser";
-const app = express();
+const app = express(); // Create express app
+const httpServer = createServer(app); // Create HTTP server
+
+// Create Socket.io server
+export const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+  
 const port = 5000;
 
 // Middlewares
@@ -28,7 +41,26 @@ var pathAdmin: String = variableConfig.pathAdmin; //set global variable for admi
 app.use("/", clientRoutes);
 app.use(`/${pathAdmin}`, adminRoutes);
 
-app.listen(port, () => {
+// Config socket.io
+io.on("connection", (socket) => {
+  console.log("A user connected: ", socket.id);
+
+
+  // Products bidding room
+  socket.on("join_bidding_channel", (product_id: number) => {
+    socket.join(`bidding_room_${product_id}`);
+    console.log(`User ${socket.id} joined room bidding_room_${product_id}`);
+  })
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected: ", socket.id);
+  });
+})
+
+
+
+// Start the server
+httpServer.listen (port, () => {
   console.log(`Your website is running at port: http://localhost:${port}`);
-});
+})
 //

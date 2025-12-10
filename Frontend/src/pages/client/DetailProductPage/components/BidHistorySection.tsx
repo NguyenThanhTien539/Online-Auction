@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import {toast} from "sonner"
 
-export default function BidHistorySection({product_id} : {product_id?: number}){
+type ProductType = {
+  product_id: number,
+}
+export default function BidHistorySection({product} : {product?: ProductType | null}){
   const [bidHistory, setBidHistory] = useState<{
     bidding_id: number,
     user_id: number,
@@ -18,7 +21,7 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
     async function fetchBidHistory(){
       // Fetch bid history from API
       try{
-        const response = await fetch(`http://localhost:5000/api/bid/history?product_id=${product_id}`, {
+        const response = await fetch(`http://localhost:5000/api/bid/history?product_id=${product?.product_id}`, {
           method: "GET",
           credentials: "include",
         });
@@ -34,7 +37,7 @@ export default function BidHistorySection({product_id} : {product_id?: number}){
       }
     }
     fetchBidHistory();
-  }, [product_id]);
+  }, [product]);
   
  
 
