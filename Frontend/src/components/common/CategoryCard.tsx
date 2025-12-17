@@ -43,6 +43,7 @@ function CategoryCard({ name = "Ronaldo", image, onClick, className }: CategoryC
           src={displayImage}
           alt={name}
           className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-110"
+          loading ="lazy"
         />
 
         {/* Image overlay gradient - Gray/Blue theme */}

@@ -4,6 +4,8 @@ import {toast} from "sonner"
 type ProductType = {
   product_id: number,
 }
+import Loading from "@/components/common/Loading";
+
 export default function BidHistorySection({product} : {product?: ProductType | null}){
   const [bidHistory, setBidHistory] = useState<{
     bidding_id: number,
@@ -15,13 +17,16 @@ export default function BidHistorySection({product} : {product?: ProductType | n
     price_owner_id: number,
     price_owner_username: string,
   }[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   
 
   useEffect(()=>{
+    setLoading (true);
     async function fetchBidHistory(){
+      
       // Fetch bid history from API
       try{
-        const response = await fetch(`http://localhost:5000/api/bid/history?product_id=${product?.product_id}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bid/history?product_id=${product?.product_id}`, {
           method: "GET",
           credentials: "include",
         });
@@ -37,6 +42,9 @@ export default function BidHistorySection({product} : {product?: ProductType | n
       }
     }
     fetchBidHistory();
+    setInterval (() => {
+      setLoading (false);
+    }, 500);
   }, [product]);
   
  
@@ -47,6 +55,11 @@ export default function BidHistorySection({product} : {product?: ProductType | n
     const thirdLen = Math.floor(len / 3);
     return name.substring(0, len - thirdLen) + '***';
   };
+
+
+  if (loading){
+    return <Loading className = "static w-full h-full bg-transparent"/>;
+  }
 
   return(
     <div className="bg-white rounded-lg p-6">

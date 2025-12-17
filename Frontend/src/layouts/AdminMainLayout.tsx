@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
 
 export default function MainLayout() {
-  const auth = useAuth();
+  const {auth}= useAuth();
   const route = useNavigate();
 
   if (!auth) {

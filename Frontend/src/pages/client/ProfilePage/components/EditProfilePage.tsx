@@ -29,7 +29,7 @@ export default function EditProfilePage() {
   const {auth, setAuth} = useAuth();
   const [date, setDate] = useState<Date | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null); // Ensure form is initialized only once
-
+  
   // Form state
   const [formData, setFormData] = useState<ProfileData | null>(null);
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function EditProfilePage() {
     .then (data => {
         toast.success (data.message || "Cập nhật thông tin thành công");
         setAuth (data.data);
-        navigate ("/");
+        navigate (-1);
     })
     .catch (err => {
         toast.error (err.message || "Có lỗi xảy ra khi cập nhật thông tin");
@@ -245,7 +245,7 @@ export default function EditProfilePage() {
             <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 mt-8 pt-6 border-t border-gray-200">
               <button
                 type="button"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate(-1)}
                 className="px-6 py-3 cursor-pointer border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Hủy bỏ

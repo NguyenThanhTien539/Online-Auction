@@ -149,19 +149,6 @@ function PostProductPage(){
             setIsSubmitting(true);
 
 
-
-            // const formPayload = new FormData();
-            // formPayload.append("product_name", formData.product_name);
-            // // formPayload.append("cat1_id", formData.cat1_id.toString());
-            // formPayload.append("cat2_id", formData.cat2_id.toString());
-            // formPayload.append("start_price", formData.start_price.toString());
-            // formPayload.append("step_price", formData.step_price.toString());
-            // formPayload.append("buy_now_price", formData.buy_now_price.toString());
-            // formPayload.append("start_time", formData.start_time ? formatToUTC(formData.start_time, "datetime") : '');
-            // formPayload.append("end_time", formData.end_time ? formatToUTC(formData.end_time, "datetime") : '');
-            // formPayload.append("description", formData.description);
-            // formPayload.append("auto_extended", formData.autoExtend ? "true" : "false");
-
             const formPayLoad = new FormData();
             const form = event.target as HTMLFormElement;
             

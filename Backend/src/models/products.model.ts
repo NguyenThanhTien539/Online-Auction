@@ -350,3 +350,66 @@ export async function updateLoveStatus(user_id: number, product_id: number, love
     }
     return;
 }
+
+
+export async function getProductQuestions({product_id, page, limit} : {product_id: number, page: number, limit: number}) {
+    const offset = (page - 1) * limit;
+
+    // limit is the limit of parent question, and result include all children of these parents
+    let query = await db.raw (`
+        WITH ParentQuestions AS (
+            SELECT pq.*, u.username, u.user_id
+            FROM product_questions pq 
+            LEFT JOIN users u ON pq.user_id = u.user_id
+            WHERE pq.product_id = ? AND pq.question_parent_id IS NULL
+            ORDER BY pq.created_at DESC
+            LIMIT ? OFFSET ?
+        ),
+        TotalCount AS (
+            SELECT count(*) as full_count 
+            FROM product_questions 
+            WHERE product_id = ? AND question_parent_id IS NULL
+        )
+        -- Gộp kết quả
+        SELECT res.*, tc.full_count as total_count
+        FROM (
+            SELECT pq.*, u.username, u.user_id
+            FROM product_questions pq
+            LEFT JOIN users u ON pq.user_id = u.user_id
+            WHERE pq.question_parent_id IN (SELECT question_id FROM ParentQuestions)
+            
+            UNION ALL
+            
+            SELECT * FROM ParentQuestions
+        ) res
+        CROSS JOIN TotalCount tc
+        ORDER BY res.created_at DESC;
+        `, [product_id, limit, offset, product_id]);
+    let allQuestions = await query.rows;
+    return {
+        data : allQuestions,
+        total_questions: allQuestions.length > 0 ? allQuestions[0].total_count : 0
+    }
+}
+
+
+export async function postProductQuestion({product_id, user_id, content, question_parent_id} : {product_id: number, user_id: number, content: string, question_parent_id?: number | null}) {
+    const insertData: any = {
+        product_id: product_id,
+        user_id: user_id,
+        content: content,
+    };
+    if (question_parent_id){
+        insertData.question_parent_id = question_parent_id;
+    }
+    let result = await db('product_questions').insert(insertData).returning("*");
+    const newQuestions = await result[0];
+    let query = await db.raw (`
+        SELECT pq.*, u.username, u.user_id
+        FROM product_questions pq
+        LEFT JOIN users u ON pq.user_id = u.user_id
+        WHERE pq.question_id = ?
+    `, [newQuestions.question_id]);
+    result = await query.rows[0];
+    return result;
+}

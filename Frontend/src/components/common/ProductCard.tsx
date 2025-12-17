@@ -108,7 +108,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
             {/* Image */}
             
             <div className = "flex w-full h-[50%] shrink-0 overflow-hidden rounded-t-xl justify-center relative">
-                <img src = {product_image} className = "flex object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"></img>
+                <img src = {product_image} loading = "lazy" className = "flex object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"></img>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div onClick={(e) => e.stopPropagation()}>

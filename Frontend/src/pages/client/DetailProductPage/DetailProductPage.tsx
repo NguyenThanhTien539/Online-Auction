@@ -39,7 +39,7 @@ function DetailProductPage() {
 
   // Auth user useContext
   const {auth} = useAuth();
-
+  const [isSeller, setIsSeller] = useState(false);
   // Sample product data - in a real app, this would come from props or API
   const [products, setProduct] = useState<ProductType>();
   const {slugid} = useParams();
@@ -67,7 +67,7 @@ function DetailProductPage() {
       try{
         // param is slug-id
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/products/detail?product_id=${product_id}&product_slug=${product_slug}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/detail?product_id=${product_id}&product_slug=${product_slug}`);
         const data = await response.json();
         if (!response.ok){
           toast.error("Lỗi khi tải sản phẩm");
@@ -84,6 +84,11 @@ function DetailProductPage() {
       setLoading (false);
     }
     fetchProduct();
+
+    // Check if auth user is seller of this product
+    if (auth && products){
+      setIsSeller (auth.user_id === products.seller_id);
+    }
   },[]);
 
   useEffect (() => {
@@ -195,6 +200,7 @@ function DetailProductPage() {
             <img
               src={products?.product_images[currentImageIndex]}
               alt={products?.product_name}
+              loading = "lazy"
               className="w-full h-[600px] object-cover rounded-lg shadow-lg cursor-pointer"
               onClick={() => openImageModal(currentImageIndex)}
             />
@@ -219,6 +225,7 @@ function DetailProductPage() {
                   key={index}
                   src={image}
                   alt={`Image ${index + 1}`}
+                  loading = "lazy"
                   className={`w-28 h-20 object-cover rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:scale-105 flex-shrink-0 ${
                     index === currentImageIndex ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'
                   }`}
@@ -434,7 +441,7 @@ function TabSection({products}: {products?: ProductType}) {
           )}
           {activeTab === 'qa' && (
             <div className="bg-white py-2 px-2 rounded-lg">
-              <QASection product_id={products?.product_id} />
+              <QASection seller_id = {products?.seller_id} product_id = {products?.product_id}/>
             </div>
           )}
         </div>

@@ -18,13 +18,13 @@ import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 interface UserInfo {
   username: string;
   email: string;
-  full_name: string;
+  full_name: string;  
 }
 
 export default function RegisterSellerPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const auth = useAuth();
+  const {auth} = useAuth();
   const editor = useRef<any>(null);
   const handleEditorChange = (content: string) => {
     const reasonContent = document.getElementById("reason") as HTMLInputElement;
@@ -82,7 +82,7 @@ export default function RegisterSellerPage() {
         })
         .then (data => {
             toast.success (data.message || "Gửi yêu cầu thành công");
-            navigate ("/profile");
+            navigate (-1);
         })
         .catch (error => {
             toast.error (error.message || "Lỗi kết nối máy chủ");
@@ -99,32 +99,34 @@ export default function RegisterSellerPage() {
    
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+    <div className="min-h-screen pb-5 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="mb-8">
           <button
-            onClick={() => navigate('/profile')}
-            className="inline-flex items-center cursor-pointer text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center cursor-pointer text-xl p-3 px-6 mb-4 transition-colors text-green-600 "
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại Profile
+            Quay lại
           </button>
 
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Đăng ký trở thành Seller
-          </h1>
-          <p className="text-gray-600">
-            Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá
-          </p>
+          <div className = "text-center">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Đăng ký trở thành Seller
+              </h1>
+              <p className="text-gray-600">
+                Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá
+              </p>
+          </div>
+         
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate__animated animate__fadeInUp">
           {/* Card Header */}
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6">
             <h2 className="text-xl font-semibold flex items-center">
@@ -224,12 +226,13 @@ export default function RegisterSellerPage() {
                 <div className="text-sm text-blue-700">
                   <p className="font-semibold mb-1">Lưu ý quan trọng:</p>
                   <ul className="space-y-1">
-                    <li>• Yêu cầu sẽ được xem xét trong vòng 7 ngày</li>
+                    <li> Yêu cầu sẽ được xem xét trong vòng 7 ngày</li>
+                    <li> Bạn sẽ được làm seller trong vòng 7 ngày</li>
                     <li>
-                      • Chúng tôi sẽ liên hệ qua email để thông báo kết quả
+                      Chúng tôi sẽ liên hệ qua email để thông báo kết quả
                     </li>
-                    <li>• Seller cần tuân thủ các quy định của nền tảng</li>
-                    <li>• Có thể yêu cầu xác minh thông tin bổ sung</li>
+                    <li>Seller cần tuân thủ các quy định của nền tảng</li>
+                    <li>Có thể yêu cầu xác minh thông tin bổ sung</li>
                   </ul>
                 </div>
               </div>
@@ -239,8 +242,8 @@ export default function RegisterSellerPage() {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate("/profile")}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => navigate(-1)}
+                className="px-6 py-3 border cursor-pointer border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Hủy bỏ
               </button>

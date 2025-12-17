@@ -257,3 +257,69 @@ export async function updateLoveStatus (req: Request, res: Response) {
         });
     }
 }
+
+
+export async function getProductQuestions (req: Request, res: Response) {
+
+    const product_id = req.query.product_id as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+
+    if (!product_id){
+        return res.status(400).json({
+            status: "error",
+            message: "product_id is required"
+        });
+    }
+
+    const result = await productsModel.getProductQuestions({product_id: parseInt(product_id), page: page, limit: limit});
+    if (!result){
+        return res.status(500).json({
+            status: "error",
+            message: "Error in fetching questions"
+        });
+    }
+
+    return res.status(200).json({
+        status: "success",
+        data: result.data,
+        totalQuestions: result.total_questions,
+    });
+
+}
+
+export async function postProductQuestion (req: Request, res: Response) {
+
+    const user = (req as any).user;
+    const product_id = req.body.product_id as string;
+    const content = req.body.content as string;
+    const question_parent_id = req.body.question_parent_id ? parseInt(req.body.question_parent_id as string) : null;
+
+    if (!product_id || !content){
+        return res.status(400).json({
+            status: "error",
+            message: "product_id and content are required"
+        });
+    }
+
+    const result = await productsModel.postProductQuestion({
+        product_id: parseInt(product_id),
+        user_id: user.user_id,
+        content: content,
+        question_parent_id: question_parent_id
+    });
+
+    if (!result){
+        return res.status(500).json({
+            status: "error",
+            message: "Error in posting question"
+        });
+    }
+
+    return res.status(201).json({
+        status: "success",
+        message: "Question posted successfully",
+        data: result
+    });
+
+}

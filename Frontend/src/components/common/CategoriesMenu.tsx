@@ -86,7 +86,7 @@ function CatagoriesButton (
                 </span>
             {/* Drop menu */}
             {open &&
-                <div className = "absolute top-[130%] left-0 bg-black/90 text-white w-fit shadow-lg shadow-gray-900/10">
+                <div className = "animate__animated animate__fadeInUp absolute top-[130%] left-0 bg-black/90 text-white w-fit shadow-lg shadow-gray-900/10">
                     <CatagoriesDropdownMenu/>
                 </div>
             }
@@ -146,7 +146,7 @@ function CatagoriesDropdownMenu(){
                       <span>{category.name}</span>
                       <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent className="w-full flex bg-black/95 backdrop-blur-md shadow-2xl shadow-black/60 border border-gray-700/60 rounded-xl overflow-hidden">
+                    <NavigationMenuContent className="animate__animated animate__fadeIn animate__faster w-full flex bg-black/95 backdrop-blur-md shadow-2xl shadow-black/60 border border-gray-700/60 rounded-xl overflow-hidden">
                       <CatagoriesDetailContent title={category.name} items={category.children} />
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -182,7 +182,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {id : n
   }
 
   return (
-    <div className = "bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-2xl z-1000 m-3 cursor-auto">
+    <div className = " bg-transparent w-[500px] h-[300px] flex flex-col overflow-y-scroll scrollbar-hide rounded-2xl z-1000 m-3 cursor-auto animate__animated animate__fadeInUp">
       {/* Tittle */}
       <div className = "font-bold text-2xl ml-3 text-white mb-5 flex items-center gap-2">
         <Grid3X3 className="w-6 h-6 text-blue-400" />

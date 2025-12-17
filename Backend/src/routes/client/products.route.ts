@@ -13,4 +13,6 @@ route.get("/my-products", verifyToken, productsController.getMyProductsList);
 route.get("/search", productsController.searchProducts);
 route.get("/love_status", justDecodeToken, productsController.getLoveStatus);
 route.post("/update_love_status", verifyToken, productsController.updateLoveStatus);
+route.get("/questions", productsController.getProductQuestions);
+route.post("/questions", verifyToken, productsController.postProductQuestion);
 export default route;

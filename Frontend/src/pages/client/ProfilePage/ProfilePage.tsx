@@ -33,7 +33,7 @@ export default function ProfilePage() {
   const [isOwner , setIsOwner] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
-
+  
   useEffect (() => {
 
     const username = params.username_id?.trim().split("_")[0];

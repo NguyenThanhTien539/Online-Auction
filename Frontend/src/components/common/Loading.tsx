@@ -1,18 +1,21 @@
 import React from 'react';
 import { Loader2, ShoppingBag } from 'lucide-react';
 import avatar from '@/assets/images/avatar.png';
+import {cn} from "@/lib/utils";
 interface LoadingProps {
   message?: string;
   size?: 'sm' | 'md' | 'lg';
   showImage?: boolean;
   image?: string;
+  className?: string;
 }
 
 const Loading: React.FC<LoadingProps> = ({
   message = "Đang tải...",
   size = 'md',
   showImage = true,
-  image
+  image,
+  className = '',
 }) => {
   const sizeClasses = {
     sm: {
@@ -43,7 +46,7 @@ const Loading: React.FC<LoadingProps> = ({
     image = avatar;
   }
   return (
-    <div className="fixed inset-0 mt-[50px] lg:mt-[70px] bg-gray-100 backdrop-blur-sm flex items-center justify-center z-100">
+    <div className={cn("fixed inset-0 mt-[50px] lg:mt-[70px] bg-gray-100 backdrop-blur-sm flex items-center justify-center z-100", className)}>
       <div className={`${currentSize.container} backdrop-blur-md rounded-2xl  max-w-4xl mx-4`}>
         {/* Main content - Horizontal layout */}
         <div className="flex flex-col items-center justify-center space-x-12">
@@ -51,7 +54,7 @@ const Loading: React.FC<LoadingProps> = ({
           {showImage && (
             <div className="relative flex-shrink-0">
               {image ? (
-                <div className={`${currentSize.image} rounded-full overflow-hidden border-2 border-white/30 shadow-lg relative`}>
+                <div className={`${currentSize.image} p-2 rounded-full overflow-hidden shadow-[0px_0px_10px] shadow-blue-500 relative`}>
                   <img
                     src={image}
                     alt="Loading"
@@ -65,14 +68,14 @@ const Loading: React.FC<LoadingProps> = ({
               )}
 
               {/* Pulsing ring */}
-              <div className="absolute inset-0 rounded-full border-2 border-blue-400/30 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-blue-400 animate-ping"></div>
 
               {/* Orbiting dots around image */}
               <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-2 h-2 bg-blue-100 rounded-full shadow-sm"
+                    className="absolute w-2 h-2 bg-blue-200 rounded-full shadow-sm"
                     style={{
                       top: '50%',
                       left: '50%',

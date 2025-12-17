@@ -103,7 +103,7 @@ export default function MyProductsPage() {
                 const page = searchParams.get("page") ? parseInt(searchParams.get("page") as string) : 1;
                 const type = searchParams.get("type") || "my-favorites";
                 const response = await fetch(
-                    `http://localhost:5000/api/products/my-products?type=${type}&page=${page}`,
+                    `${import.meta.env.VITE_API_URL}/api/products/my-products?type=${type}&page=${page}`,
                     { credentials: "include" }
                 );
                 const data = await response.json();
@@ -112,7 +112,7 @@ export default function MyProductsPage() {
                     toast.error("Có lỗi khi lấy dữ liệu");
                     setLoading(false);
                     if (response.status === 403) {
-                        navigate("/profile");
+                        navigate(-1);
                     }
                     return;
                 }
@@ -130,7 +130,7 @@ export default function MyProductsPage() {
         };
 
         getData();
-    }, [searchParams, currentPage]);
+    }, [searchParams]);
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import CatagoriseButton from "@/components/common/CategoriesMenu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/routes/ProtectedRouter";
-import {LucideSearch, Heart} from "lucide-react"
+import {LucideSearch, Heart, Plus, UserPlus} from "lucide-react"
 import ProfileDropdown from "@/components/common/ProfileDropdown";
 
 
@@ -75,6 +75,22 @@ function Navbar() {
               >
                 <Heart size={20} className="text-gray-600 hover:text-red-500 transition-colors" />
               </Link>
+
+              {/* Add Product or register to be seller */}
+
+              {(auth.role == "user") ?
+               (<Link to="/register-seller" title = "Wanna be seller ?" 
+                className="cursor-pointer hover:shadow-[0px_0px_5px] p-2 rounded-full hover:shadow-gray-400 transition-all duration-200 mr-2"
+              >
+                <UserPlus size={20} className="text-gray-600 hover:text-green-500 transition-colors" />
+              </Link>)
+              :
+              (<Link to="/products/post" title = "Add new product"
+                className="cursor-pointer hover:shadow-[0px_0px_5px] p-2 rounded-full hover:shadow-gray-400 transition-all duration-200 mr-2"
+              >
+                <Plus size={20} className="text-gray-600 hover:text-blue-500 transition-colors" />
+              </Link>)
+              }
               <ProfileDropdown />
             </>
 
