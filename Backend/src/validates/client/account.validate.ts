@@ -93,7 +93,10 @@ export const loginPost = (req: Request, res: Response, next: NextFunction) => {
       "string.empty": "Vui lòng nhập mật khẩu!",
       "string.min": "Mật khẩu phải ít nhất 8 ký tự!",
     }),
-    rememberPassword: Joi.boolean().allow(""), // Cho phép boolean hoặc để trống
+    rememberPassword: Joi.boolean().allow(""), // Cho phép boolean hoặc để trống,
+    captchaToken: Joi.string().required().messages({
+      "string.empty": "Captcha token is required!",
+    }),
   });
 
   const { error } = schema.validate(req.body);

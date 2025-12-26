@@ -45,7 +45,7 @@ export default function AuthLayout() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-2">
         <div className="w-full">
           {/* Premium Header */}
           <div className="text-center">

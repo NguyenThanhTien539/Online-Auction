@@ -82,10 +82,10 @@ const Hero = () => {
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4 lg:w-5/12">
               <div className="hero-content">
-                <h1 className={`mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl transition-all duration-1000 delay-300 ${
+                <h1 className={`mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 via-blue-500 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl transition-all duration-1000 delay-300 ${
                   hasIntersected ? 'animate__animated animate__fadeInLeft' : ''
                 }`}>
-                  <Trophy className="inline mr-3 text-yellow-500" size={48} /> Sàn Đấu Giá Trực Tuyến
+                  <Trophy className="inline mr-3 text-yellow-500 bg-yellow-200 p-2 rounded-full" size={50} /> Sàn Đấu Giá Trực Tuyến
                 </h1>
                 <p className={`mb-8 max-w-[480px] text-base text-gray-800 dark:text-dark-6 font-medium transition-all duration-1000 delay-500 ${
                   hasIntersected ? 'animate__animated animate__fadeInLeft' : ''

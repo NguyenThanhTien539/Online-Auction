@@ -6,6 +6,7 @@ import * as VerifyModel from "../../models/verify.model.ts";
 import { generateOTP } from "../../helpers/generate.helper.ts";
 import { sendMail } from "../../helpers/mail.helper.ts";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 // Hasing password function
@@ -20,6 +21,30 @@ export async function comparePassword(
   hashedPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(password, hashedPassword);
+}
+
+
+async function verifyCaptcha(token: string){
+  try{
+      const secretKey = process.env.CAPTCHA_SECRET_KEY as string;
+
+      const response = await fetch ("https://www.google.com/recaptcha/api/siteverify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `secret=${secretKey}&response=${token}`,
+      });
+      const data = await response.json();
+      console.log("Captcha verification data:", data);
+      return data;
+  }
+  catch (error) {
+    console.error("Error verifying CAPTCHA:", error);
+    return null;
+  }
+ 
+
 }
 
 //  JWT token generation functions
@@ -184,6 +209,13 @@ export const registerVerifyPost = async (req: Request, res: Response) => {
 };
 
 export const loginPost = async (req: Request, res: Response) => {
+
+  const captchaResponse = await verifyCaptcha(req.body.captchaToken);
+
+  if (!captchaResponse || (!captchaResponse as any).success || (captchaResponse as any).score < 0.5) {
+    res.status(404).json({ code: "error", message: "CAPTCHA verification failed" });
+    return;
+  }
   const existedAccount = await AccountModel.findEmail(req.body.email);
   if (!existedAccount) {
     res.json({ code: "error", message: "Email chưa tồn tại trong hệ thống" });

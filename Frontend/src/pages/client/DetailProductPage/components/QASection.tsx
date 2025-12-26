@@ -96,7 +96,6 @@ export default function QASection({product_id, seller_id} : {product_id?: number
         // Refresh questions
 
         setQuestions ((prev) => [...prev, data.data]);
-        setTotalQuestions ((prev) => prev + 1);
         setMainQuestions ((prev) => {
           if (replyingTo == null){
             return [data.data, ...prev];
@@ -112,6 +111,8 @@ export default function QASection({product_id, seller_id} : {product_id?: number
         }
         else {
           setCurrentPage (1);
+          setTotalQuestions ((prev) => prev + 1);
+  
         }
         e.target.reset();
       }

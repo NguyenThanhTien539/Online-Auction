@@ -122,30 +122,30 @@ function ResetPassword() {
 
   return (
     <>
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className=" flex justify-center bg-gray-50 px-4 py-6">
         <form
           id="resetPasswordForm"
           action=""
-          className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200"
+          className="w-full max-w-md bg-white p-6 rounded-xl shadow-xl border border-gray-200"
         >
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4 shadow-lg">
-              <KeyRound className="w-8 h-8 text-white" />
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-600 rounded-full mb-3 shadow-lg">
+              <KeyRound className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">
               Đặt lại mật khẩu
             </h1>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-xs">
               Vui lòng nhập mật khẩu mới để tiếp tục
             </p>
           </div>
 
           {/* Form Fields */}
-          <div className="space-y-5">
+          <div className="space-y-3">
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-xs font-semibold text-gray-700 mb-1">
                 Mật khẩu mới <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -154,10 +154,10 @@ function ResetPassword() {
                   name="password"
                   type="password"
                   placeholder="Nhập mật khẩu mới"
-                  className="w-full px-4 py-3 pl-12 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 bg-white"
+                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 bg-white text-sm"
                 />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  <Key className="w-5 h-5" />
+                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <Key className="w-4 h-4" />
                 </div>
               </div>
               <div id="passwordError" className="text-sm text-red-500 mt-1"></div>
@@ -165,7 +165,7 @@ function ResetPassword() {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-xs font-semibold text-gray-700 mb-1">
                 Xác nhận mật khẩu <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -174,29 +174,29 @@ function ResetPassword() {
                   name="confirmPassword"
                   type="password"
                   placeholder="Nhập lại mật khẩu"
-                  className="w-full px-4 py-3 pl-12 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 bg-white"
+                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 bg-white text-sm"
                 />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  <Check className="w-5 h-5" />
+                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <Check className="w-4 h-4" />
                 </div>
               </div>
               <div id="confirmPasswordError" className="text-sm text-red-500 mt-1"></div>
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <button
-                className="w-full cursor-pointer bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                className="w-full cursor-pointer bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg text-sm"
                 type="submit"
               >
-                <RotateCcw className="w-5 h-5" />
+                <RotateCcw className="w-4 h-4" />
                 Xác nhận đổi mật khẩu
               </button>
             </div>
 
             {/* Back to Login Link */}
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-600">
+            <div className="text-center pt-3">
+              <p className="text-xs text-gray-600">
                 Quay lại trang đăng nhập?
                 <span
                   className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"

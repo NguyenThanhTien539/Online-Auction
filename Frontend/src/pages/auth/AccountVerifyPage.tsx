@@ -86,7 +86,7 @@ function AccountVerify() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="flex justify-center bg-gray-50 px-4 py-6">
 
         
 
@@ -94,49 +94,49 @@ function AccountVerify() {
       <form
         id="registerVerify"
         action=""
-        className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200"
+        className="w-full max-w-md bg-white p-6 rounded-xl shadow-xl border border-gray-200"
       >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-600 rounded-full mb-4 shadow-lg">
-            <ShieldCheck className="w-8 h-8 text-white" />
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-teal-600 rounded-full mb-3 shadow-lg">
+            <ShieldCheck className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
             Nhập mã OTP
           </h1>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-xs">
             Vui lòng nhập mã OTP để tiếp tục
           </p>
         </div>
 
         {/* OTP Input */}
-        <div className="flex flex-col items-center space-y-6">
+        <div className="flex flex-col items-center space-y-4">
           <div className="w-full flex flex-col items-center">
             <OTPForm
-              className="flex scale-150"
+              className="flex scale-125"
               onChange={(val) => {
                 setOtp(val);
               }}
             />
           </div>
-          <div className="text-red-500 text-sm">{error}</div>
+          <div className="text-red-500 text-xs">{error}</div>
         </div>
 
         {/* Submit Button */}
-        <div className="pt-6">
+        <div className="pt-3">
           <button
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer"
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer text-sm"
             type="submit"
             onClick={handleSubmit}
           >
-            <CheckCircle className="w-5 h-5" />
+            <CheckCircle className="w-4 h-4" />
             Xác nhận mã OTP
           </button>
         </div>
 
         {/* Back to Register Link */}
-        <div className="text-center pt-4">
-          <p className="text-sm text-gray-600">
+        <div className="text-center pt-3">
+          <p className="text-xs text-gray-600">
             Quay lại trang đăng ký?
             <span
               className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
