@@ -3,12 +3,14 @@ interface Category {
   name: string;
   parent_id: number | null;
   slug: string;
+  cat_image?: string;
 }
 
 interface CategoryNode {
   id: number;
   name: string;
   slug: string;
+  cat_image: string;
   children: CategoryNode[];
 }
 
@@ -24,6 +26,7 @@ export const buildTree = (
 
       tree.push({
         id: item.id,
+        cat_image: item.cat_image || "",
         name: item.name,
         slug: item.slug,
         children,

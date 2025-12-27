@@ -192,7 +192,7 @@ function CatagoriesDetailContent({title, items} : {title: string, items: {id : n
       {/* Content */}
       <div className = "grid grid-cols-3 gap-4 px-3 pb-4">
         {items.map((item, i) => (
-          <CatagoriesMiniItem key={i} image={item.cat_image} name={item.name} handleClick = {()=>handleClickCat2(item.id)}/>
+          <CatagoriesMiniItem key={i} image={item?.cat_image} name={item.name} handleClick = {()=>handleClickCat2(item.id)}/>
         ))}
 
       </div>

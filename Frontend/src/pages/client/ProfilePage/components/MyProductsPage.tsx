@@ -229,7 +229,7 @@ export default function MyProductsPage() {
                         {/* Pagination */}
                         <div className="flex justify-center mt-12">
                             <PaginationComponent
-                                numberOfPages={5}
+                                numberOfPages={numberOfPages}
                                 currentPage={currentPage}
                                 controlPage={handlePageChange}
                             />

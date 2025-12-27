@@ -66,6 +66,7 @@ function ListProductsPage() {
             try{
                 setLoading(true);
                 const page = searchParams.get("page");
+                setCurrentPage(page ? Number(page) : 1);
                 console.log ("This page and currentPage: ", page, currentPage);
                 const cat2_id = searchParams.get("cat2_id");
                 const priceFilter = searchParams.get("price");
