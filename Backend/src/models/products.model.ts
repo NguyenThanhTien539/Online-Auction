@@ -31,7 +31,7 @@ export async function getProductById (product_id: number) {
 }
 
 export async function getProductsPageList(cat2_id : number, page: number, priceFilter: string, timeFilter: string) {
-    const itemsPerPage = 4;
+    const itemsPerPage = 6;
     const offset = (page - 1) * itemsPerPage;
     
     let orderBy = [];
@@ -297,7 +297,8 @@ export async function searchProducts({query, page, limit} : {query: string, page
     let results = await productsQuery.rows;
     return {
         data: results,
-        numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / limit) : 0
+        numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / limit) : 0,
+        quantity: results.length > 0 ? results[0].total_count : 0
     }
 
 }

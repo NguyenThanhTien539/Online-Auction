@@ -27,7 +27,7 @@ export default function ListSearchProductPage() {
     const [isLoading, setLoading] = useState(false);
     const [numberOfPages, setNumberOfPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
-
+    const [quantity, setQuantity] = useState(0);
 
     const handleClickProduct = (productId : number, productName : string) => {
             const slug = slugify(productName);
@@ -43,6 +43,7 @@ export default function ListSearchProductPage() {
 
     useEffect (() => {
         setSearchQuery(searchParams.get("query") || "");
+        setCurrentPage(Number(searchParams.get("page")) || 1);
         setLoading(true);
         fetch (`http://localhost:5000/api/products/search?query=${searchParams.get("query")}&page=${currentPage}`)
         .then (response => {
@@ -56,6 +57,7 @@ export default function ListSearchProductPage() {
         .then (data => {
             setProducts(data.data.products);
             setNumberOfPages(data.data.total_pages);
+            setQuantity(data.data.quantity);
         })
         .catch (error => {
             toast.error (error.message || "Lỗi kết nối máy chủ");
@@ -69,37 +71,45 @@ export default function ListSearchProductPage() {
     return (
       isLoading ? <Loading></Loading> : <div>  
             
-            <div className="relative mt-16 mb-8 ml-20 flex items-center gap-4">
-                <Search className="w-12 h-12 text-blue-600" />
+            <div className="relative mt-16 mb-12 ml-20 flex items-center gap-6">
+                <div className="relative w-20 h-20 flex justify-center bg-gray-50 rounded-lg border-2 border-gray-100">
+                    <Search className="w-10 h-10 text-blue-700" />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-300/50 rounded-full border-2 border-white"></div>
+                </div>
                 <div>
-                    <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <div className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
                        Kết quả tìm kiếm
                     </div>
-                    <div className="text-2xl md:text-3xl font-semibold mt-2 text-gray-600">
-                        cho "{searchQuery.trim()}"
+                    <div className="text-2xl md:text-3xl font-medium mt-2 text-gray-600">
+                        cho <span className="text-blue-700 font-semibold">"{searchQuery.trim()}"</span>
                     </div>
                 </div>
 
                 {/* Decorative elements */}
-                <div className="absolute -top-2 -left-2 w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full animate-ping opacity-60"></div>
-                <div className="absolute -bottom-4 -right-4 w-3 h-3 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full animate-bounce opacity-60"></div>
+                <div className="absolute -top-4 -left-3 w-20 h-20 border-2 border-gray-200 rounded-lg"></div>
+                <div className="absolute -bottom-3 right-8 w-16 h-16 border-2 border-blue-100 rounded-full"></div>
+                <div className="absolute top-1/2 -right-8 w-2 h-2 bg-blue-300 rounded-full"></div>
+                <div className="absolute top-0 right-12 w-1 h-1 bg-gray-400 rounded-full"></div>
             </div>
 
 
 
 
             {/* Products List */}
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 mt-[100px] mb-[100px] max-w-[1200px] mx-auto border border-gray-200">
+            <div className="bg-white rounded-2xl p-8 py-15 mt-[100px] mb-[100px] max-w-[1200px] mx-auto shadow-sm shadow-blue-100">
                 {products && products.length > 0 ? (
                     <>
-                        <div className="text-lg font-medium text-gray-700 mb-6">
-                            Tìm thấy {products.length} sản phẩm
+                        <div className="flex items-center gap-2 mb-8 pb-4 border-b-2 border-blue-400">
+                            <div className="w-1 h-6 bg-blue-600"></div>
+                            <div className="text-lg font-semibold text-gray-900">
+                                Tìm thấy <span className="text-blue-700">{quantity}</span> sản phẩm
+                            </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             {products.map((item, index) => (
                                 <div className="flex justify-center" key={index}>
                                     <ProductCard 
-                                        className="w-[400px] hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden" 
+                                        className="w-[400px] hover:shadow-xl hover:border-blue-200 transition-all duration-300 rounded-xl overflow-hidden border border-gray-200" 
                                         product_image={item.product_images ? item.product_images[0] : ""} 
                                         product_id={item.product_id}
                                         product_name={item.product_name} 
@@ -116,10 +126,13 @@ export default function ListSearchProductPage() {
                         </div>
                     </>
                 ) : (
-                    <div className="text-center py-16">
-                        <Search className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-2xl font-semibold text-gray-600 mb-2">Không tìm thấy sản phẩm</h3>
-                        <p className="text-gray-500">Hãy thử tìm kiếm với từ khóa khác</p>
+                    <div className="text-center py-20">
+                        <div className="relative inline-block mb-6">
+                            <Search className="w-24 h-24 text-gray-300 mx-auto" />
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 border-2 border-gray-200 rounded-full"></div>
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy sản phẩm</h3>
+                        <p className="text-gray-600">Hãy thử tìm kiếm với từ khóa khác</p>
                     </div>
                 )}
             </div>

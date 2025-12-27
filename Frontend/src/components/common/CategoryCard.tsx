@@ -17,7 +17,7 @@ function CategoryCard({ name = "Ronaldo", image, onClick, className }: CategoryC
     <div ref={ref}
       className={cn(
         // Main container with glassmorphism effect - Gray/Blue theme
-        "group relative w-[280px] h-[380px] cursor-pointer overflow-hidden rounded-3xl",
+        "group relative w-[380px] h-[450px] cursor-pointer overflow-hidden rounded-3xl",
         "bg-gray-100/50 backdrop-blur-xl border-1 border-black/20",
         "hover:bg-white/10 hover:border-white/20",
         "transition-all duration-500 ease-out",
