@@ -49,7 +49,7 @@ export async function fetchTopEndingSoonProducts(limit: number) {
         LEFT JOIN users u1 ON p.price_owner_id = u1.user_id
         LEFT JOIN users u2 on p.seller_id = u2.user_id
         where p.is_removed = false and p.end_time > NOW()
-        ORDER BY p.end_time DESC
+        ORDER BY p.end_time ASC
         LIMIT ? OFFSET 0
     `, [limit]);
     let result = await query.rows;
