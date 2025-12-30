@@ -1,5 +1,6 @@
 import express from "express";
 import * as productsController from "../../controllers/client/products.controller.ts";
+import * as topProductsController from "../../controllers/client/top_products.controller.ts";
 import {verifyToken} from "../../middlewares/auth.middleware.ts";
 import {verifyRole} from "../../middlewares/auth.middleware.ts";
 import { justDecodeToken } from "../../middlewares/auth.middleware.ts";
@@ -15,4 +16,10 @@ route.get("/love_status", justDecodeToken, productsController.getLoveStatus);
 route.post("/update_love_status", verifyToken, productsController.updateLoveStatus);
 route.get("/questions", productsController.getProductQuestions);
 route.post("/questions", verifyToken, productsController.postProductQuestion);
+
+// Top products (in home page)
+route.get("/ending_soon", topProductsController.getTopEndingSoonProducts);
+route.get("/highest_price", topProductsController.getTopHighestPriceProducts);
+route.get("/most_bids", topProductsController.getTopMostBidProducts);
+
 export default route;

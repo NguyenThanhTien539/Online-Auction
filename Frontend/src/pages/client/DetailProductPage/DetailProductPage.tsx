@@ -192,18 +192,24 @@ function DetailProductPage() {
       {/* Product Name */}
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{products?.product_name}</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.85fr_1fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] gap-8">
         {/* Main Image and Related Images */}
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           {/* Main Image */}
-          <div className="flex justify-center relative">
-            <img
+          <div className="flex justify-center relative bg-blue-300 min-w-0">
+            {products && products.product_images && products.product_images.length > 0 ?
+             <img
               src={products?.product_images[currentImageIndex]}
               alt={products?.product_name}
               loading = "lazy"
               className="w-full h-[600px] object-cover rounded-lg shadow-lg cursor-pointer"
               onClick={() => openImageModal(currentImageIndex)}
             />
+          :
+          <div className="w-full h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
+            <FileText className="w-16 h-16 text-gray-400"/>
+          </div>
+          }
             <div onClick = {(e) => e.stopPropagation()}>
                 <AddToLove product_id = {products?.product_id || 0} className = "w-[100px] right-20 top-5"></AddToLove>
             </div>
@@ -218,7 +224,7 @@ function DetailProductPage() {
           </div>
 
           {/* Related Images - Horizontal Scroll */}
-          <div className="max-w-[50%] mx-auto">
+          <div className="max-w-[80%] mx-auto">
             <div className="flex overflow-x-auto space-x-2 pb-4 pt-2">
               {products?.product_images?.map((image, index) => (
                 <img

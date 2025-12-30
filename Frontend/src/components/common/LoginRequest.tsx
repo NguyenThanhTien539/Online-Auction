@@ -10,7 +10,7 @@ export default function LoginRequest() {
   };
 
   const handleGoToLogin = () => {
-    navigate('/login');
+    navigate('/accounts/login');
   };
 
   return (
@@ -64,7 +64,7 @@ export default function LoginRequest() {
               <p className="text-sm text-gray-500">
                 Chưa có tài khoản?{' '}
                 <button
-                  onClick={() => navigate('/register')}
+                  onClick={() => navigate('/accounts/register')}
                   className="text-blue-400 hover:text-blue-500 font-medium hover:underline"
                 >
                   Đăng ký ngay

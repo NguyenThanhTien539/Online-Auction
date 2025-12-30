@@ -22,9 +22,7 @@ export default function AddToLove({product_id, className} : {product_id: number,
         setIsSubmit(true);
         const newLoveStatus = !isLoved;
 
-        // Update local state immediately for better UX
-        setIsLoved(newLoveStatus);
-        setLoveCount(prev => newLoveStatus ? prev + 1 : prev - 1);
+        
         isLovedRef.current = newLoveStatus;
         // Send request to server
         fetch(`http://localhost:5000/api/products/update_love_status`, {
@@ -39,8 +37,21 @@ export default function AddToLove({product_id, className} : {product_id: number,
             }),
 
         })
+        .then (res => {
+            if (!res.ok) {
+                return res.json().then (data => {
+                    throw Error ("Need to login to update love status");
+                });
+            }
+            return res.json();
+        })
+        .then (data => {
+            // Update local state immediately for better UX
+            setIsLoved(newLoveStatus);
+            setLoveCount(prev => newLoveStatus ? prev + 1 : prev - 1);
+        })
         .catch ((error) => {
-            toast.error("Có lỗi xảy ra. Vui lòng thử lại sau!");
+            toast.error(`${error.message}`);
         })
         .finally(()=> {
             setIsSubmit(false);

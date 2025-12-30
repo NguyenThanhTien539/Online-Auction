@@ -69,14 +69,14 @@ const Hero = () => {
       
       <div
         ref={ref}
-        className={`relative pl-[30px] pb-[110px] pt-[120px] bg-gradient-to-br from-blue-300 via-blue-200 to-white dark:from-gray-800 dark:to-gray-900 lg:pt-[100px] mb-[50px] overflow-hidden border border-blue-200/50 shadow-2xl shadow-blue-300/30 backdrop-blur-sm transition-all duration-1000 ${
+        className={`relative pl-[30px] pb-[110px] pt-[120px] bg-gradient-to-br from-blue-300 via-blue-200 to-white dark:from-gray-800 dark:to-gray-900 lg:pt-[100px] mb-[50px] overflow-hidden border border-blue-200/50 shadow-2xl shadow-blue-300/30 backdrop-blur-sm ${
           hasIntersected ? 'animate__animated animate__fadeInUp animate__slow' : 'opacity-0'
         }`}
       >
         {/* Floating shapes for fun */}
-        <div className={`absolute top-10 left-10 w-20 h-20 bg-blue-300 rounded-full opacity-20 transition-all duration-1000 delay-300 ${hasIntersected ? 'animate-pulse' : 'scale-0'}`}></div>
-        <div className={`absolute top-20 right-20 w-16 h-16 bg-white rounded-full opacity-30 transition-all duration-1000 delay-500 ${hasIntersected ? 'animate-pulse' : 'scale-0'}`}></div>
-        <div className={`absolute bottom-20 left-1/4 w-12 h-12 bg-blue-200 rounded-full opacity-25 transition-all duration-1000 delay-700 ${hasIntersected ? 'animate-ping' : 'scale-0'}`}></div>
+        <div className={`absolute top-10 left-10 w-20 h-20 bg-white rounded-full opacity-30 transition-all duration-1000 delay-300 ${hasIntersected ? 'animate__animated animate__pulse  animate__infinite' : 'scale-0'}`}></div>
+        <div className={`absolute top-12 right-20 w-16 h-16 bg-white rounded-full opacity-30 transition-all duration-1000 delay-500 ${hasIntersected ? 'animate__animated animate__fadeInDown animate__slower animate__infinite' : 'scale-0'}`}></div>
+        <div className={`absolute bottom-20 left-1/4 w-12 h-12 bg-white opacity-25 transition-all delay-700 ${hasIntersected ? 'animate__animated animate__hinge animate__slower animate__infinite' : 'scale-0'}`}></div>
         
         <div className="container relative z-10">
           <div className="-mx-4 flex flex-wrap">
@@ -85,7 +85,7 @@ const Hero = () => {
                 <h1 className={`mb-5 text-4xl font-bold !leading-[1.208] bg-gradient-to-r from-blue-600 via-blue-500 to-blue-300 bg-clip-text text-transparent sm:text-[42px] lg:text-[40px] xl:text-5xl transition-all duration-1000 delay-300 ${
                   hasIntersected ? 'animate__animated animate__fadeInLeft' : ''
                 }`}>
-                  <Trophy className="inline mr-3 text-yellow-500 bg-yellow-200 p-2 rounded-full" size={50} /> Sàn Đấu Giá Trực Tuyến
+                  <Trophy className="inline mr-3 text-yellow-400 bg-linear-180 from-yellow-200 via-yellow-50 to-white/50 p-2 rounded-full" size={50} /> Sàn Đấu Giá Trực Tuyến
                 </h1>
                 <p className={`mb-8 max-w-[480px] text-base text-gray-800 dark:text-dark-6 font-medium transition-all duration-1000 delay-500 ${
                   hasIntersected ? 'animate__animated animate__fadeInLeft' : ''
@@ -99,14 +99,14 @@ const Hero = () => {
                     <Link to = "/about"
                       className="inline-flex items-center justify-center rounded-full bg-blue-600 text-white px-8 py-4 text-center text-base font-bold hover:bg-blue-800 lg:px-10 transition-all duration-700 transform hover:scale-110 hover:shadow-2xl hover:shadow-blue-400"
                     >
-                      <BookOpen className="mr-2" size={20} /> Về chúng tôi
+                      <BookOpen className="mr-2 animate__animated animate__infinite animate__flash animate__slower" size={20} /> Về chúng tôi
                     </Link>
                   </li>
                   <li>
                     <Link to = "/my-products"
                       className="inline-flex items-center justify-center px-6 py-4 text-center text-base font-bold text-white hover:text-blue-200 dark:text-white transition-all duration-700 rounded-full shadow-lg shadow-gray-400 hover:shadow-xl hover:shadow-blue-400 transform hover:scale-110 bg-gradient-to-r from-rose-300 to-rose-500"
                     >
-                      <Heart className="mr-2 animate-pulse" size={24} />
+                      <Heart className="mr-2 animate__animated animate__infinite animate__heartBeat animate__slow" size={24} />
                        Yêu thích của bạn
                     </Link>
                   </li>

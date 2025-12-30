@@ -5,31 +5,7 @@ import moneyIcon from "@/assets/icons/money.png"
 import bidIcon from "@/assets/icons/bid_turn.svg"
 import clockIcon from "@/assets/icons/clock.png"
 import useIntersectionObserver from "@/hooks/useIntersectionObserver"
-import { Section } from "lucide-react"
-const getDataAllTop5 =() => {
-    let endProducts;
-    let turnProducts;
-    let priceProducts;
-    useEffect(()=>{
-        const end = async() =>{
-            try{
-                let endRequest = await fetch("http://localhost:5000/api/products/ending-soon?limit=5")
-                let endData = await endRequest.json();
 
-                if (!endRequest.ok){
-                    console.log("Error:", endData.message);
-                    return;
-                }
-                endProducts = endData;
-            }
-            catch(e){
-                console.log("Error database:", e)
-            }
-            
-        }
-
-    }, [])
-}
 
 
 function Section2(){
@@ -61,8 +37,25 @@ type Products = {
 function Section21()
 {
     const [products, setProducts] = useState<Products[]>([]);
+    useEffect (() => {
+        async function fetchData(){
+            try{
+                const promise = await fetch(`${import.meta.env.VITE_API_URL}/api/products/ending_soon?limit=5`);
+                const response = await promise.json();
+                if (!promise.ok){
+                    throw new Error(response.message || 'Failed to fetch top ending soon products');
+                }
+                setProducts(response.data);
+
+            }
+            catch (err){
+                console.error(err);
+            }
+        }
+        fetchData();
+    }, [])
+    
     // simulate 5 products
-    const number = 5;
     const {ref, hasIntersected} = useIntersectionObserver ();
     return (
         <div ref = {ref}>
@@ -72,9 +65,24 @@ function Section21()
             </div>
             <div>
                 <HorizontalBar className = {`h-[400px] bg-linear-to-r from-blue-300 to-green-100 `}>
-                    {Array.from({length: number}).map((_, index) => (
-                        <ProductCard key={index} className = {`scale-80 hover:scale-85 ${hasIntersected ? "animate__animated animate__slideInRight " : ""}`}></ProductCard>
-                    ))}
+                    {products && products.length > 0 && 
+                            products.map((item, index) => (
+                                <div key={index} className="flex justify-center">
+                                    <ProductCard
+                                        className = {`scale-80 hover:scale-85 `}
+                                        product_image={item.product_images ? item.product_images[0] : ""}
+                                        product_id={item.product_id}
+                                        product_name={item.product_name}
+                                        current_price={item.current_price}
+                                        buy_now_price={item.buy_now_price}
+                                        start_time={item.start_time}
+                                        end_time={item.end_time}
+                                        price_owner_username={item.price_owner_username}
+                                        bid_turns={item.bid_turns}
+                                   
+                                    />
+                                </div>
+                            ))}
 
                     
                 </HorizontalBar>
@@ -85,8 +93,25 @@ function Section21()
 
 function Section22()
 {
-    const {ref, hasIntersected} = useIntersectionObserver ();
-    const number = 5;
+    const [products, setProducts] = useState<Products[]>([]);
+    useEffect (() => {
+        async function fetchData(){
+            try{
+                const promise = await fetch(`${import.meta.env.VITE_API_URL}/api/products/most_bids?limit=5`);
+                const response = await promise.json();
+                if (!promise.ok){
+                    throw new Error(response.message || 'Failed to fetch top ending soon products');
+                }
+                setProducts(response.data);
+
+            }
+            catch (err){
+                console.error(err);
+            }
+        }
+        fetchData();
+    }, [])
+     const {ref, hasIntersected} = useIntersectionObserver ();
     return (
         <div ref = {ref}>
              {/* Top 5 sản phẩm có nhiều lượt ra giá nhất */}
@@ -95,9 +120,24 @@ function Section22()
             </div>
             <div>
                 <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
-                    {Array.from({length: number}).map((_, index) => (
-                        <ProductCard key={index} className = {`scale-80 hover:scale-85 ${hasIntersected ? "animate__animated animate__slideInLeft " : ""}`}></ProductCard>
-                    ))}
+                    {products && products.length > 0 && 
+                            products.map((item, index) => (
+                                <div key={index} className="flex justify-center">
+                                    <ProductCard
+                                        className = {`scale-80 hover:scale-85 `}
+                                        product_image={item.product_images ? item.product_images[0] : ""}
+                                        product_id={item.product_id}
+                                        product_name={item.product_name}
+                                        current_price={item.current_price}
+                                        buy_now_price={item.buy_now_price}
+                                        start_time={item.start_time}
+                                        end_time={item.end_time}
+                                        price_owner_username={item.price_owner_username}
+                                        bid_turns={item.bid_turns}
+                                   
+                                    />
+                                </div>
+                            ))}
                 </HorizontalBar>
             </div>
         </div>
@@ -106,8 +146,25 @@ function Section22()
 
 function Section23()
 {
-    const {ref, hasIntersected} = useIntersectionObserver ();
-    const number = 5;
+    const [products, setProducts] = useState<Products[]>([]);
+    useEffect (() => {
+        async function fetchData(){
+            try{
+                const promise = await fetch(`${import.meta.env.VITE_API_URL}/api/products/highest_price?limit=5`);
+                const response = await promise.json();
+                if (!promise.ok){
+                    throw new Error(response.message || 'Failed to fetch top ending soon products');
+                }
+                setProducts(response.data);
+
+            }
+            catch (err){
+                console.error(err);
+            }
+        }
+        fetchData();
+    }, [])
+     const {ref, hasIntersected} = useIntersectionObserver ();
     return (
         <div ref = {ref}>
               {/* Top 5 sản phẩm có giá cao nhất */}
@@ -116,9 +173,24 @@ function Section23()
             </div>
             <div>
                 <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
-                    {Array.from({length: number}).map((_, index) => (
-                        <ProductCard key={index} className = {`scale-80 hover:scale-85 ${hasIntersected ? "animate__animated animate__slideInRight " : ""}`}></ProductCard>
-                    ))}
+                    {products && products.length > 0 && 
+                            products.map((item, index) => (
+                                <div key={index} className="flex justify-center">
+                                    <ProductCard
+                                        className = {`scale-80 hover:scale-85`}
+                                        product_image={item.product_images ? item.product_images[0] : ""}
+                                        product_id={item.product_id}
+                                        product_name={item.product_name}
+                                        current_price={item.current_price}
+                                        buy_now_price={item.buy_now_price}
+                                        start_time={item.start_time}
+                                        end_time={item.end_time}
+                                        price_owner_username={item.price_owner_username}
+                                        bid_turns={item.bid_turns}
+                                   
+                                    />
+                                </div>
+                            ))}
                 </HorizontalBar>
             </div>
         </div>

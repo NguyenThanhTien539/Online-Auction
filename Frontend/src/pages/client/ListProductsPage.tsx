@@ -203,7 +203,7 @@ function ListProductsPage() {
                 {products && products.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            {products.map((item, index) => (
+                            {products && products.map((item, index) => (
                                 <div key={index} className="flex justify-center">
                                     <ProductCard
                                         className="w-full max-w-[450px]"

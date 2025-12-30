@@ -109,7 +109,6 @@ export default function MyProductsPage() {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    toast.error("Có lỗi khi lấy dữ liệu");
                     setLoading(false);
                     if (response.status === 403) {
                         navigate(-1);
