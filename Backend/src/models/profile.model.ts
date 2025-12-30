@@ -30,7 +30,8 @@ export async function editUserProfile(data: any) {
       full_name: data.full_name,
       address: data.address,
       date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : null,
-    }).returning("*");
+    })
+    .returning("*");
   return sql;
 }
 
@@ -41,11 +42,17 @@ export async function getSellerApplicationById(id: number) {
   return await db("upgrade_to_sellers").select("*").where({ id }).first();
 }
 
-export async function getUserProfileDetail(params : {username : string, user_id : number, current_user_id : number | null}) {
+export async function updateUserRole(user_id: number, role: string) {
+  return await db("users").where({ user_id }).update({ role });
+}
+
+export async function getUserProfileDetail(params: {
+  username: string;
+  user_id: number;
+  current_user_id: number | null;
+}) {
   const isOwner = params.current_user_id === params.user_id;
-  console.log("Fetching profile for username:", params.username, "user_id:", params.user_id, "isOwner:", isOwner);
-  const sql = 
-  `
+  const sql = `
   select *
   from users u
   where u.username = ? and u.user_id = ?
@@ -54,12 +61,11 @@ export async function getUserProfileDetail(params : {username : string, user_id 
 
   const data = await result.rows[0];
   console.log("Fetched user profile data: ", data);
-  if (!data){
+  if (!data) {
     return null;
   }
   return {
-    data : data,
-    is_owner : isOwner
-  }
-
+    data: data,
+    is_owner: isOwner,
+  };
 }

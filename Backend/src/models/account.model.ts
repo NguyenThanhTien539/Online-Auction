@@ -16,6 +16,7 @@ export const updatePassword = async (email: string, newPassword: string) => {
   return db("users").where({ email: email }).update({ password: newPassword });
 };
 
+
 export const findAcountById = async (user_id: number) => {
   // const sql = db("users").select("*").where({ user_id }).first();
   const results = await db.raw(
