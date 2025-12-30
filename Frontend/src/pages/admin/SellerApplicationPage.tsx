@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Eye, Check, X } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type BidderForm = {
   id: number;
@@ -28,8 +28,10 @@ function formatDate(dateStr: string) {
 
 export default function BidderFormListPage() {
   const navigate = useNavigate();
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const [list, setList] = useState<BidderForm[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   // ========= FILTER STATE =========
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "accepted" | "rejected"
@@ -37,6 +39,30 @@ export default function BidderFormListPage() {
   const [search, setSearch] = useState<string>("");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
+
+  useEffect(() => {
+    const status = (searchParams.get("status") ?? "all") as
+      | "all"
+      | "pending"
+      | "accepted"
+      | "rejected";
+    setStatusFilter(status);
+
+    setSearch(searchParams.get("keyword") ?? "");
+    setDateFrom(searchParams.get("from") ?? "");
+    setDateTo(searchParams.get("to") ?? "");
+  }, []);
+
+  // 2) Whenever filters change, write back to URL
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (statusFilter !== "all") params.status = statusFilter;
+    if (search.trim()) params.keyword = search.trim();
+    if (dateFrom) params.from = dateFrom;
+    if (dateTo) params.to = dateTo;
+
+    setSearchParams(params, { replace: true });
+  }, [statusFilter, search, dateFrom, dateTo, setSearchParams]);
 
   // ========= FILTERED LIST =========
   const filteredList = useMemo(
@@ -108,7 +134,7 @@ export default function BidderFormListPage() {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/seller/applications`,
+      }/api/application-form/list`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -118,6 +144,9 @@ export default function BidderFormListPage() {
         } else {
           setList([]);
         }
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
 
@@ -151,228 +180,200 @@ export default function BidderFormListPage() {
           onApplyBulkAction={(action) => console.log(action, selectedIds)}
         />
 
-        {/* Desktop Table View */}
-        <div className="mt-4 sm:mt-5 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl border border-gray-200 overflow-hidden hidden lg:block">
-          <div className="w-full overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-left w-10 lg:w-12">
-                    <input
-                      type="checkbox"
-                      checked={allChecked}
-                      onChange={toggleAll}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Họ tên
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Email
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Ngày gửi
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Trạng thái
-                  </th>
-                  <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
-                    Hành động
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredList.map((item) => {
-                  const checked = selectedIds.includes(item.id);
-                  return (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-3 lg:px-4 py-3 lg:py-4">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="mt-4 sm:mt-5 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl border border-gray-200 overflow-hidden hidden lg:block">
+              <div className="w-full overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-left w-10 lg:w-12">
+                        <input
+                          type="checkbox"
+                          checked={allChecked}
+                          onChange={toggleAll}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                      </th>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
+                        Họ tên
+                      </th>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
+                        Email
+                      </th>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
+                        Ngày gửi
+                      </th>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
+                        Trạng thái
+                      </th>
+                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
+                        Hành động
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredList.map((item) => {
+                      const checked = selectedIds.includes(item.id);
+                      return (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-3 lg:px-4 py-3 lg:py-4">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleOne(item.id)}
+                              className="w-4 h-4 cursor-pointer"
+                            />
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4  text-gray-900 text-center text-sm lg:text-base">
+                            {item.full_name}
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
+                            <div className="max-w-[200px] mx-auto truncate">
+                              {item.email}
+                            </div>
+                          </td>
+
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
+                            {formatDate(item.created_at)}
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                            <span
+                              className={`inline-flex items-center justify-center px-2.5 lg:px-3 py-1 rounded-md text-xs lg:text-sm font-semibold min-w-[90px] ${
+                                item.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : item.status === "accepted"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-red-200 text-red-600"
+                              }`}
+                            >
+                              {item.status === "pending"
+                                ? "Chờ duyệt"
+                                : item.status === "accepted"
+                                ? "Đã duyệt"
+                                : "Từ chối"}
+                            </span>
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                            <div className="flex items-center justify-center gap-1 lg:gap-2">
+                              <button
+                                className="p-1.5 lg:p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/seller/application/detail/${item.id}`
+                                  )
+                                }
+                                title="Xem chi tiết"
+                              >
+                                <Eye
+                                  size={16}
+                                  className="lg:w-[18px] lg:h-[18px] cursor-pointer"
+                                />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {filteredList.length === 0 && (
+                <div className="py-8 lg:py-10 text-center text-gray-500 text-sm lg:text-base">
+                  Không có dữ liệu
+                </div>
+              )}
+            </div>
+
+            {/* Mobile/Tablet Card View */}
+            <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:hidden">
+              {filteredList.map((item) => {
+                const checked = selectedIds.includes(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start gap-3">
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleOne(item.id)}
-                          className="w-4 h-4 cursor-pointer"
+                          className="w-4 h-4 mt-1 cursor-pointer shrink-0"
                         />
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4  text-gray-900 text-center text-sm lg:text-base">
-                        {item.full_name}
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
-                        <div className="max-w-[200px] mx-auto truncate">
-                          {item.email}
-                        </div>
-                      </td>
-
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
-                        {formatDate(item.created_at)}
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
-                        <span
-                          className={`inline-flex items-center justify-center px-2.5 lg:px-3 py-1 rounded-md text-xs lg:text-sm font-semibold min-w-[90px] ${
-                            item.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : item.status === "accepted"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-red-200 text-red-600"
-                          }`}
-                        >
-                          {item.status === "pending"
-                            ? "Chờ duyệt"
-                            : item.status === "accepted"
-                            ? "Đã duyệt"
-                            : "Từ chối"}
-                        </span>
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
-                        <div className="flex items-center justify-center gap-1 lg:gap-2">
-                          <button
-                            className="p-1.5 lg:p-2 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"
-                            onClick={() =>
-                              navigate(
-                                `/admin/seller/application/detail/${item.id}`
-                              )
-                            }
-                            title="Xem chi tiết"
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1">
+                            {item.full_name}
+                          </h3>
+                          <span
+                            className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-md text-xs font-semibold ${
+                              item.status === "pending"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : item.status === "accepted"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-red-200 text-red-600"
+                            }`}
                           >
-                            <Eye
-                              size={16}
-                              className="lg:w-[18px] lg:h-[18px] cursor-pointer"
-                            />
-                          </button>
-                          {item.status === "pending" && (
-                            <>
-                              <button
-                                className="p-1.5 lg:p-2 hover:bg-green-50 text-green-600 rounded-lg transition-colors border border-green-200"
-                                title="Chấp nhận"
-                              >
-                                <Check
-                                  size={16}
-                                  className="lg:w-[18px] lg:h-[18px]"
-                                />
-                              </button>
-                              <button
-                                className="p-1.5 lg:p-2 hover:bg-red-50 text-red-500 rounded-lg transition-colors border border-red-200"
-                                title="Từ chối"
-                              >
-                                <X
-                                  size={16}
-                                  className="lg:w-[18px] lg:h-[18px]"
-                                />
-                              </button>
-                            </>
-                          )}
+                            {item.status === "pending"
+                              ? "Chờ duyệt"
+                              : item.status === "accepted"
+                              ? "Đã duyệt"
+                              : "Từ chối"}
+                          </span>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          {filteredList.length === 0 && (
-            <div className="py-8 lg:py-10 text-center text-gray-500 text-sm lg:text-base">
-              Không có dữ liệu
-            </div>
-          )}
-        </div>
-
-        {/* Mobile/Tablet Card View */}
-        <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:hidden">
-          {filteredList.map((item) => {
-            const checked = selectedIds.includes(item.id);
-            return (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleOne(item.id)}
-                      className="w-4 h-4 mt-1 cursor-pointer flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1">
-                        {item.full_name}
-                      </h3>
-                      <span
-                        className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-md text-xs font-semibold ${
-                          item.status === "pending"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : item.status === "accepted"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-red-200 text-red-600"
-                        }`}
-                      >
-                        {item.status === "pending"
-                          ? "Chờ duyệt"
-                          : item.status === "accepted"
-                          ? "Đã duyệt"
-                          : "Từ chối"}
-                      </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                <div className="space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-gray-500 font-medium">Email:</span>
-                    <span className="font-medium text-gray-900 break-all">
-                      {item.email}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-gray-500 font-medium">Ngày gửi:</span>
-                    <span className="text-gray-700">
-                      {formatDate(item.created_at)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
-                  <button className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
-                    <Eye size={16} className="flex-shrink-0" />
-                    <span className="font-medium text-xs sm:text-sm">
-                      Xem chi tiết
-                    </span>
-                  </button>
-
-                  {item.status === "pending" && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <button className="flex items-center justify-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-200">
-                        <Check size={16} className="flex-shrink-0" />
-                        <span className="font-medium text-xs sm:text-sm">
-                          Chấp nhận
+                    <div className="space-y-2 text-xs sm:text-sm mb-3 sm:mb-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-gray-500 font-medium">
+                          Email:
                         </span>
-                      </button>
+                        <span className="font-medium text-gray-900 break-all">
+                          {item.email}
+                        </span>
+                      </div>
 
-                      <button className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200">
-                        <X size={16} className="flex-shrink-0" />
+                      <div className="flex flex-col gap-1">
+                        <span className="text-gray-500 font-medium">
+                          Ngày gửi:
+                        </span>
+                        <span className="text-gray-700">
+                          {formatDate(item.created_at)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+                      <button className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
+                        <Eye size={16} className="shrink-0" />
                         <span className="font-medium text-xs sm:text-sm">
-                          Từ chối
+                          Xem chi tiết
                         </span>
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                  </div>
+                );
+              })}
 
-          {filteredList.length === 0 && (
-            <div className="col-span-full bg-white rounded-lg sm:rounded-xl border border-gray-200 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-base">
-              Không có dữ liệu
+              {filteredList.length === 0 && (
+                <div className="col-span-full bg-white rounded-lg sm:rounded-xl border border-gray-200 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-base">
+                  Không có dữ liệu
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
