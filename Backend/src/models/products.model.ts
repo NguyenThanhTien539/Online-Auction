@@ -14,6 +14,16 @@ export async function isProductInBiddingTime (product_id: number) {
     return result ? true : false;
 }
 
+export async function getSellerOfProduct (product_id: number) {
+    const query = await db.raw(`
+        select  u.*, p.*
+        from products p join
+        users u on p.seller_id = u.user_id
+        where p.product_id = ?`, [product_id]);
+    const result = await query.rows[0];
+    return result;
+}
+
 export async function getProductById (product_id: number) {
     let query = await db.raw(`
         SELECT 
@@ -243,8 +253,9 @@ export async function getProductDetail(product_id: string, product_slug: string)
         WHERE product_id = ?
     `, [product_id]);
     const productName = await queryName.rows[0]?.product_name;
+    console.log ("Backend - Product name from DB:", productName);
     const generatedSlug = slugify(productName || "");
-
+    console.log ("Backend - Generated slug:", generatedSlug, " vs Frontend slug: ", product_slug);
     if (generatedSlug !== product_slug){
         return null;
     }
@@ -412,5 +423,16 @@ export async function postProductQuestion({product_id, user_id, content, questio
         WHERE pq.question_id = ?
     `, [newQuestions.question_id]);
     result = await query.rows[0];
+    return result;
+}
+
+export async function getUserInParentQuestion(question_parent_id: number) {
+    let query = await db.raw (`
+        SELECT u.*
+        FROM product_questions pq
+        LEFT JOIN users u ON pq.user_id = u.user_id
+        WHERE pq.question_id = ?
+    `, [question_parent_id]);
+    let result = await query.rows[0];
     return result;
 }

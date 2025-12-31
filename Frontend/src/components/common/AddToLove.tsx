@@ -14,8 +14,6 @@ export default function AddToLove({product_id, className} : {product_id: number,
     const [isSubmit, setIsSubmit] = useState(false);
   
 
-    console.log ("Product id in AddToLove: ", product_id);
-
    
     const handleClick = () => {
         if (isSubmit) return; // Prevent multiple clicks while submitting

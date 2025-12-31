@@ -1,7 +1,7 @@
 
 
 export function slugify(str : string) {
-   str = str.replace(/^\s+|\s+$/g, "");
+    str = str.replace(/^\s+|\s+$/g, "");
    str = str.toLowerCase();
 
    var from = "àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ·/_,:;";

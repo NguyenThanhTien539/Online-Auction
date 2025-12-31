@@ -74,7 +74,7 @@ function ListProductsPage() {
 
                 setFilterPrice(priceFilter || "");
                 setFilterTime(timeFilter || "");
-                const response = await fetch (`http://localhost:5000/api/products/page_list?cat2_id=${cat2_id}&page=${page}&price=${priceFilter}&time=${timeFilter}`)
+                const response = await fetch (`${import.meta.env.VITE_API_URL}/api/products/page_list?cat2_id=${cat2_id}&page=${page}&price=${priceFilter}&time=${timeFilter}`)
                 const data = await response.json();
 
                 if (!response.ok)
@@ -83,7 +83,6 @@ function ListProductsPage() {
                     setLoading(false);
                     return;
                 }
-                toast.success("Tải trang thành công");
                 setLoading(false);
                 setProducts(data.data);
                 setNumberOfPages(data.numberOfPages);
@@ -146,10 +145,7 @@ function ListProductsPage() {
         navigate(`/products?${newUrl.toString()}`);
     }
 
-    const handleClickProduct = (productId : number, productName : string) => {
-        const slug = slugify(productName);
-        navigate(`/product/${slug}-${productId}`);
-    }
+
 
     return(
         isLoading ? <Loading></Loading> : <div className="min-h-screen bg-gray-50">
@@ -182,7 +178,7 @@ function ListProductsPage() {
                             />
                             <button
                                 type="submit"
-                                className="bg-gray-600 hover:bg-gray-700 w-[200px] cursor-pointer text-white px-4 rounded-lg font-sm transition-colors duration-200 shadow-sm"
+                                className="bg-gray-600 hover:bg-gray-700 w-[300px] cursor-pointer text-white px-4 rounded-lg font-sm transition-colors duration-200 shadow-sm"
                                 onClick={handleSubmitFilter}
                             >
                                 Áp dụng
@@ -216,7 +212,7 @@ function ListProductsPage() {
                                         end_time={item.end_time}
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns}
-                                        onClick={() => handleClickProduct(item.product_id, item.product_name)}
+       
                                    
                                     />
                                 </div>

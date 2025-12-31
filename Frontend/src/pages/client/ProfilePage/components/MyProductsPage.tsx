@@ -8,6 +8,7 @@ import { Heart, Package, ShoppingCart, Trophy, TrendingUp, Archive } from "lucid
 import speakingURL from "speakingurl";
 import LoginRequest from "@/components/common/LoginRequest";
 import {useAuth} from "@/routes/ProtectedRouter";
+import { slugify } from "@/utils/make_slug";
 type Products = {
     product_id : number,
     product_images : string[],
@@ -115,8 +116,6 @@ export default function MyProductsPage() {
                     }
                     return;
                 }
-
-                toast.success("Tải trang thành công");
                 setLoading(false);
                 setProducts(data.data);
                 setNumberOfPages(data.numberOfPages);
@@ -144,10 +143,6 @@ export default function MyProductsPage() {
         setSearchParams(newParams);
     }
 
-    const handleClickProduct = (productId : number, productName : string) => {
-        const slug = speakingURL(productName);
-        navigate(`/product/${slug}-${productId}`);
-    };
 
     const activeTabInfo = getActiveTabInfo();
     if (!auth) return <LoginRequest />;
@@ -219,7 +214,7 @@ export default function MyProductsPage() {
                                         end_time={item.end_time}
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns}
-                                        onClick={() => handleClickProduct(item.product_id, item.product_name)}
+
                                     />
                                 </div>
                             ))}

@@ -50,8 +50,8 @@ export default function QASection({product_id, seller_id} : {product_id?: number
         }
         const data = await res.json();
         setQuestions (data.data);
-        setTotalQuestions (data.totalQuestions);
-        setTotalPages (Math.ceil(data.totalQuestions / limit));
+        setTotalQuestions (Number(data.totalQuestions) || 0);
+        setTotalPages (Math.ceil(Number(data.totalQuestions) / limit) || 1);
         setMainQuestions (data.data.filter((q: QuestionType) => q.question_parent_id === null));
 
       }

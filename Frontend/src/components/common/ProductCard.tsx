@@ -28,7 +28,7 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
     // Start time take day, month, year
     const startDate = DateTime.fromISO(start_time, { zone: "Asia/Ho_Chi_Minh" });
     const endDate = DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
-
+    console.log("Product Name in ProductCard:", product_name);
     const handleClickProduct = (productId? : number, productName? : string) => {
             const slug = slugify(productName?? "");
             navigate(`/product/${slug}-${productId}`);
@@ -103,7 +103,8 @@ function ProductCard({product_image, product_id, product_name, current_price, bu
         hover:scale-[103%] hover:-translate-y-1 transition-all duration-300 bg-white hover:cursor-pointer overflow-hidden group shrink-0",   
              hasIntersected ? "animate__animated animate__fadeInUp" : "opacity-0",
          data.className)}
-            onClick = {data.onClick ?? (() => {handleClickProduct(product_id?? 0, product_name?? "")})}>
+            onClick = {data.onClick ?? (() => {handleClickProduct(product_id?? 0, product_name?? "")})}
+            >
             
             {/* Image */}
             

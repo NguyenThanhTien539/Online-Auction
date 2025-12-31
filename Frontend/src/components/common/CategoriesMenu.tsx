@@ -115,7 +115,7 @@ function CatagoriesDropdownMenu(){
       }
       else{
         setCatData(data.data);
-        console.log("Success in loading all cats");
+
       }
     }
     loadData();

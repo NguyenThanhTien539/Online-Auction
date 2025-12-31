@@ -28,11 +28,6 @@ export default function ListSearchProductPage() {
     const [numberOfPages, setNumberOfPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
     const [quantity, setQuantity] = useState(0);
-
-    const handleClickProduct = (productId : number, productName : string) => {
-            const slug = slugify(productName);
-            navigate(`/product/${slug}-${productId}`);
-    }
     
     const handleSetCurrentPage = (page : number) => {
         setCurrentPage(page);
@@ -119,7 +114,6 @@ export default function ListSearchProductPage() {
                                         end_time={item.end_time} 
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns} 
-                                        onClick={() => handleClickProduct(item.product_id, item.product_name)}
                                     />
                                 </div>
                             ))}
