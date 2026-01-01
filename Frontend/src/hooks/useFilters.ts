@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export function useCategoryFilters() {
+export function useFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "inactive"
-  >((searchParams.get("status") as "all" | "active" | "inactive") || "all");
+  const [statusFilter, setStatusFilter] = useState<string>(
+    (searchParams.get("status") as string) || "all"
+  );
   const [creatorFilter, setCreatorFilter] = useState<string>(
     searchParams.get("creator") || ""
   );
@@ -37,7 +37,7 @@ export function useCategoryFilters() {
 
   useEffect(() => {
     const status = searchParams.get("status") || "all";
-    setStatusFilter(status as "all" | "active" | "inactive");
+    setStatusFilter(status);
     const creator = searchParams.get("creator") || "";
     setCreatorFilter(creator);
     const dateFromVal = searchParams.get("dateFrom") || "";

@@ -2,8 +2,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { Eye, Check, X } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
+import Pagination from "@/components/admin/Pagination";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
+import { useFilters } from "@/hooks/useFilters";
+import { formatToVN } from "@/utils/format_time";
 type BidderForm = {
   id: number;
   full_name: string;
@@ -12,129 +14,56 @@ type BidderForm = {
   status: "pending" | "accepted" | "rejected";
 };
 
-function formatDate(dateStr: string) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-
-  return `${hours}:${minutes} - ${day}/${month}/${year}`;
-}
+const LIMIT = 10;
 
 export default function BidderFormListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [list, setList] = useState<BidderForm[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  // ========= FILTER STATE =========
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "pending" | "accepted" | "rejected"
-  >("all");
-  const [search, setSearch] = useState<string>("");
-  const [dateFrom, setDateFrom] = useState<string>("");
-  const [dateTo, setDateTo] = useState<string>("");
-
-  useEffect(() => {
-    const status = (searchParams.get("status") ?? "all") as
-      | "all"
-      | "pending"
-      | "accepted"
-      | "rejected";
-    setStatusFilter(status);
-
-    setSearch(searchParams.get("keyword") ?? "");
-    setDateFrom(searchParams.get("from") ?? "");
-    setDateTo(searchParams.get("to") ?? "");
-  }, []);
-
-  // 2) Whenever filters change, write back to URL
-  useEffect(() => {
-    const params: Record<string, string> = {};
-    if (statusFilter !== "all") params.status = statusFilter;
-    if (search.trim()) params.keyword = search.trim();
-    if (dateFrom) params.from = dateFrom;
-    if (dateTo) params.to = dateTo;
-
-    setSearchParams(params, { replace: true });
-  }, [statusFilter, search, dateFrom, dateTo, setSearchParams]);
-
-  // ========= FILTERED LIST =========
-  const filteredList = useMemo(
-    () =>
-      list.filter((item) => {
-        // Filter by status
-        if (statusFilter !== "all" && item.status !== statusFilter)
-          return false;
-
-        // Filter by search (name, email, phone)
-        if (search.trim()) {
-          const key = search.toLowerCase();
-          if (
-            !item.full_name.toLowerCase().includes(key) &&
-            !item.email.toLowerCase().includes(key)
-          ) {
-            return false;
-          }
-        }
-
-        // Filter by date range
-        if (dateFrom) {
-          const from = new Date(dateFrom);
-          if (new Date(item.created_at) < from) return false;
-        }
-        if (dateTo) {
-          const to = new Date(dateTo);
-          if (new Date(item.created_at) > to) return false;
-        }
-
-        return true;
-      }),
-    [list, statusFilter, search, dateFrom, dateTo]
-  );
-
-  const resetFilters = () => {
-    setStatusFilter("all");
-    setSearch("");
-    setDateFrom("");
-    setDateTo("");
-  };
-
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  const allChecked =
-    filteredList.length > 0 &&
-    filteredList.every((item) => selectedIds.includes(item.id));
-
-  const toggleAll = () => {
-    const filteredIds = filteredList.map((i) => i.id);
-    setSelectedIds((prev) => {
-      if (allChecked) return prev.filter((id) => !filteredIds.includes(id));
-      const newSet = new Set([...prev, ...filteredIds]);
-      return Array.from(newSet);
-    });
-  };
-
-  const toggleOne = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleStatusFilterChange = (v: string) => {
-    setStatusFilter(v as "all" | "pending" | "accepted" | "rejected");
-  };
+  const {
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    search,
+    handleStatusFilterChange,
+    handleCreatorFilterChange,
+    handleDateFromChange,
+    handleDateToChange,
+    handleSearchChange,
+    resetFilters,
+  } = useFilters();
 
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/application-form/list`,
+      }/api/application-form/number-of-forms?status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const total = data.total as number;
+        setTotalPages(Math.ceil(total / LIMIT));
+        const newTotalPages = Math.ceil(total / LIMIT);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setSearchParams((prev) => ({
+            ...Object.fromEntries(prev),
+            page: "1",
+          }));
+        }
+      });
+  }, [statusFilter, dateFrom, dateTo, search]);
+
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/application-form/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -148,7 +77,7 @@ export default function BidderFormListPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [currentPage, statusFilter, dateFrom, dateTo, search]);
 
   return (
     <div className="w-full min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
@@ -167,17 +96,16 @@ export default function BidderFormListPage() {
             { value: "rejected", label: "Đã từ chối" },
           ]}
           search={search}
-          setSearch={setSearch}
+          setSearch={handleSearchChange}
           dateFrom={dateFrom}
-          setDateFrom={setDateFrom}
+          setDateFrom={handleDateFromChange}
           dateTo={dateTo}
-          setDateTo={setDateTo}
+          setDateTo={handleDateToChange}
           onResetFilters={resetFilters}
           bulkActionOptions={[
             { value: "accepted", label: "Chấp nhận" },
             { value: "rejected", label: "Từ chối" },
           ]}
-          onApplyBulkAction={(action) => console.log(action, selectedIds)}
         />
 
         {isLoading ? (
@@ -192,14 +120,6 @@ export default function BidderFormListPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-3 lg:px-4 py-3 lg:py-4 text-left w-10 lg:w-12">
-                        <input
-                          type="checkbox"
-                          checked={allChecked}
-                          onChange={toggleAll}
-                          className="w-4 h-4 cursor-pointer"
-                        />
-                      </th>
                       <th className="px-3 lg:px-4 py-3 lg:py-4 text-center font-semibold text-gray-700 text-sm lg:text-base">
                         Họ tên
                       </th>
@@ -218,21 +138,12 @@ export default function BidderFormListPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredList.map((item) => {
-                      const checked = selectedIds.includes(item.id);
+                    {list.map((item) => {
                       return (
                         <tr
                           key={item.id}
                           className="hover:bg-gray-50 transition-colors"
                         >
-                          <td className="px-3 lg:px-4 py-3 lg:py-4">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleOne(item.id)}
-                              className="w-4 h-4 cursor-pointer"
-                            />
-                          </td>
                           <td className="px-3 lg:px-4 py-3 lg:py-4  text-gray-900 text-center text-sm lg:text-base">
                             {item.full_name}
                           </td>
@@ -243,7 +154,7 @@ export default function BidderFormListPage() {
                           </td>
 
                           <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-900 text-sm lg:text-base">
-                            {formatDate(item.created_at)}
+                            {formatToVN(item.created_at)}
                           </td>
                           <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
                             <span
@@ -286,7 +197,7 @@ export default function BidderFormListPage() {
                   </tbody>
                 </table>
               </div>
-              {filteredList.length === 0 && (
+              {list.length === 0 && (
                 <div className="py-8 lg:py-10 text-center text-gray-500 text-sm lg:text-base">
                   Không có dữ liệu
                 </div>
@@ -295,8 +206,7 @@ export default function BidderFormListPage() {
 
             {/* Mobile/Tablet Card View */}
             <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:hidden">
-              {filteredList.map((item) => {
-                const checked = selectedIds.includes(item.id);
+              {list.map((item) => {
                 return (
                   <div
                     key={item.id}
@@ -306,8 +216,6 @@ export default function BidderFormListPage() {
                       <div className="flex items-start gap-3">
                         <input
                           type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleOne(item.id)}
                           className="w-4 h-4 mt-1 cursor-pointer shrink-0"
                         />
                         <div className="flex-1 min-w-0">
@@ -348,7 +256,7 @@ export default function BidderFormListPage() {
                           Ngày gửi:
                         </span>
                         <span className="text-gray-700">
-                          {formatDate(item.created_at)}
+                          {formatToVN(item.created_at)}
                         </span>
                       </div>
                     </div>
@@ -366,7 +274,7 @@ export default function BidderFormListPage() {
                 );
               })}
 
-              {filteredList.length === 0 && (
+              {list.length === 0 && (
                 <div className="col-span-full bg-white rounded-lg sm:rounded-xl border border-gray-200 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-base">
                   Không có dữ liệu
                 </div>
@@ -374,6 +282,12 @@ export default function BidderFormListPage() {
             </div>
           </>
         )}
+
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          isPageLoading={isLoading}
+        />
       </div>
     </div>
   );

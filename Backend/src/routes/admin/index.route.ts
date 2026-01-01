@@ -12,6 +12,11 @@ route.use(
   categoryRoute
 );
 
-route.use("/api/application-form", applicationFormRoute);
+route.use(
+  "/api/application-form",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyRole("admin"),
+  applicationFormRoute
+);
 
 export default route;
