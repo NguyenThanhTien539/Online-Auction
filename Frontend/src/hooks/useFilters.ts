@@ -53,7 +53,10 @@ export function useFilters() {
     updateFilters({ creator: v });
   const handleDateFromChange = (v: string) => updateFilters({ dateFrom: v });
   const handleDateToChange = (v: string) => updateFilters({ dateTo: v });
-  const handleSearchChange = (v: string) => updateFilters({ search: v });
+  const handleSearchChange = (v: string) => {
+    // Không slugify ở đây, giữ nguyên value gốc
+    updateFilters({ search: v });
+  };
   const resetFilters = () => {
     setSearchParams({});
   };

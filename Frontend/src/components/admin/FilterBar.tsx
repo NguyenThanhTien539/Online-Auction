@@ -33,6 +33,7 @@ type Props = {
   /** ----- Tìm kiếm ----- */
   search?: string;
   setSearch?: (v: string) => void;
+  onSearchSubmit?: () => void; // callback khi nhấn Enter
 
   /** ----- Hành động & reset & tạo mới ----- */
   onResetFilters?: () => void;
@@ -65,6 +66,7 @@ export default function FilterBar({
   // search
   search,
   setSearch,
+  onSearchSubmit,
 
   // actions
   onResetFilters,
@@ -112,6 +114,9 @@ export default function FilterBar({
 
   // state select "Hành động"
   const [selectedAction, setSelectedAction] = useState<string>("");
+
+  // state để xử lý IME (Input Method Editor) cho tiếng Việt
+  const [isComposing, setIsComposing] = useState(false);
 
   const handleApplyClick = () => {
     if (!onApplyBulkAction) return;
@@ -234,10 +239,26 @@ export default function FilterBar({
             <Search className="w-5 h-5" />
             <input
               type="text"
-              placeholder="Tìm kiếm"
+              placeholder="Tìm kiếm (nhấn Enter để tìm)"
               className="flex-1 border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
               value={search}
-              onChange={(e) => setSearch!(e.target.value)}
+              onChange={(e) => {
+                // Chỉ update state khi KHÔNG đang composition (gõ tiếng Việt)
+                if (!isComposing) {
+                  setSearch!(e.target.value);
+                }
+              }}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={(e) => {
+                setIsComposing(false);
+                // Update state với giá trị cuối cùng sau khi IME hoàn tất
+                setSearch!((e.target as HTMLInputElement).value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !isComposing && onSearchSubmit) {
+                  onSearchSubmit();
+                }
+              }}
             />
           </div>
         )}

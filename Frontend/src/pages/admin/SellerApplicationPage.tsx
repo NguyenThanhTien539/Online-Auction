@@ -6,6 +6,8 @@ import Pagination from "@/components/admin/Pagination";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFilters } from "@/hooks/useFilters";
 import { formatToVN } from "@/utils/format_time";
+import { slugify } from "@/utils/make_slug";
+
 type BidderForm = {
   id: number;
   full_name: string;
@@ -26,23 +28,39 @@ export default function BidderFormListPage() {
 
   const {
     statusFilter,
-    creatorFilter,
     dateFrom,
     dateTo,
-    search,
+    search: searchFromUrl,
     handleStatusFilterChange,
-    handleCreatorFilterChange,
     handleDateFromChange,
     handleDateToChange,
     handleSearchChange,
     resetFilters,
   } = useFilters();
 
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
+  const [localSearch, setLocalSearch] = useState("");
+
+  // Chỉ clear local search khi reset filters (searchFromUrl = "")
+  useEffect(() => {
+    if (!searchFromUrl) {
+      setLocalSearch("");
+    }
+  }, [searchFromUrl]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      handleSearchChange(slugified);
+    }
+  };
+
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/application-form/number-of-forms?status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      }/api/application-form/number-of-forms?status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${searchFromUrl}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -57,13 +75,13 @@ export default function BidderFormListPage() {
           }));
         }
       });
-  }, [statusFilter, dateFrom, dateTo, search]);
+  }, [statusFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/application-form/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      }/api/application-form/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${searchFromUrl}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -77,7 +95,7 @@ export default function BidderFormListPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [currentPage, statusFilter, dateFrom, dateTo, search]);
+  }, [currentPage, statusFilter, dateFrom, dateTo, searchFromUrl]);
 
   return (
     <div className="w-full min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
@@ -95,8 +113,9 @@ export default function BidderFormListPage() {
             { value: "accepted", label: "Đã chấp nhận" },
             { value: "rejected", label: "Đã từ chối" },
           ]}
-          search={search}
-          setSearch={handleSearchChange}
+          search={localSearch}
+          setSearch={setLocalSearch}
+          onSearchSubmit={handleSearchSubmit}
           dateFrom={dateFrom}
           setDateFrom={handleDateFromChange}
           dateTo={dateTo}

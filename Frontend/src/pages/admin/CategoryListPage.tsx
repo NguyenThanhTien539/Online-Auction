@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { formatToVN } from "@/utils/format_time";
 import type { CategoryItem } from "@/interface/category.interface";
 import { useFilters } from "@/hooks/useFilters";
-
+import { slugify } from "@/utils/make_slug";
 const LIMIT = 5;
 
 export default function CategoryList() {
@@ -22,7 +22,7 @@ export default function CategoryList() {
     creatorFilter,
     dateFrom,
     dateTo,
-    search,
+    search: searchFromUrl,
     handleStatusFilterChange,
     handleCreatorFilterChange,
     handleDateFromChange,
@@ -31,11 +31,31 @@ export default function CategoryList() {
     resetFilters,
   } = useFilters();
 
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
+  const [localSearch, setLocalSearch] = useState("");
+
+  useEffect(() => {
+    if (!searchFromUrl) {
+      setLocalSearch("");
+    }
+  }, [searchFromUrl]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
+      handleSearchChange(slugified);
+    }
+  };
+
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -50,7 +70,7 @@ export default function CategoryList() {
           }));
         }
       });
-  }, [statusFilter, creatorFilter, dateFrom, dateTo, search]);
+  }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
     setIsPageLoading(true);
@@ -58,7 +78,9 @@ export default function CategoryList() {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -72,7 +94,14 @@ export default function CategoryList() {
         setIsLoading(false);
         setIsPageLoading(false);
       });
-  }, [currentPage, statusFilter, creatorFilter, dateFrom, dateTo, search]);
+  }, [
+    currentPage,
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    searchFromUrl,
+  ]);
 
   // ================== SELECTION ==================
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -142,8 +171,9 @@ export default function CategoryList() {
         setDateFrom={handleDateFromChange}
         dateTo={dateTo}
         setDateTo={handleDateToChange}
-        search={search}
-        setSearch={handleSearchChange}
+        search={localSearch}
+        setSearch={setLocalSearch}
+        onSearchSubmit={handleSearchSubmit}
         onResetFilters={resetFilters}
         bulkActionOptions={[
           { value: "active", label: "Cho hoạt động" },

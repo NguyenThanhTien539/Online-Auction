@@ -5,6 +5,7 @@ import FilterBar from "@/components/admin/FilterBar";
 import Pagination from "@/components/admin/Pagination";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFilters } from "@/hooks/useFilters";
+import { slugify } from "@/utils/make_slug";
 
 type UserItem = {
   user_id: number;
@@ -31,6 +32,24 @@ export default function UserListPage() {
     handleStatusFilterChange,
     resetFilters,
   } = useFilters();
+
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
+  const [localSearch, setLocalSearch] = useState("");
+
+  // Chỉ clear local search khi reset filters (searchFromUrl = "")
+  useEffect(() => {
+    if (!search) {
+      setLocalSearch("");
+    }
+  }, [search]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== search) {
+      handleSearchChange(slugified);
+    }
+  };
 
   useEffect(() => {
     fetch(
@@ -107,8 +126,9 @@ export default function UserListPage() {
             { value: "user", label: "Người dùng" },
             { value: "seller", label: "Người bán" },
           ]}
-          search={search}
-          setSearch={handleSearchChange}
+          search={localSearch}
+          setSearch={setLocalSearch}
+          onSearchSubmit={handleSearchSubmit}
           onResetFilters={resetFilters}
         />
 

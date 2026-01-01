@@ -36,7 +36,7 @@ export async function calTotalCategories(req: Request, res: Response) {
     Object.assign(filter, { dateTo: req.query.dateTo });
   }
   if (req.query.search) {
-    Object.assign(filter, { search: req.query.search });
+    Object.assign(filter, { search: req.query.search as string });
   }
 
   const total = await categoriesModel.calTotalCategories(filter);
@@ -60,9 +60,8 @@ export async function list(req: AccountRequest, res: Response) {
     Object.assign(filter, { dateTo: req.query.dateTo });
   }
   if (req.query.search) {
-    Object.assign(filter, { search: req.query.search });
+    Object.assign(filter, { search: req.query.search as string });
   }
-
   const list = await categoriesModel.getCategoryWithOffsetLimit(
     (page - 1) * limit,
     limit,

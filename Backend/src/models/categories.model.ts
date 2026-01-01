@@ -117,7 +117,7 @@ export const getCategoryWithOffsetLimit = async (
   }
 
   if (filter?.search) {
-    q.andWhereILike("name", `%${filter.search}%`);
+    q.andWhere("slug", "like", `%${filter.search}%`);
   }
 
   return q;
@@ -148,7 +148,7 @@ export const calTotalCategories = async (filter: any = {}) => {
   }
 
   if (filter?.search) {
-    q.andWhereILike("name", `%${filter.search}%`);
+    q.andWhere("slug", "like", `%${filter.search}%`);
   }
 
   const result = await q;
