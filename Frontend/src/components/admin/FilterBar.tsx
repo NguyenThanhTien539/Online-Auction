@@ -14,7 +14,6 @@ type BulkActionOption = {
 };
 
 type Props = {
-  /** ----- Trạng thái ----- */
   showStatusFilter?: boolean; // default: true
   statusFilter?: string;
   setStatusFilter?: (v: string) => void;
@@ -135,7 +134,7 @@ export default function FilterBar({
           {hasStatusFilter && (
             <div className="flex h-full items-center gap-2 px-5 border-r border-gray-300">
               <select
-                className="bg-transparent outline-none font-medium"
+                className="cursor-pointer bg-transparent outline-none font-medium"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter!(e.target.value)}
               >
@@ -150,9 +149,9 @@ export default function FilterBar({
 
           {/* Người tạo */}
           {hasCreatorFilter && (
-            <div className="flex items-center px-5 h-full border-r border-gray-300">
+            <div className=" flex items-center px-5 h-full border-r border-gray-300">
               <select
-                className="bg-transparent outline-none font-medium"
+                className="cursor-pointer bg-transparent outline-none font-medium"
                 value={creatorFilter}
                 onChange={(e) => setCreatorFilter!(e.target.value)}
               >
@@ -207,7 +206,7 @@ export default function FilterBar({
         {hasBulkAction && (
           <div className="flex rounded-xl bg-white border border-gray-200 overflow-hidden shadow-sm">
             <select
-              className="h-full px-4 text-sm text-gray-800 bg-white outline-none border-none"
+              className="cursor-pointer h-full px-4 text-sm text-gray-800 bg-white outline-none border-none"
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
             >
@@ -221,7 +220,7 @@ export default function FilterBar({
 
             <button
               type="button"
-              className="h-full px-5 text-sm font-semibold text-red-600 hover:bg-gray-50 cursor-pointer border-l border-gray-200"
+              className=" cursor-pointer h-full px-5 text-sm font-semibold text-red-600 hover:bg-gray-50 border-l border-gray-200"
               onClick={handleApplyClick}
             >
               Áp dụng

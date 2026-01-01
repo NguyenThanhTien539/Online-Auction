@@ -2,7 +2,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 import JustValidate from "just-validate";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { slugify } from "@/utils/make_slug";
 import { useBuildTree, useCategoryWithID } from "@/hooks/useCategory";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ export default function CategoryEdit() {
   const editorRef = useRef(null);
   const { item } = useCategoryWithID(Number(id));
   const { tree } = useBuildTree();
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -51,6 +52,7 @@ export default function CategoryEdit() {
       )
 
       .onSuccess((event: any) => {
+        setIsLoading(true);
         const name = event.target.name.value;
         const status = event.target.status.value;
         const parentValue = event.target.parent.value as string; // "" hoặc "3"
@@ -82,12 +84,17 @@ export default function CategoryEdit() {
         )
           .then((res) => res.json())
           .then((data) => {
+            setIsLoading(false);
             if (data.code == "error") {
               toast.error(data.message);
             }
             if (data.code == "success") {
               toast.success(data.message);
             }
+          })
+          .catch(() => {
+            setIsLoading(false);
+            toast.error("Có lỗi xảy ra");
           });
       });
   }, [item]);
@@ -179,9 +186,10 @@ export default function CategoryEdit() {
               <div className="flex flex-col items-center justify-center gap-5 pt-2">
                 <button
                   type="submit"
-                  className="rounded-xl bg-blue-500 px-3 py-5 text-[18px] font-medium text-white hover:bg-blue-600 cursor-pointer"
+                  disabled={isLoading}
+                  className="rounded-xl bg-blue-500 px-3 py-5 text-[18px] font-medium text-white hover:bg-blue-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cập nhật danh mục
+                  {isLoading ? "Đang cập nhật..." : "Cập nhật danh mục"}
                 </button>
 
                 <span

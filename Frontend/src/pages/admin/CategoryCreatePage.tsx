@@ -84,7 +84,6 @@ export default function CategoryCreate() {
             }
             if (data.code == "success") {
               toast.success(data.message);
-              navigate(0);
             }
           });
       });
@@ -168,7 +167,6 @@ export default function CategoryCreate() {
               </div>
             </div>
 
-            
             {/* Mô tả */}
             <div className="w-full">
               <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -183,14 +181,14 @@ export default function CategoryCreate() {
             <div className="flex flex-col  items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-4">
               <button
                 type="submit"
-                className="w-full sm:w-auto rounded-lg bg-blue-500 px-8 py-3 text-base font-medium text-white hover:bg-blue-600 active:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+                className="cursor-pointer w-full sm:w-auto rounded-lg bg-blue-500 px-8 py-3 text-base font-medium text-white hover:bg-blue-600 active:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
               >
                 Tạo mới danh mục
               </button>
 
               <button
                 type="button"
-                className="w-full sm:w-auto text-base font-medium text-blue-500 hover:text-blue-600 underline transition-colors py-2"
+                className="cursor-pointer w-full sm:w-auto text-base font-medium text-blue-500 hover:text-blue-600 underline transition-colors py-2"
                 onClick={() => {
                   navigate(`/${import.meta.env.VITE_PATH_ADMIN}/category/list`);
                 }}

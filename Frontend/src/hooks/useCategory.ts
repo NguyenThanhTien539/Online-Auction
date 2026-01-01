@@ -59,6 +59,7 @@ export function useBuildTree() {
 
 export function useCategories() {
   const [items, setItems] = useState<CategoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch(
@@ -69,13 +70,16 @@ export function useCategories() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data.list);
         setItems(data.list);
+        setIsLoading(false);
       })
-      .catch(() => setItems([]));
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+      });
   }, []);
 
-  return { items };
+  return { items, isLoading };
 }
 
 export function useCategoryWithID(id: number) {

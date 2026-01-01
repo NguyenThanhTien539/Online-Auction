@@ -1,38 +1,77 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FilterBar from "@/components/admin/FilterBar";
 import { Pencil, Trash2 } from "lucide-react";
-import { useCategories } from "@/hooks/useCategory";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { formatToVN } from "@/utils/format_time";
+import type { CategoryItem } from "@/interface/category.interface";
+import { useCategoryFilters } from "@/hooks/useCategoryFilters";
 
-function formatDate(dateStr: string) {
-  if (!dateStr) return "";
-
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  const seconds = String(d.getSeconds()).padStart(2, "0");
-
-  return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
-}
+const LIMIT = 5;
 
 export default function CategoryList() {
   const navigate = useNavigate();
-  const { items } = useCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [items, setItems] = useState<CategoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const {
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    search,
+    handleStatusFilterChange,
+    handleCreatorFilterChange,
+    handleDateFromChange,
+    handleDateToChange,
+    handleSearchChange,
+    resetFilters,
+  } = useCategoryFilters();
 
-  // ================== FILTER STATE ==================
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "inactive"
-  >("all");
-  const [creatorFilter, setCreatorFilter] = useState<string>("");
-  const [dateFrom, setDateFrom] = useState<string>("");
-  const [dateTo, setDateTo] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const total = data.total as number;
+        setTotalPages(Math.ceil(total / LIMIT));
+        const newTotalPages = Math.ceil(total / LIMIT);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setSearchParams((prev) => ({
+            ...Object.fromEntries(prev),
+            page: "1",
+          }));
+        }
+      });
+  }, [statusFilter, creatorFilter, dateFrom, dateTo, search]);
+
+  useEffect(() => {
+    setIsPageLoading(true);
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${search}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setItems(data.list);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      });
+  }, [currentPage, statusFilter, creatorFilter, dateFrom, dateTo, search]);
 
   // ================== SELECTION ==================
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -51,43 +90,17 @@ export default function CategoryList() {
     [items]
   );
 
-  // ================== FILTERED ITEMS ==================
-  const filteredItems = useMemo(
-    () =>
-      items.filter((item) => {
-        if (statusFilter !== "all" && item.status !== statusFilter)
-          return false;
-        if (creatorFilter && item.created_by !== creatorFilter) return false;
-        if (dateFrom) {
-          const from = new Date(dateFrom);
-          if (new Date(item.created_at) < from) return false;
-        }
-        if (dateTo) {
-          const to = new Date(dateTo);
-          if (new Date(item.created_at) > to) return false;
-        }
-        if (search.trim()) {
-          const key = search.toLowerCase();
-          if (!item.name.toLowerCase().includes(key)) return false;
-        }
-        return true;
-      }),
-    [items, statusFilter, creatorFilter, dateFrom, dateTo, search]
-  );
-
   // ================== CHECKBOX ==================
   const allChecked = useMemo(
-    () =>
-      filteredItems.length > 0 &&
-      filteredItems.every((i) => selectedIds.includes(i.id)),
-    [filteredItems, selectedIds]
+    () => items.length > 0 && items.every((i) => selectedIds.includes(i.id)),
+    [items, selectedIds]
   );
 
   const toggleAll = () => {
-    const filteredIds = filteredItems.map((i) => i.id);
+    const itemIds = items.map((i) => i.id);
     setSelectedIds((prev) => {
-      if (allChecked) return prev.filter((id) => !filteredIds.includes(id));
-      const newSet = new Set([...prev, ...filteredIds]);
+      if (allChecked) return prev.filter((id) => !itemIds.includes(id));
+      const newSet = new Set([...prev, ...itemIds]);
       return Array.from(newSet);
     });
   };
@@ -98,17 +111,13 @@ export default function CategoryList() {
     );
   };
 
-  const handleStatusFilterChange = (v: string) => {
-    setStatusFilter(v as "all" | "active" | "inactive");
-  };
-
-  const resetFilters = () => {
-    setStatusFilter("all");
-    setCreatorFilter("");
-    setDateFrom("");
-    setDateTo("");
-    setSearch("");
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -119,21 +128,21 @@ export default function CategoryList() {
       <FilterBar
         showStatusFilter
         statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
+        setStatusFilter={handleStatusFilterChange}
         statusOptions={[
           { value: "all", label: "Trạng thái" },
           { value: "active", label: "Hoạt động" },
           { value: "inactive", label: "Dừng" },
         ]}
         creatorFilter={creatorFilter}
-        setCreatorFilter={setCreatorFilter}
+        setCreatorFilter={handleCreatorFilterChange}
         creatorOptions={creatorOptions}
         dateFrom={dateFrom}
-        setDateFrom={setDateFrom}
+        setDateFrom={handleDateFromChange}
         dateTo={dateTo}
-        setDateTo={setDateTo}
+        setDateTo={handleDateToChange}
         search={search}
-        setSearch={setSearch}
+        setSearch={handleSearchChange}
         onResetFilters={resetFilters}
         bulkActionOptions={[
           { value: "active", label: "Cho hoạt động" },
@@ -145,7 +154,12 @@ export default function CategoryList() {
       />
 
       {/* Desktop Table View */}
-      <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden hidden lg:block">
+      <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden hidden lg:block relative">
+        {isPageLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        )}
         <div className="w-full overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -176,7 +190,7 @@ export default function CategoryList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredItems.map((item) => {
+              {items.map((item) => {
                 const checked = selectedIds.includes(item.id);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
@@ -207,7 +221,7 @@ export default function CategoryList() {
                         {item.created_by || "Không rõ"}
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
-                        {formatDate(item.created_at)}
+                        {formatToVN(item.created_at)}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -215,7 +229,7 @@ export default function CategoryList() {
                         {item.updated_by || "Không rõ"}
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
-                        {formatDate(item.updated_at)}
+                        {formatToVN(item.updated_at)}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -243,7 +257,7 @@ export default function CategoryList() {
             </tbody>
           </table>
         </div>
-        {filteredItems.length === 0 && (
+        {items.length === 0 && (
           <div className="py-10 text-center text-gray-500">
             Không có danh mục nào phù hợp bộ lọc
           </div>
@@ -251,8 +265,13 @@ export default function CategoryList() {
       </div>
 
       {/* Mobile/Tablet Card View */}
-      <div className="mt-5 space-y-4 lg:hidden">
-        {filteredItems.map((item) => {
+      <div className="mt-5 space-y-4 lg:hidden relative">
+        {isPageLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10 rounded-xl">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+        {items.map((item) => {
           const checked = selectedIds.includes(item.id);
           return (
             <div
@@ -294,7 +313,7 @@ export default function CategoryList() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ngày tạo:</span>
                   <span className="text-gray-700 text-xs text-right">
-                    {formatDate(item.created_at)}
+                    {formatToVN(item.created_at)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -306,7 +325,7 @@ export default function CategoryList() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ngày cập nhật:</span>
                   <span className="text-gray-700 text-xs text-right">
-                    {formatDate(item.updated_at)}
+                    {formatToVN(item.updated_at)}
                   </span>
                 </div>
               </div>
@@ -334,12 +353,61 @@ export default function CategoryList() {
           );
         })}
 
-        {filteredItems.length === 0 && (
+        {items.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 py-10 text-center text-gray-500">
             Không có danh mục nào phù hợp bộ lọc
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-6">
+          <button
+            onClick={() =>
+              setSearchParams((prev) => ({
+                ...Object.fromEntries(prev),
+                page: Math.max(currentPage - 1, 1).toString(),
+              }))
+            }
+            disabled={currentPage === 1 || isPageLoading}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() =>
+                setSearchParams((prev) => ({
+                  ...Object.fromEntries(prev),
+                  page: page.toString(),
+                }))
+              }
+              disabled={isPageLoading}
+              className={`px-3 py-2 border border-gray-300 rounded-md text-sm font-medium ${
+                page === currentPage
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "text-gray-700 bg-white hover:bg-gray-50"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() =>
+              setSearchParams((prev) => ({
+                ...Object.fromEntries(prev),
+                page: Math.min(currentPage + 1, totalPages).toString(),
+              }))
+            }
+            disabled={currentPage === totalPages || isPageLoading}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
+      )}
     </div>
   );
 }
