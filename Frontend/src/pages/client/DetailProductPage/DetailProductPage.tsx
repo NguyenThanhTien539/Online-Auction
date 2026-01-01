@@ -9,11 +9,14 @@ import PlayBidSection from './components/PlayBidSection';
 import BidHistorySection from './components/BidHistorySection';
 import QASection from './components/QASection';
 import ProductDescriptionSection from './components/ProductDescriptionSection';
+import RelatedProductsSection from './components/RelatedProductsSection';
 import { Eye, Clock, Calendar, User, Star, Award, FileText, TrendingUp } from 'lucide-react';
 import useSocketBidding from '@/hooks/useSocketBidding';
 import PreviewImage from './components/PreviewProductModal';
 import Loading from '@/components/common/Loading';
 import AddToLove from '@/components/common/AddToLove';
+
+
 type ProductType = {
   product_id : number,
   product_name : string,
@@ -34,6 +37,8 @@ type ProductType = {
   start_time: string,
   end_time:  string,
   description: string,
+
+  cat2_id : number
 }
 function DetailProductPage() {
 
@@ -85,11 +90,14 @@ function DetailProductPage() {
     }
     fetchProduct();
 
+
+  },[slugid]);
+  useEffect (() => {
     // Check if auth user is seller of this product
     if (auth && products){
       setIsSeller (auth.user_id === products.seller_id);
     }
-  },[]);
+  }, [auth, products]);
 
   useEffect (() => {
     if (!socket)  return;
@@ -196,7 +204,7 @@ function DetailProductPage() {
         {/* Main Image and Related Images */}
         <div className="space-y-4 min-w-0">
           {/* Main Image */}
-          <div className="flex justify-center relative bg-blue-300 min-w-0">
+          <div className="flex justify-center relative min-w-0">
             {products && products.product_images && products.product_images.length > 0 ?
              <img
               src={products?.product_images[currentImageIndex]}
@@ -376,7 +384,10 @@ function DetailProductPage() {
       </div>
 
       {/* Tab Section */}
-      <TabSection products={products} />
+      <TabSection products={products} isSeller = {isSeller}/>
+
+      {/* Related Products */}
+      <RelatedProductsSection category_id={products?.cat2_id} product_id = {products?.product_id} />
       
 
       {/* Image Preview Modal */}
@@ -394,7 +405,7 @@ function DetailProductPage() {
   );
 }
 
-function TabSection({products}: {products?: ProductType}) {
+function TabSection({products, isSeller}: {products?: ProductType, isSeller?: boolean}) {
   const authUser = useAuth();
   const [activeTab, setActiveTab] = useState<'description' | 'bidHistory' | 'qa'>('description');
   return (
@@ -438,7 +449,7 @@ function TabSection({products}: {products?: ProductType}) {
         {/* Tab Content */}
         <div className="min-h-fit pb-20">
           {activeTab === 'description' && products?.description && (
-            <ProductDescriptionSection description={products.description} />
+            <ProductDescriptionSection description={products.description} isSeller = {isSeller} />
           )}
           {activeTab === 'bidHistory' && authUser && (
             <div className="bg-white py-2 px-2 rounded-lg">

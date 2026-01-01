@@ -10,6 +10,7 @@ const route = express.Router();
 route.get("/page_list",  productsController.getProductsPageList);
 route.get("/detail", productsController.getProductDetailBySlugId);
 route.post("/post-product", verifyToken, verifyRole("seller", "admin"), upload.array("product_images", 10) ,productsController.postNewProduct);
+route.patch("/update/description", verifyToken, verifyRole("seller", "admin"), productsController.updateProductDescription);
 route.get("/my-products", verifyToken, productsController.getMyProductsList);
 route.get("/search", productsController.searchProducts);
 route.get("/love_status", justDecodeToken, productsController.getLoveStatus);
@@ -22,4 +23,6 @@ route.get("/ending_soon", topProductsController.getTopEndingSoonProducts);
 route.get("/highest_price", topProductsController.getTopHighestPriceProducts);
 route.get("/most_bids", topProductsController.getTopMostBidProducts);
 
+
+route.get("/related", productsController.getRelatedProducts);
 export default route;

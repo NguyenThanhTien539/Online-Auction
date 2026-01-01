@@ -33,9 +33,12 @@ export function verifyRole(...allowedRoles: string[]) {
       return res.status(401).json({ message: "User not authenticated" });
     }
     if (!allowedRoles.includes((req as any).user.role)) {
+      // Format return message with allowed roles
       return res
         .status(403)
-        .json({ message: "Access denied: insufficient permissions" });
+        .json({
+          message: `Access denied. Allowed roles: ${allowedRoles.join(", ")}`,
+        });
     }
     next();
   };
