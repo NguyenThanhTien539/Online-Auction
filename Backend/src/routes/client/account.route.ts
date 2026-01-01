@@ -20,6 +20,12 @@ route.post("/forgot-password", accountController.forgotPassword);
 
 route.post("/reset-password", accountController.resetPassword);
 
+route.patch(
+  "/change-password",
+  verifyToken,
+  accountController.changePassword
+);
+
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
 route.post("/logout", verifyToken, accountController.logoutPost); 

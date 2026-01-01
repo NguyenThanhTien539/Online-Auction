@@ -353,3 +353,160 @@ export const logoutPost = async (_: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.json({ code: "success", message: "Đăng xuất thành công" , data : null});
 };
+
+// [POST] /accounts/change-password
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user_id = res.locals.user.user_id;
+
+    // Kiểm tra user tồn tại
+    const existedAccount = await AccountModel.findAcountById(user_id);
+    if (!existedAccount) {
+      res.json({ code: "error", message: "Tài khoản không tồn tại" });
+      return;
+    }
+
+    // Kiểm tra mật khẩu hiện tại
+    const isPasswordValid = await comparePassword(
+      currentPassword,
+      existedAccount.password
+    );
+
+    if (!isPasswordValid) {
+      res.json({
+        code: "error",
+        message: "Mật khẩu hiện tại không đúng",
+      });
+      return;
+    }
+
+    // Kiểm tra mật khẩu mới không trùng mật khẩu cũ
+    const isSamePassword = await comparePassword(
+      newPassword,
+      existedAccount.password
+    );
+
+    if (isSamePassword) {
+      res.json({
+        code: "error",
+        message: "Mật khẩu mới phải khác mật khẩu hiện tại",
+      });
+      return;
+    }
+
+    // Xóa OTP hết hạn
+    await VerifyModel.deleteExpiredOTP();
+
+    // Kiểm tra OTP đã tồn tại chưa
+    const existedOTP = await VerifyModel.findEmail(existedAccount.email);
+    if (existedOTP) {
+      res.json({
+        code: "existedOTP",
+        message: "OTP đã được gửi và có hạn trong vòng 5 phút!",
+      });
+      return;
+    }
+
+    // Tạo OTP
+    const length = 6;
+    const otp = generateOTP(length);
+
+    // Lưu OTP vào DB
+    await VerifyModel.insertOtpAndEmail(existedAccount.email, otp);
+
+    // Tạo token chứa thông tin để verify sau
+    const change_password_token = jwt.sign(
+      {
+        otp: otp,
+        email: existedAccount.email,
+        user_id: user_id,
+        newPassword: newPassword,
+      },
+      `${process.env.JWT_SECRET}`,
+      {
+        expiresIn: "5m",
+      }
+    );
+
+    // Gửi email OTP
+    const title = "Mã OTP xác nhận đổi mật khẩu";
+    const content = `Mã OTP của bạn là <b>${otp}</b>. Mã OTP có hiệu lực trong 5 phút, vui lòng không cung cấp cho bất kỳ ai`;
+    sendMail(existedAccount.email, title, content);
+
+    // Set cookie
+    res.cookie("change_password_token", change_password_token, {
+      maxAge: 5 * 60 * 1000,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    res.json({
+      code: "success",
+      message: "Mã OTP đã được gửi đến email của bạn",
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.json({
+      code: "error",
+      message: "Có lỗi xảy ra, vui lòng thử lại",
+    });
+  }
+};
+
+// [POST] /accounts/verify-change-password
+export const verifyChangePassword = async (req: Request, res: Response) => {
+  try {
+    await VerifyModel.deleteExpiredOTP();
+
+    const change_password_token = req.cookies.change_password_token;
+    if (!change_password_token) {
+      res.json({ code: "error", message: "Phiên làm việc đã hết hạn" });
+      return;
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(
+      change_password_token,
+      `${process.env.JWT_SECRET}`
+    ) as JwtPayload;
+
+    // Kiểm tra OTP có đúng không
+    const existedRecord = await VerifyModel.findEmailAndOtp(
+      decoded.email,
+      req.body.otp
+    );
+
+    if (!existedRecord) {
+      res.json({
+        code: "otp error",
+        message: "OTP không hợp lệ!",
+      });
+      return;
+    }
+
+    // Hash mật khẩu mới
+    const hashedNewPassword = await hashPassword(decoded.newPassword);
+
+    // Cập nhật mật khẩu mới vào DB
+    await AccountModel.updatePassword(decoded.email, hashedNewPassword);
+
+    // Xóa OTP đã sử dụng
+    await VerifyModel.deletedOTP(decoded.email);
+
+    // Xóa cookie
+    res.clearCookie("change_password_token");
+
+    res.json({
+      code: "success",
+      message: "Đổi mật khẩu thành công",
+    });
+  } catch (error) {
+    console.error("Verify change password error:", error);
+    res.json({
+      code: "error",
+      message: "Có lỗi xảy ra, vui lòng thử lại",
+    });
+  }
+};

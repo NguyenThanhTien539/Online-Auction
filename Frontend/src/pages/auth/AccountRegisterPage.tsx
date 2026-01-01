@@ -114,142 +114,137 @@ function AccountRegister() {
   }, []);
   return (
     <>
-      <div className="flex justify-center bg-gray-50 px-4 py-6">
+      <div className="flex  justify-center  px-4 py-8">
         <form
           id="registerForm"
           action=""
-          className="w-full max-w-md bg-white p-6 rounded-xl shadow-xl border border-gray-200"
+          className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl border-2 border-emerald-100"
         >
           {/* Header */}
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-600 rounded-full mb-2 shadow-lg">
-              <UserPlus className="w-6 h-6 text-white" />
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl mb-3 shadow-lg">
+              <UserPlus className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">
-              Đăng ký tài khoản
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+              Đăng Ký
             </h1>
-            <p className="text-gray-600 text-xs">
-              Tạo tài khoản để tham gia đấu giá ngay!
-            </p>
           </div>
 
           {/* Form Fields */}
           <div className="space-y-3">
             {/* Full Name Field */}
             <div>
-              <label htmlFor="full_name" className="block text-xs font-semibold text-gray-700 mb-1">
-                Họ Tên <span className="text-red-500">*</span>
+              <label htmlFor="full_name" className="block text-sm font-bold text-gray-700 mb-1.5">
+                Họ Tên
               </label>
               <div className="relative">
                 <input
                   type="text"
                   id="full_name"
-                  placeholder="Ví dụ: Nguyễn Văn A"
-                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 bg-white text-sm"
+                  placeholder="Nguyễn Văn A"
+                  className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
                 />
-                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <User className="w-4 h-4" />
                 </div>
               </div>
-              <div id="full_nameError" className="text-sm text-red-500 mt-1"></div>
+              <div id="full_nameError" className="text-xs text-red-500 mt-1 font-medium"></div>
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-xs font-semibold text-gray-700 mb-1">
-                Email <span className="text-red-500">*</span>
+              <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1.5">
+                Email
               </label>
               <div className="relative">
                 <input
                   type="text"
                   id="email"
-                  placeholder="Ví dụ: nva@gmail.com"
-                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 bg-white text-sm"
+                  placeholder="your@email.com"
+                  className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
                 />
-                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <Mail className="w-4 h-4" />
                 </div>
               </div>
-              <div id="emailError" className="text-sm text-red-500 mt-1"></div>
+              <div id="emailError" className="text-xs text-red-500 mt-1 font-medium"></div>
             </div>
 
             {/* Address Field */}
             <div>
-              <label htmlFor="address" className="block text-xs font-semibold text-gray-700 mb-1">
-                Địa chỉ <span className="text-red-500">*</span>
+              <label htmlFor="address" className="block text-sm font-bold text-gray-700 mb-1.5">
+                Địa chỉ
               </label>
               <div className="relative">
                 <input
                   id="address"
                   type="text"
-                  placeholder="Ví dụ: Đ.Nguyễn Thông, Tân An, Long An"
-                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 bg-white text-sm"
+                  placeholder="Thành phố, Tỉnh"
+                  className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
                 />
-                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <MapPin className="w-4 h-4" />
                 </div>
               </div>
-              <div id="addressError" className="text-sm text-red-500 mt-1"></div>
+              <div id="addressError" className="text-xs text-red-500 mt-1 font-medium"></div>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-xs font-semibold text-gray-700 mb-1">
-                Mật khẩu <span className="text-red-500">*</span>
+              <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-1.5">
+                Mật khẩu
               </label>
               <div className="relative">
                 <input
                   type="password"
                   id="password"
-                  placeholder="******"
-                  className="w-full px-3 py-2 pl-9 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 bg-white text-sm"
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
                 />
-                <div className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                   <Lock className="w-4 h-4" />
                 </div>
               </div>
-              <div id="passwordError" className="text-sm text-red-500 mt-1"></div>
+              <div id="passwordError" className="text-xs text-red-500 mt-1 font-medium"></div>
             </div>
 
             {/* Agree Checkbox */}
             <div>
-              <label className="flex items-center gap-2 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer group">
                 <input
                   id="agree"
                   type="checkbox"
-                  className="w-3.5 h-3.5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                  className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded-md focus:ring-emerald-500 focus:ring-2 cursor-pointer"
                 />
-                <span className="text-xs text-gray-700 cursor-pointer">
-                  Tôi đồng ý với <span className="text-green-600 font-medium">điều khoản sử dụng</span>
+                <span className="text-xs text-gray-600 group-hover:text-gray-800">
+                  Tôi đồng ý với <span className="text-emerald-600 font-semibold">điều khoản sử dụng</span>
                 </span>
               </label>
-              <div id="agreeError" className="text-xs text-red-500 mt-1"></div>
+              <div id="agreeError" className="text-xs text-red-500 mt-1 font-medium"></div>
             </div>
 
             {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                className="w-full cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg text-sm"
-                type="submit"
-              >
-                <UserPlus className="w-4 h-4" />
-                Đăng ký ngay
-              </button>
-            </div>
+            <button
+              className="w-full cursor-pointer bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl text-sm"
+              type="submit"
+            >
+              <UserPlus className="w-4 h-4" />
+              Đăng ký
+            </button>
 
             {/* Login Link */}
-            <div className="text-center pt-3">
-              <p className="text-xs text-gray-600">
-                Bạn đã có tài khoản?
-                <span
-                  className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer font-semibold transition-colors duration-200"
-                  onClick={() => {
-                    navigate("/accounts/login");
-                  }}
-                >
-                  Đăng nhập ngay
-                </span>
-              </p>
+            <div className="text-center pt-2">
+              <span className="text-xs text-gray-600">
+                Đã có tài khoản?
+              </span>
+              <span
+                className="ml-1 text-emerald-600 hover:text-emerald-700 cursor-pointer font-bold transition-colors duration-200 text-xs"
+                onClick={() => {
+                  navigate("/accounts/login");
+                }}
+              >
+                Đăng nhập ngay
+              </span>
             </div>
           </div>
         </form>

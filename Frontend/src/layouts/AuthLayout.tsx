@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Heart
 } from 'lucide-react';
+import bidding from "@/assets/icons/bid_turn.svg"
 
 export default function AuthLayout() {
   return (
@@ -45,41 +46,38 @@ export default function AuthLayout() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-2">
-        <div className="w-full">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-4">
+        <div className="w-full max-w-6xl">
           {/* Premium Header */}
-          <div className="text-center">
+          <div className="text-center mb-4">
             <div className="relative inline-block">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-50 to-white rounded-3xl shadow-xl border-2 border-yellow-200">
-                <Award className="w-10 h-10 text-blue-600" />
-              </div>
-              <div className="absolute -top-1 -right-1">
-                <Star className="w-6 h-6 text-yellow-500 fill-current" />
-              </div>
+              <img 
+                src={bidding} 
+                alt="Online Auction" 
+                className="w-16 h-16 object-contain"
+              />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mt-4">Online Auction</h1>
-            <p className="text-gray-600 mt-2 font-medium">Nền tảng đấu giá trực tuyến hàng đầu</p>
+            <h1 className="text-2xl font-bold text-gray-800 mt-2">Online Auction</h1>
+            <p className="text-gray-600 text-sm font-medium">Nền tảng đấu giá trực tuyến hàng đầu</p>
           </div>
 
           {/* Auth Form Container */}
           <div className="mx-auto overflow-hidden">
-            <div className="px-8">
-              <Outlet />
-            </div>
+            <Outlet />
 
             {/* Footer */}
-            <div className="px-8 py-4 bg-gray-50 border-t border-gray-100">
-              <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+            <div className="py-3 bg-gray-50 border-t border-gray-100 mt-4">
+              <div className="flex items-center justify-center space-x-6 text-xs text-gray-500">
                 <div className="flex items-center">
-                  <Shield className="w-4 h-4 mr-1" />
+                  <Shield className="w-3 h-3 mr-1" />
                   <span>An toàn</span>
                 </div>
                 <div className="flex items-center">
-                  <TrendingUp className="w-4 h-4 mr-1" />
+                  <TrendingUp className="w-3 h-3 mr-1" />
                   <span>Đáng tin cậy</span>
                 </div>
                 <div className="flex items-center">
-                  <Heart className="w-4 h-4 mr-1" />
+                  <Heart className="w-3 h-3 mr-1" />
                   <span>Uy tín</span>
                 </div>
               </div>
@@ -87,19 +85,16 @@ export default function AuthLayout() {
           </div>
 
           {/* Luxury Bottom Section */}
-          <div className="text-center mt-8">
-            <div className="flex justify-center space-x-1 mb-3">
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
-              <Star className="w-5 h-5 text-yellow-400 fill-current" />
+          <div className="text-center mt-4">
+            <div className="flex justify-center space-x-1 mb-2">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
             </div>
-            <p className="text-sm text-gray-600 font-medium">
+            <p className="text-xs text-gray-600 font-medium">
               Nền tảng đấu giá hàng đầu Việt Nam
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Hàng triệu người dùng tin tưởng
             </p>
           </div>
         </div>

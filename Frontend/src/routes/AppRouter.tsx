@@ -17,6 +17,7 @@ import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
 import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage";
 import ResetPassword from "@/pages/auth/ResetPasswordPage";
+import ChangePassword from "@/pages/client/ProfilePage/components/ChangePasswordPage"
 import CategoryEdit from "@/pages/admin/CategoryEditPage";
 import ProductListPage from "@/pages/admin/ProductListPage";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
@@ -93,6 +94,10 @@ const routers = createBrowserRouter([
       {
         path: "profile/edit",
         element : <EditProfilePage />
+      },
+      {
+        path: "profile/change-password",
+        element : <ChangePassword />
       }
     ],
   },

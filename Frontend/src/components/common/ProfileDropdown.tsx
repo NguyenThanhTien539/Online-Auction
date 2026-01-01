@@ -65,7 +65,7 @@ export default function ProfileDropdown({ menuItems }: ProfileDropdownProps) {
       label: "Đổi mật khẩu",
       icon: <Lock size={16} />,
       action: () => {
-        navigate("/change-password");
+        navigate("/profile/change-password");
         setIsOpen(false);
       }
     },
