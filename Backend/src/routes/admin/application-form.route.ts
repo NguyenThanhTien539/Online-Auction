@@ -6,6 +6,8 @@ route.get("/list", sellerController.applications);
 
 route.get("/detail/:id", sellerController.applicationDetail);
 
+route.get("/number-of-forms", sellerController.calTotalApplications);
+
 route.patch("/set-status/:id", sellerController.setStatus);
 
 export default route;

@@ -14,7 +14,6 @@ type BulkActionOption = {
 };
 
 type Props = {
-  /** ----- Trạng thái ----- */
   showStatusFilter?: boolean; // default: true
   statusFilter?: string;
   setStatusFilter?: (v: string) => void;
@@ -34,6 +33,7 @@ type Props = {
   /** ----- Tìm kiếm ----- */
   search?: string;
   setSearch?: (v: string) => void;
+  onSearchSubmit?: () => void; // callback khi nhấn Enter
 
   /** ----- Hành động & reset & tạo mới ----- */
   onResetFilters?: () => void;
@@ -66,6 +66,7 @@ export default function FilterBar({
   // search
   search,
   setSearch,
+  onSearchSubmit,
 
   // actions
   onResetFilters,
@@ -114,6 +115,9 @@ export default function FilterBar({
   // state select "Hành động"
   const [selectedAction, setSelectedAction] = useState<string>("");
 
+  // state để xử lý IME (Input Method Editor) cho tiếng Việt
+  const [isComposing, setIsComposing] = useState(false);
+
   const handleApplyClick = () => {
     if (!onApplyBulkAction) return;
     if (!selectedAction) return;
@@ -135,7 +139,7 @@ export default function FilterBar({
           {hasStatusFilter && (
             <div className="flex h-full items-center gap-2 px-5 border-r border-gray-300">
               <select
-                className="bg-transparent outline-none font-medium"
+                className="cursor-pointer bg-transparent outline-none font-medium"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter!(e.target.value)}
               >
@@ -150,9 +154,9 @@ export default function FilterBar({
 
           {/* Người tạo */}
           {hasCreatorFilter && (
-            <div className="flex items-center px-5 h-full border-r border-gray-300">
+            <div className=" flex items-center px-5 h-full border-r border-gray-300">
               <select
-                className="bg-transparent outline-none font-medium"
+                className="cursor-pointer bg-transparent outline-none font-medium"
                 value={creatorFilter}
                 onChange={(e) => setCreatorFilter!(e.target.value)}
               >
@@ -207,7 +211,7 @@ export default function FilterBar({
         {hasBulkAction && (
           <div className="flex rounded-xl bg-white border border-gray-200 overflow-hidden shadow-sm">
             <select
-              className="h-full px-4 text-sm text-gray-800 bg-white outline-none border-none"
+              className="cursor-pointer h-full px-4 text-sm text-gray-800 bg-white outline-none border-none"
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
             >
@@ -221,7 +225,7 @@ export default function FilterBar({
 
             <button
               type="button"
-              className="h-full px-5 text-sm font-semibold text-red-600 hover:bg-gray-50 cursor-pointer border-l border-gray-200"
+              className=" cursor-pointer h-full px-5 text-sm font-semibold text-red-600 hover:bg-gray-50 border-l border-gray-200"
               onClick={handleApplyClick}
             >
               Áp dụng
@@ -235,10 +239,26 @@ export default function FilterBar({
             <Search className="w-5 h-5" />
             <input
               type="text"
-              placeholder="Tìm kiếm"
+              placeholder="Tìm kiếm (nhấn Enter để tìm)"
               className="flex-1 border-none bg-transparent text-sm outline-none placeholder:text-gray-400"
               value={search}
-              onChange={(e) => setSearch!(e.target.value)}
+              onChange={(e) => {
+                // Chỉ update state khi KHÔNG đang composition (gõ tiếng Việt)
+                if (!isComposing) {
+                  setSearch!(e.target.value);
+                }
+              }}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={(e) => {
+                setIsComposing(false);
+                // Update state với giá trị cuối cùng sau khi IME hoàn tất
+                setSearch!((e.target as HTMLInputElement).value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !isComposing && onSearchSubmit) {
+                  onSearchSubmit();
+                }
+              }}
             />
           </div>
         )}

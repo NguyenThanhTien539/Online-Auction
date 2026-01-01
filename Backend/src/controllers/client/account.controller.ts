@@ -358,7 +358,7 @@ export const logoutPost = async (_: Request, res: Response) => {
 export const changePassword = async (req: Request, res: Response) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const user_id = res.locals.user.user_id;
+    const user_id = (req as any).user.user_id;
 
     // Kiểm tra user tồn tại
     const existedAccount = await AccountModel.findAcountById(user_id);
@@ -398,15 +398,11 @@ export const changePassword = async (req: Request, res: Response) => {
     // Xóa OTP hết hạn
     await VerifyModel.deleteExpiredOTP();
 
-    // Kiểm tra OTP đã tồn tại chưa
-    const existedOTP = await VerifyModel.findEmail(existedAccount.email);
-    if (existedOTP) {
-      res.json({
-        code: "existedOTP",
-        message: "OTP đã được gửi và có hạn trong vòng 5 phút!",
-      });
-      return;
-    }
+    // Xóa OTP cũ của email này (nếu có)
+    await VerifyModel.deletedOTP(existedAccount.email);
+
+    // Xóa cookie change_password_token cũ (nếu có)
+    res.clearCookie("change_password_token");
 
     // Tạo OTP
     const length = 6;

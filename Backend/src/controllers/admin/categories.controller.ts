@@ -3,6 +3,7 @@ import * as accountModel from "../../models/account.model.ts";
 import * as categoryHelper from "../../helpers/category.helper.ts";
 import * as categoriesModel from "../../models/categories.model.ts";
 import { AccountRequest } from "../../interfaces/request.interface.ts";
+
 export async function buildTree(_: Request, res: Response) {
   const categories = await categoriesModel.getAllCategory();
   const buildTree = categoryHelper.buildTree(categories, null);
@@ -10,17 +11,66 @@ export async function buildTree(_: Request, res: Response) {
 }
 
 export async function createPost(req: AccountRequest, res: Response) {
-  req.body.created_by = req.user.user_id;
-  req.body.updated_by = req.user.user_id;
-  await categoriesModel.insertCategory(req.body);
-  res.json({ code: "success", message: "Thành công" });
+  try {
+    req.body.created_by = req.user.user_id;
+    req.body.updated_by = req.user.user_id;
+    await categoriesModel.insertCategory(req.body);
+    res.json({ code: "success", message: "Tạo danh mục mới thành công" });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra" });
+  }
+}
+
+export async function calTotalCategories(req: Request, res: Response) {
+  const filter = {};
+  if (req.query.status) {
+    Object.assign(filter, { status: req.query.status });
+  }
+  if (req.query.creator) {
+    Object.assign(filter, { creator: req.query.creator });
+  }
+  if (req.query.dateFrom) {
+    Object.assign(filter, { dateFrom: req.query.dateFrom });
+  }
+  if (req.query.dateTo) {
+    Object.assign(filter, { dateTo: req.query.dateTo });
+  }
+  if (req.query.search) {
+    Object.assign(filter, { search: req.query.search as string });
+  }
+
+  const total = await categoriesModel.calTotalCategories(filter);
+  res.json({ code: "success", message: "Thành công", total: total });
 }
 
 export async function list(req: AccountRequest, res: Response) {
-  const list = await categoriesModel.getAllCategory();
-
+  const page = req.query.page ? Number(req.query.page) : 1;
+  const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const filter = {};
+  if (req.query.status) {
+    Object.assign(filter, { status: req.query.status });
+  }
+  if (req.query.creator) {
+    Object.assign(filter, { creator: req.query.creator });
+  }
+  if (req.query.dateFrom) {
+    Object.assign(filter, { dateFrom: req.query.dateFrom });
+  }
+  if (req.query.dateTo) {
+    Object.assign(filter, { dateTo: req.query.dateTo });
+  }
+  if (req.query.search) {
+    Object.assign(filter, { search: req.query.search as string });
+  }
+  const list = await categoriesModel.getCategoryWithOffsetLimit(
+    (page - 1) * limit,
+    limit,
+    filter
+  );
   for (const category of list) {
-    const detailedAccount = await accountModel.findAcountById(category.created_by);
+    const detailedAccount = await accountModel.findAcountById(
+      category.created_by
+    );
     category.created_by = detailedAccount
       ? detailedAccount.full_name
       : "Không xác định";
@@ -32,7 +82,11 @@ export async function list(req: AccountRequest, res: Response) {
       : "Không xác định";
   }
 
-  res.json({ code: "success", message: "Thành công", list: list });
+  res.json({
+    code: "success",
+    message: "Thành công",
+    list: list,
+  });
 }
 
 export async function edit(req: Request, res: Response) {

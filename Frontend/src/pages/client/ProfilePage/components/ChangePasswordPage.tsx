@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import JustValidate from "just-validate";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { KeyRound, Key, Check, Lock, ShieldCheck, CheckCircle } from "lucide-react";
+import { KeyRound, Key, Check, Lock, ShieldCheck, CheckCircle, Eye, EyeOff } from "lucide-react";
 import OTPForm from "@/components/common/OTPForm";
 
 // Component Form Đổi Mật Khẩu
@@ -13,6 +13,9 @@ interface ChangePasswordFormProps {
 
 function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const navigate = useNavigate();
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const validate = new JustValidate("#changePasswordForm");
@@ -104,7 +107,7 @@ function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         };
 
         fetch(`${import.meta.env.VITE_API_URL}/accounts/change-password`, {
-          method: "POST",
+          method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataFinal),
           credentials: "include",
@@ -157,13 +160,20 @@ function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
             <input
               id="currentPassword"
               name="currentPassword"
-              type="password"
+              type={showCurrentPassword ? "text" : "password"}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
+              className="w-full px-3 py-2.5 pl-10 pr-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
               <Lock className="w-4 h-4" />
             </div>
+            <button
+              type="button"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors"
+            >
+              {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
           <div id="currentPasswordError" className="text-xs text-red-500 mt-1 font-medium"></div>
         </div>
@@ -177,13 +187,20 @@ function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
             <input
               id="newPassword"
               name="newPassword"
-              type="password"
+              type={showNewPassword ? "text" : "password"}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
+              className="w-full px-3 py-2.5 pl-10 pr-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
               <Key className="w-4 h-4" />
             </div>
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors"
+            >
+              {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
           <div id="newPasswordError" className="text-xs text-red-500 mt-1 font-medium"></div>
         </div>
@@ -197,13 +214,20 @@ function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
             <input
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 pl-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
+              className="w-full px-3 py-2.5 pl-10 pr-10 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all duration-200 bg-gray-50 hover:bg-white text-sm"
             />
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
               <Check className="w-4 h-4" />
             </div>
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors"
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
           <div id="confirmPasswordError" className="text-xs text-red-500 mt-1 font-medium"></div>
         </div>
@@ -261,7 +285,7 @@ function OTPVerifyForm({ onBack }: OTPVerifyFormProps) {
       .then((data) => {
         if (data.code === "success") {
           toast.success(data.message);
-          navigate("/profile");
+          navigate(-1);
         }
         if (data.code === "error") {
           toast.error(data.message);

@@ -1,38 +1,107 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FilterBar from "@/components/admin/FilterBar";
+import Pagination from "@/components/admin/Pagination";
 import { Pencil, Trash2 } from "lucide-react";
-import { useCategories } from "@/hooks/useCategory";
-import { useNavigate } from "react-router-dom";
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return "";
-
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  const seconds = String(d.getSeconds()).padStart(2, "0");
-
-  return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
-}
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { formatToVN } from "@/utils/format_time";
+import type { CategoryItem } from "@/interface/category.interface";
+import { useFilters } from "@/hooks/useFilters";
+import { slugify } from "@/utils/make_slug";
+const LIMIT = 5;
 
 export default function CategoryList() {
   const navigate = useNavigate();
-  const { items } = useCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [items, setItems] = useState<CategoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const {
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    search: searchFromUrl,
+    handleStatusFilterChange,
+    handleCreatorFilterChange,
+    handleDateFromChange,
+    handleDateToChange,
+    handleSearchChange,
+    resetFilters,
+  } = useFilters();
 
-  // ================== FILTER STATE ==================
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "inactive"
-  >("all");
-  const [creatorFilter, setCreatorFilter] = useState<string>("");
-  const [dateFrom, setDateFrom] = useState<string>("");
-  const [dateTo, setDateTo] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
+  const [localSearch, setLocalSearch] = useState("");
+
+  useEffect(() => {
+    if (!searchFromUrl) {
+      setLocalSearch("");
+    }
+  }, [searchFromUrl]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
+      handleSearchChange(slugified);
+    }
+  };
+
+  useEffect(() => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const total = data.total as number;
+        setTotalPages(Math.ceil(total / LIMIT));
+        const newTotalPages = Math.ceil(total / LIMIT);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setSearchParams((prev) => ({
+            ...Object.fromEntries(prev),
+            page: "1",
+          }));
+        }
+      });
+  }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
+
+  useEffect(() => {
+    setIsPageLoading(true);
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setItems(data.list);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      });
+  }, [
+    currentPage,
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    searchFromUrl,
+  ]);
 
   // ================== SELECTION ==================
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -51,43 +120,17 @@ export default function CategoryList() {
     [items]
   );
 
-  // ================== FILTERED ITEMS ==================
-  const filteredItems = useMemo(
-    () =>
-      items.filter((item) => {
-        if (statusFilter !== "all" && item.status !== statusFilter)
-          return false;
-        if (creatorFilter && item.created_by !== creatorFilter) return false;
-        if (dateFrom) {
-          const from = new Date(dateFrom);
-          if (new Date(item.created_at) < from) return false;
-        }
-        if (dateTo) {
-          const to = new Date(dateTo);
-          if (new Date(item.created_at) > to) return false;
-        }
-        if (search.trim()) {
-          const key = search.toLowerCase();
-          if (!item.name.toLowerCase().includes(key)) return false;
-        }
-        return true;
-      }),
-    [items, statusFilter, creatorFilter, dateFrom, dateTo, search]
-  );
-
   // ================== CHECKBOX ==================
   const allChecked = useMemo(
-    () =>
-      filteredItems.length > 0 &&
-      filteredItems.every((i) => selectedIds.includes(i.id)),
-    [filteredItems, selectedIds]
+    () => items.length > 0 && items.every((i) => selectedIds.includes(i.id)),
+    [items, selectedIds]
   );
 
   const toggleAll = () => {
-    const filteredIds = filteredItems.map((i) => i.id);
+    const itemIds = items.map((i) => i.id);
     setSelectedIds((prev) => {
-      if (allChecked) return prev.filter((id) => !filteredIds.includes(id));
-      const newSet = new Set([...prev, ...filteredIds]);
+      if (allChecked) return prev.filter((id) => !itemIds.includes(id));
+      const newSet = new Set([...prev, ...itemIds]);
       return Array.from(newSet);
     });
   };
@@ -98,17 +141,13 @@ export default function CategoryList() {
     );
   };
 
-  const handleStatusFilterChange = (v: string) => {
-    setStatusFilter(v as "all" | "active" | "inactive");
-  };
-
-  const resetFilters = () => {
-    setStatusFilter("all");
-    setCreatorFilter("");
-    setDateFrom("");
-    setDateTo("");
-    setSearch("");
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -119,21 +158,22 @@ export default function CategoryList() {
       <FilterBar
         showStatusFilter
         statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
+        setStatusFilter={handleStatusFilterChange}
         statusOptions={[
           { value: "all", label: "Trạng thái" },
           { value: "active", label: "Hoạt động" },
           { value: "inactive", label: "Dừng" },
         ]}
         creatorFilter={creatorFilter}
-        setCreatorFilter={setCreatorFilter}
+        setCreatorFilter={handleCreatorFilterChange}
         creatorOptions={creatorOptions}
         dateFrom={dateFrom}
-        setDateFrom={setDateFrom}
+        setDateFrom={handleDateFromChange}
         dateTo={dateTo}
-        setDateTo={setDateTo}
-        search={search}
-        setSearch={setSearch}
+        setDateTo={handleDateToChange}
+        search={localSearch}
+        setSearch={setLocalSearch}
+        onSearchSubmit={handleSearchSubmit}
         onResetFilters={resetFilters}
         bulkActionOptions={[
           { value: "active", label: "Cho hoạt động" },
@@ -145,7 +185,12 @@ export default function CategoryList() {
       />
 
       {/* Desktop Table View */}
-      <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden hidden lg:block">
+      <div className="mt-5 bg-white rounded-2xl border border-gray-200 overflow-hidden hidden lg:block relative">
+        {isPageLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        )}
         <div className="w-full overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -176,7 +221,7 @@ export default function CategoryList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredItems.map((item) => {
+              {items.map((item) => {
                 const checked = selectedIds.includes(item.id);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
@@ -207,7 +252,7 @@ export default function CategoryList() {
                         {item.created_by || "Không rõ"}
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
-                        {formatDate(item.created_at)}
+                        {formatToVN(item.created_at)}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -215,7 +260,7 @@ export default function CategoryList() {
                         {item.updated_by || "Không rõ"}
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
-                        {formatDate(item.updated_at)}
+                        {formatToVN(item.updated_at)}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
@@ -243,7 +288,7 @@ export default function CategoryList() {
             </tbody>
           </table>
         </div>
-        {filteredItems.length === 0 && (
+        {items.length === 0 && (
           <div className="py-10 text-center text-gray-500">
             Không có danh mục nào phù hợp bộ lọc
           </div>
@@ -251,8 +296,13 @@ export default function CategoryList() {
       </div>
 
       {/* Mobile/Tablet Card View */}
-      <div className="mt-5 space-y-4 lg:hidden">
-        {filteredItems.map((item) => {
+      <div className="mt-5 space-y-4 lg:hidden relative">
+        {isPageLoading && (
+          <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10 rounded-xl">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+        {items.map((item) => {
           const checked = selectedIds.includes(item.id);
           return (
             <div
@@ -294,7 +344,7 @@ export default function CategoryList() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ngày tạo:</span>
                   <span className="text-gray-700 text-xs text-right">
-                    {formatDate(item.created_at)}
+                    {formatToVN(item.created_at)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -306,7 +356,7 @@ export default function CategoryList() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ngày cập nhật:</span>
                   <span className="text-gray-700 text-xs text-right">
-                    {formatDate(item.updated_at)}
+                    {formatToVN(item.updated_at)}
                   </span>
                 </div>
               </div>
@@ -334,12 +384,18 @@ export default function CategoryList() {
           );
         })}
 
-        {filteredItems.length === 0 && (
+        {items.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 py-10 text-center text-gray-500">
             Không có danh mục nào phù hợp bộ lọc
           </div>
         )}
       </div>
+
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        isPageLoading={isPageLoading}
+      />
     </div>
   );
 }

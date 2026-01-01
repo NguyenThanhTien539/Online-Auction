@@ -14,13 +14,6 @@ export async function editUserProfile(data: any) {
   return sql;
 }
 
-export async function getAllSellerApplications() {
-  return await db("upgrade_to_sellers").select("*");
-}
-export async function getSellerApplicationById(id: number) {
-  return await db("upgrade_to_sellers").select("*").where({ id }).first();
-}
-
 export async function updateUserRole(user_id: number, role: string) {
   return await db("users").where({ user_id }).update({ role });
 }

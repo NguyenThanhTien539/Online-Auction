@@ -25,6 +25,11 @@ route.patch(
   verifyToken,
   accountController.changePassword
 );
+route.post(
+  "/verify-change-password",
+  verifyToken,
+  accountController.verifyChangePassword
+)
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
