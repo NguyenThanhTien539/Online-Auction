@@ -61,7 +61,7 @@ export default function RegisterSellerPage() {
         setIsSubmitting(true);
         
         console.log("Submitting seller registration with reason:", e.target.reason.value);
-        fetch ("http://localhost:5000/api/profile/register-seller", {
+        fetch (`${import.meta.env.VITE_API_URL}/api/user/register-seller`, {
             method: "POST",
             credentials: "include",
             headers: {

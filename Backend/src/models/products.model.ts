@@ -436,3 +436,51 @@ export async function getUserInParentQuestion(question_parent_id: number) {
     let result = await query.rows[0];
     return result;
 }
+
+
+export async function getRelatedProducts({category_id, product_id, limit} : {category_id?: number, product_id?: number | null, limit: number}) {
+    if (!category_id) {
+        return null;
+    }
+
+    const query = await db.raw(`
+        SELECT 
+            p.*,
+            u.username AS price_owner_username
+        FROM products p
+        LEFT JOIN users u ON p.price_owner_id = u.user_id
+        WHERE p.cat2_id = ?
+            AND p.product_id != COALESCE(?, 1)
+            AND p.is_removed = FALSE
+        ORDER BY RANDOM()
+        LIMIT ?
+    `, [category_id, product_id, limit]);
+
+    return query.rows;
+}
+
+
+
+export async function updateProductDescription({product_id, seller_id, new_description} : {product_id: number, seller_id: string, new_description: string}) {
+    // Check if the product belongs to the seller
+    const productQuery = await db.raw(`
+        SELECT *
+        FROM products
+        WHERE product_id = ? AND seller_id = ?
+    `, [product_id, seller_id]);
+    const product = await productQuery.rows[0];
+    if (!product) {
+        return {
+            status: "403",
+            message: "You are not authorized to update this product."
+        }
+    }
+    // Update description
+    await db('products')
+        .where({ product_id: product_id })
+        .update({ description: new_description });
+    return {
+        status: "200",
+        message: "Product description updated successfully."
+    }
+}

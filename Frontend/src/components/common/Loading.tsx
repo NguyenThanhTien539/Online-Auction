@@ -58,7 +58,7 @@ const Loading: React.FC<LoadingProps> = ({
                   <img
                     src={image}
                     alt="Loading"
-                    className="w-full h-full object-cover bg-white"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ) : (

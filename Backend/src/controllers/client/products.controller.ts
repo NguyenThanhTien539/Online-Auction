@@ -564,3 +564,67 @@ export async function postProductQuestion (req: Request, res: Response) {
     });
 
 }
+
+
+export async function getRelatedProducts (req: Request, res: Response) {
+    try{
+        const category_id = req.query.category_id as string;
+        const product_id = req.query.product_id as string;
+        const limit = req.query.limit ? parseInt (req.query.limit as string) : 5;
+        if (!category_id){
+            return res.status(400).json({
+                status: "error",
+                message: "category_id is required"
+            });
+        }
+        const products = await productsModel.getRelatedProducts({
+            category_id: parseInt(category_id),
+            product_id: product_id ? parseInt(product_id) : null,
+            limit: limit
+        })
+        return res.status(200).json({
+            status: "success",
+            data: products
+        });
+    }
+    catch (err){
+    }
+}
+
+
+export async function updateProductDescription (req: Request, res: Response) {
+    try{
+        const user = (req as any).user;
+        const product_id = req.body.product_id as number;
+        const newDescription = req.body.description as string;
+        const promise = await productsModel.updateProductDescription({
+            product_id: product_id,
+            seller_id: user.user_id,
+            new_description: newDescription
+        });
+
+        if (!promise){
+            return res.status(500).json({
+                status: "error",
+                message: "Error in updating product description"
+            });
+        }
+        if (promise.status === "403"){
+            return res.status(403).json({
+                status: "error",
+                message: promise.message
+            });
+        }
+        return res.status(200).json({
+            status: "success",
+            message: "Cập nhật mô tả sản phẩm thành công"
+        });
+    }   
+    catch (err){
+        console.error(err);
+        return res.status(500).json({
+            status: "error",
+            message: "Lỗi máy chủ"
+        });
+    }
+}
