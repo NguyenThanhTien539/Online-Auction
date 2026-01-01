@@ -14,4 +14,4 @@ route.get("/edit/:id", categoriesController.edit);
 
 route.patch("/edit/:id", categoriesController.editPatch);
 
-export default route;
+export default route; 

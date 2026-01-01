@@ -1,6 +1,7 @@
 import express from "express";
 import categoryRoute from "./category.route.ts";
 import applicationFormRoute from "./application-form.route.ts";
+import userRoute from "./user.route.ts";
 import * as authMiddleware from "../../middlewares/auth.middleware.ts";
 
 const route = express.Router();
@@ -17,6 +18,13 @@ route.use(
   authMiddleware.verifyToken,
   authMiddleware.verifyRole("admin"),
   applicationFormRoute
+);
+
+route.use(
+  "/api/user",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyRole("admin"),
+  userRoute
 );
 
 export default route;
