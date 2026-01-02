@@ -23,7 +23,7 @@ function AccountRegister() {
       .then((res) => res.json())
       .then((data) => {
         if (data.code == "error") {
-          console.log(data.message);
+          toast.error(data.message);
         }
         if (data.code == "success") {
           if (data.role === "admin") {
@@ -33,8 +33,6 @@ function AccountRegister() {
             navigate(`/`);
             toast.success(data.message);
           }
-        } else {
-          toast.error("Đăng ký bằng Google thất bại");
         }
       });
   };
@@ -121,7 +119,7 @@ function AccountRegister() {
           address: address,
         };
 
-        fetch("http://localhost:5000/accounts/register", {
+        fetch(`${import.meta.env.VITE_API_URL}/accounts/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

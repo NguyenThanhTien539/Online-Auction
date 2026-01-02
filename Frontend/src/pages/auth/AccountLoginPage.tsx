@@ -65,8 +65,7 @@ function AccountLogin() {
           .then((res) => res.json())
           .then((data) => {
             if (data.code == "error") {
-              console.log("Response from backend:", data.message);
-              toast.error("Đăng nhập thất bại");
+              toast.error(data.message);
             }
 
             if (data.code == "success") {
@@ -97,19 +96,16 @@ function AccountLogin() {
       .then((res) => res.json())
       .then((data) => {
         if (data.code == "error") {
-          console.log("Response from backend:", data.message);
-          toast.error("Đăng nhập bằng Google thất bại");
+          toast.error(data.message);
         }
         if (data.code == "success") {
           if (data.role === "admin") {
             navigate(`/admin/dashboard`);
-            toast.success("Đăng nhập bằng Google thành công!");
+            toast.success(data.message);
           } else {
             navigate(`/`);
-            toast.success("Đăng nhập bằng Google thành công!");
+            toast.success(data.message);
           }
-        } else {
-          toast.error("Đăng nhập bằng Google thất bại");
         }
       });
   };
