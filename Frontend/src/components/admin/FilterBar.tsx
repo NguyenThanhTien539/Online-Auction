@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, RotateCcw, Search } from "lucide-react";
+import { Filter, RotateCcw, Search, Trash2 } from "lucide-react";
 
 type StatusOption = {
   value: string;
@@ -43,6 +43,9 @@ type Props = {
 
   onCreateNew?: () => void; // truyền → hiện nút tạo mới
   createLabel?: string;
+
+  onTrashClick?: () => void; // truyền → hiện nút thùng rác
+  trashLabel?: string;
 };
 
 export default function FilterBar({
@@ -75,6 +78,9 @@ export default function FilterBar({
 
   onCreateNew,
   createLabel = "+ Tạo mới",
+
+  onTrashClick,
+  trashLabel = "Thùng rác",
 }: Props) {
   // ===== EFFECTIVE OPTIONS =====
   const effectiveStatusOptions: StatusOption[] = statusOptions ?? [
@@ -271,6 +277,17 @@ export default function FilterBar({
             onClick={onCreateNew}
           >
             {createLabel}
+          </button>
+        )}
+        {/* Nút thùng rác */}
+        {onTrashClick && (
+          <button
+            type="button"
+            className="h-full px-4 rounded-2xl bg-red-500 text-white text-[15px] font-semibold hover:bg-red-600 cursor-pointer flex items-center gap-2"
+            onClick={onTrashClick}
+          >
+            <Trash2 size={16} />
+            <span className="hidden sm:inline">{trashLabel}</span>
           </button>
         )}
       </div>

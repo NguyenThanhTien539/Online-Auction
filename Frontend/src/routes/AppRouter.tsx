@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AuthProvider } from "@/routes/ProtectedRouter";
 import Home from "@/pages/home/HomePage";
-import AboutPage from "@/pages/AboutPage"
+import AboutPage from "@/pages/AboutPage";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import AdminMainLayout from "@/layouts/AdminMainLayout";
@@ -17,7 +17,7 @@ import CategoryList from "@/pages/admin/CategoryListPage";
 import CategoryCreate from "@/pages/admin/CategoryCreatePage";
 import DetailProductPage from "@/pages/client/DetailProductPage/DetailProductPage";
 import ResetPassword from "@/pages/auth/ResetPasswordPage";
-import ChangePassword from "@/pages/client/ProfilePage/components/ChangePasswordPage"
+import ChangePassword from "@/pages/client/ProfilePage/components/ChangePasswordPage";
 import CategoryEdit from "@/pages/admin/CategoryEditPage";
 import ProductListPage from "@/pages/admin/ProductListPage";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
@@ -33,6 +33,7 @@ import ListSearchProductPage from "@/pages/client/ListSearchProductPage";
 import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
 import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
 import SellerApplicationDetailPage from "@/pages/admin/SellerApplicationDetailPage";
+import CategoryTrashPage from "@/pages/admin/CategoryTrashPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -47,8 +48,8 @@ const routers = createBrowserRouter([
         element: <Home />,
       },
       {
-        path : "/about",
-        element : <AboutPage/>
+        path: "/about",
+        element: <AboutPage />,
       },
       {
         path: "/categories/:slugid",
@@ -63,10 +64,9 @@ const routers = createBrowserRouter([
         element: <ListProductsPage />,
       },
       {
-        path : "/products/search",
-        element: <ListSearchProductPage />
-      }
-      ,
+        path: "/products/search",
+        element: <ListSearchProductPage />,
+      },
       {
         path: "product/:slugid",
         element: <DetailProductPage />,
@@ -88,17 +88,17 @@ const routers = createBrowserRouter([
         element: <RegisterSellerPage />,
       },
       {
-        path : "/profile/:username_id",
-        element : <ProfilePage />
+        path: "/profile/:username_id",
+        element: <ProfilePage />,
       },
       {
         path: "profile/edit",
-        element : <EditProfilePage />
+        element: <EditProfilePage />,
       },
       {
         path: "profile/change-password",
-        element : <ChangePassword />
-      }
+        element: <ChangePassword />,
+      },
     ],
   },
   {
@@ -157,11 +157,15 @@ const routers = createBrowserRouter([
         element: <CategoryEdit />,
       },
       {
+        path: "category/trash",
+        element: <CategoryTrashPage />,
+      },
+      {
         path: "product/list",
         element: <ProductListPage />,
       },
       {
-        path: "product/detail",
+        path: "product/detail/:id",
         element: <ProductDetailPage />,
       },
       {

@@ -23,6 +23,7 @@ export async function createPost(req: AccountRequest, res: Response) {
 
 export async function calTotalCategories(req: Request, res: Response) {
   const filter = {};
+  const deleted = req.body.deleted || false;
   if (req.query.status) {
     Object.assign(filter, { status: req.query.status });
   }
@@ -39,7 +40,7 @@ export async function calTotalCategories(req: Request, res: Response) {
     Object.assign(filter, { search: req.query.search as string });
   }
 
-  const total = await categoriesModel.calTotalCategories(filter);
+  const total = await categoriesModel.calTotalCategories(filter, deleted);
   res.json({ code: "success", message: "Thành công", total: total });
 }
 
@@ -110,4 +111,85 @@ export async function editPatch(req: Request, res: Response) {
   } catch (error) {
     res.json({ code: "error", message: "Có lỗi xảy ra ở đây" });
   }
+}
+
+export async function trashList(req: Request, res: Response) {
+  try {
+    const deleted = true;
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
+    const filter = {};
+    if (req.query.status) {
+      Object.assign(filter, { status: req.query.status });
+    }
+    if (req.query.creator) {
+      Object.assign(filter, { creator: req.query.creator });
+    }
+    if (req.query.dateFrom) {
+      Object.assign(filter, { dateFrom: req.query.dateFrom });
+    }
+    if (req.query.dateTo) {
+      Object.assign(filter, { dateTo: req.query.dateTo });
+    }
+    if (req.query.search) {
+      Object.assign(filter, { search: req.query.search as string });
+    }
+    const list = await categoriesModel.getCategoryWithOffsetLimit(
+      (page - 1) * limit,
+      limit,
+      filter,
+      deleted
+    );
+    for (const category of list) {
+      const detailedAccount = await accountModel.findAcountById(
+        category.created_by
+      );
+      category.created_by = detailedAccount
+        ? detailedAccount.full_name
+        : "Không xác định";
+      const detailedAccountUpdated = await accountModel.findAcountById(
+        category.updated_by
+      );
+      category.updated_by = detailedAccountUpdated
+        ? detailedAccountUpdated.full_name
+        : "Không xác định";
+    }
+    res.json({
+      code: "success",
+      message: "Thành công",
+      list: list,
+    });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra", list: [] });
+  }
+}
+
+export async function deleteCategory(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    await categoriesModel.deleteCategoryWithID(Number(id));
+    res.json({ code: "success", message: "Xóa danh mục thành công" });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra" });
+  }
+}
+
+export async function restoreCategory(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    await categoriesModel.restoreCategoryWithID(Number(id));
+    res.json({ code: "success", message: "Khôi phục danh mục thành công" });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra" });
+  }
+}
+
+export async function destroyCategory(req: Request, res: Response) {
+  // try {
+  //   const { id } = req.params;
+  //   await categoriesModel.destroyCategoryWithID(Number(id));
+  //   res.json({ code: "success", message: "Xóa vĩnh viễn danh mục thành công" });
+  // } catch (error) {
+  //   res.json({ code: "error", message: "Có lỗi xảy ra" });
+  // }
 }
