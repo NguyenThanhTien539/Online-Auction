@@ -34,6 +34,7 @@ import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSe
 import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
 import SellerApplicationDetailPage from "@/pages/admin/SellerApplicationDetailPage";
 import CategoryTrashPage from "@/pages/admin/CategoryTrashPage";
+import ProductTrashPage from "@/pages/admin/ProductTrashPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -167,6 +168,10 @@ const routers = createBrowserRouter([
       {
         path: "product/detail/:id",
         element: <ProductDetailPage />,
+      },
+      {
+        path: "product/trash",
+        element: <ProductTrashPage />,
       },
       {
         path: "user/list",

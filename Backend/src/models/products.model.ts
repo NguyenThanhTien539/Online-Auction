@@ -609,18 +609,15 @@ export async function updateProductDescription({
 export const getProductWithOffsetLimit = async (
   offset: number,
   limit: number,
-  filter: any
+  filter: any,
+  is_removed: boolean = false
 ) => {
   const q = db("products")
     .select("*")
     .orderBy("product_id", "asc")
+    .where("is_removed", is_removed)
     .offset(offset)
     .limit(limit);
-
-  // status = exact match (is_removed field)
-  if (filter?.status && filter.status !== "all") {
-    q.andWhere("is_removed", filter.status === "true");
-  }
 
   if (filter?.creator) {
     q.andWhereILike("seller_id", `%${filter.creator}%`);
@@ -647,8 +644,11 @@ export const getProductWithOffsetLimit = async (
   return q;
 };
 
-export const calTotalProducts = async (filter: any = {}) => {
-  const q = db("products").count("* as total");
+export const calTotalProducts = async (
+  filter: any = {},
+  is_removed: boolean = false
+) => {
+  const q = db("products").where("is_removed", is_removed).count("* as total");
 
   // status = exact match (is_removed field)
   if (filter?.status && filter.status !== "all") {
@@ -690,4 +690,20 @@ export async function countProductsByCategories(
     [categoryIds]
   );
   return query.rows[0].count;
+}
+
+export async function deleteProductById(product_id: number) {
+  await db("products")
+    .where({ product_id: product_id })
+    .update({ is_removed: true });
+}
+
+export async function restoreProductById(product_id: number) {
+  await db("products")
+    .where({ product_id: product_id })
+    .update({ is_removed: false });
+}
+
+export async function destroyProductById(product_id: number) {
+  await db("products").where({ product_id: product_id }).del();
 }

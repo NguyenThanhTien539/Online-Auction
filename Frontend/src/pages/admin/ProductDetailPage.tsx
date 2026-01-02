@@ -197,25 +197,6 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label
-                htmlFor="status"
-                className="mb-4 block text-sm font-medium text-gray-700"
-              >
-                Trạng thái
-              </label>
-              <select
-                id="status"
-                value={product.is_removed ? "removed" : "active"}
-                disabled
-                className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
-              >
-                <option value="active">Hoạt động</option>
-                <option value="removed">Đã xóa</option>
-              </select>
-            </div>
-          </div>
           {/* Hình ảnh sản phẩm */}
           <div className="space-y-2">
             <label className="mb-4 block text-sm font-medium text-gray-700">
