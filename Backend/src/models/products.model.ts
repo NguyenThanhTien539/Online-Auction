@@ -680,3 +680,14 @@ export const calTotalProducts = async (filter: any = {}) => {
   const result = await q;
   return parseInt(result[0].total as string, 10);
 };
+
+export async function countProductsByCategories(
+  categoryIds: number[]
+): Promise<number> {
+  if (categoryIds.length === 0) return 0;
+  const query = await db.raw(
+    `SELECT COUNT(*) as count FROM products WHERE cat2_id = ANY(?)`,
+    [categoryIds]
+  );
+  return query.rows[0].count;
+}

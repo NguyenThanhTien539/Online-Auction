@@ -38,22 +38,31 @@ export default function CategoryTrashPage() {
   // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
-  useEffect(() => {
-    if (!searchFromUrl) {
-      setLocalSearch("");
-    }
-  }, [searchFromUrl]);
+  const fetchItems = () => {
+    setIsPageLoading(true);
 
-  // Handler khi nhấn Enter trong search box
-  const handleSearchSubmit = () => {
-    const slugified = slugify(localSearch);
-    if (slugified !== searchFromUrl) {
-      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
-      handleSearchChange(slugified);
-    }
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/trash/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setItems(data.list);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      });
   };
 
-  useEffect(() => {
+  const fetchTotal = () => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
@@ -81,30 +90,29 @@ export default function CategoryTrashPage() {
           }));
         }
       });
+  };
+
+  useEffect(() => {
+    if (!searchFromUrl) {
+      setLocalSearch("");
+    }
+  }, [searchFromUrl]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
+      handleSearchChange(slugified);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotal();
   }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
-    setIsPageLoading(true);
-
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/category/trash/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
-        searchFromUrl
-      )}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data.list);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      })
-      .catch(() => {
-        setItems([]);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      });
+    fetchItems();
   }, [
     currentPage,
     statusFilter,
@@ -128,7 +136,8 @@ export default function CategoryTrashPage() {
       .then((data) => {
         if (data.code === "success") {
           toast.success(data.message || "Khôi phục danh mục thành công");
-          setItems((prev) => prev.filter((item) => item.id !== id));
+          fetchItems();
+          fetchTotal();
         } else {
           toast.error(data.message || "Khôi phục danh mục thất bại");
         }
@@ -212,7 +221,6 @@ export default function CategoryTrashPage() {
           { value: "delete", label: "Xóa vĩnh viễn" },
         ]}
         onApplyBulkAction={(action) => console.log(action, selectedIds)}
-        onCreateNew={() => navigate("/admin/category")}
       />
 
       {/* Desktop Table View */}
@@ -309,10 +317,9 @@ export default function CategoryTrashPage() {
                             import.meta.env.VITE_PATH_ADMIN
                           }/api/category/destroy/${item.id}`}
                           onSuccess={(data) => {
-                            // toast.success(data.message);
-                            setItems((prev) =>
-                              prev.filter((i) => i.id !== item.id)
-                            );
+                            toast.success(data.message);
+                            fetchItems();
+                            fetchTotal();
                           }}
                           onError={(message) => toast.error(message)}
                           className="p-2 hover:bg-red-50 text-red-500 rounded-lg"
@@ -416,7 +423,8 @@ export default function CategoryTrashPage() {
                   }/api/category/${item.id}`}
                   onSuccess={(data) => {
                     toast.success(data.message);
-                    window.location.reload();
+                    fetchItems();
+                    fetchTotal();
                   }}
                   onError={(message) => toast.error(message)}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"

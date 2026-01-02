@@ -2,7 +2,25 @@ import { Request, Response } from "express";
 import * as accountModel from "../../models/account.model.ts";
 import * as categoryHelper from "../../helpers/category.helper.ts";
 import * as categoriesModel from "../../models/categories.model.ts";
+import * as productsModel from "../../models/products.model.ts";
 import { AccountRequest } from "../../interfaces/request.interface.ts";
+
+async function getAllDescendantIds(categoryId: number): Promise<number[]> {
+  const allCategories =
+    await categoriesModel.getAllCategoriesIncludingDeleted();
+  const descendants: number[] = [];
+  function findDescendants(parentId: number) {
+    for (const cat of allCategories) {
+      if (cat.parent_id === parentId) {
+        descendants.push(cat.id);
+        findDescendants(cat.id);
+      }
+    }
+  }
+
+  findDescendants(categoryId);
+  return descendants;
+}
 
 export async function buildTree(_: Request, res: Response) {
   const categories = await categoriesModel.getAllCategory();
@@ -167,7 +185,20 @@ export async function trashList(req: Request, res: Response) {
 export async function deleteCategory(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    await categoriesModel.deleteCategoryWithID(Number(id));
+    const categoryId = Number(id);
+
+    const descendantIds = await getAllDescendantIds(categoryId);
+    const count = await productsModel.countProductsByCategories(descendantIds);
+    if (count > 0) {
+      return res.json({
+        code: "error",
+        message: "Không thể xóa danh mục",
+      });
+    }
+    await categoriesModel.deleteCategoryWithID(categoryId);
+    for (const descId of descendantIds) {
+      await categoriesModel.deleteCategoryWithID(descId);
+    }
     res.json({ code: "success", message: "Xóa danh mục thành công" });
   } catch (error) {
     res.json({ code: "error", message: "Có lỗi xảy ra" });
@@ -185,11 +216,17 @@ export async function restoreCategory(req: Request, res: Response) {
 }
 
 export async function destroyCategory(req: Request, res: Response) {
-  // try {
-  //   const { id } = req.params;
-  //   await categoriesModel.destroyCategoryWithID(Number(id));
-  //   res.json({ code: "success", message: "Xóa vĩnh viễn danh mục thành công" });
-  // } catch (error) {
-  //   res.json({ code: "error", message: "Có lỗi xảy ra" });
-  // }
+  try {
+    const { id } = req.params;
+    const categoryId = Number(id);
+    const descendantIds = await getAllDescendantIds(categoryId);
+
+    for (const descId of descendantIds) {
+      await categoriesModel.destroyCategoryWithID(descId);
+    }
+    await categoriesModel.destroyCategoryWithID(categoryId);
+    res.json({ code: "success", message: "Xóa vĩnh viễn danh mục thành công" });
+  } catch (error) {
+    res.json({ code: "error", message: "Có lỗi xảy ra" });
+  }
 }

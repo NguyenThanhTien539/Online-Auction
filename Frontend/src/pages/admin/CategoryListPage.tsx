@@ -35,22 +35,31 @@ export default function CategoryList() {
   // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
-  useEffect(() => {
-    if (!searchFromUrl) {
-      setLocalSearch("");
-    }
-  }, [searchFromUrl]);
+  const fetchItems = () => {
+    setIsPageLoading(true);
 
-  // Handler khi nhấn Enter trong search box
-  const handleSearchSubmit = () => {
-    const slugified = slugify(localSearch);
-    if (slugified !== searchFromUrl) {
-      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
-      handleSearchChange(slugified);
-    }
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setItems(data.list);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      });
   };
 
-  useEffect(() => {
+  const fetchTotal = () => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
@@ -78,30 +87,29 @@ export default function CategoryList() {
           }));
         }
       });
+  };
+
+  useEffect(() => {
+    if (!searchFromUrl) {
+      setLocalSearch("");
+    }
+  }, [searchFromUrl]);
+
+  // Handler khi nhấn Enter trong search box
+  const handleSearchSubmit = () => {
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
+      handleSearchChange(slugified);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotal();
   }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
-    setIsPageLoading(true);
-
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
-        searchFromUrl
-      )}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data.list);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      })
-      .catch(() => {
-        setItems([]);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      });
+    fetchItems();
   }, [
     currentPage,
     statusFilter,
@@ -163,7 +171,8 @@ export default function CategoryList() {
       .then((data) => {
         if (data.code === "success") {
           toast.success(data.message || "Xóa danh mục thành công");
-          setItems((prev) => prev.filter((item) => item.id !== id));
+          fetchItems();
+          fetchTotal();
         } else {
           toast.error(data.message || "Xóa danh mục thất bại");
         }

@@ -79,8 +79,12 @@ export const insertCategory = async (data: object) => {
   await db("categories").insert(data);
 };
 
-export const getAllCategory = async () => {
-  return db("categories").select("*").where({ deleted: false });
+export const getAllCategory = async (deleted: boolean = false) => {
+  return db("categories").select("*").where({ deleted: deleted });
+};
+
+export const getAllCategoriesIncludingDeleted = async () => {
+  return db("categories").select("*");
 };
 
 export const getCategoryWithOffsetLimit = async (
@@ -173,4 +177,8 @@ export const deleteCategoryWithID = async (id: number) => {
 
 export const restoreCategoryWithID = async (id: number) => {
   return db("categories").where({ id }).update({ deleted: false });
+};
+
+export const destroyCategoryWithID = async (id: number) => {
+  return db("categories").where({ id }).del();
 };
