@@ -79,18 +79,23 @@ export const insertCategory = async (data: object) => {
   await db("categories").insert(data);
 };
 
-export const getAllCategory = async () => {
-  return db("categories").select("*").where({ deleted: false });
+export const getAllCategory = async (deleted: boolean = false) => {
+  return db("categories").select("*").where({ deleted: deleted });
+};
+
+export const getAllCategoriesIncludingDeleted = async () => {
+  return db("categories").select("*");
 };
 
 export const getCategoryWithOffsetLimit = async (
   offset: number,
   limit: number,
-  filter: any
+  filter: any,
+  deleted: boolean = false
 ) => {
   const q = db("categories")
     .select("*")
-    .where({ deleted: false })
+    .where({ deleted: deleted })
     .orderBy("id", "asc")
     .offset(offset)
     .limit(limit);
@@ -123,8 +128,11 @@ export const getCategoryWithOffsetLimit = async (
   return q;
 };
 
-export const calTotalCategories = async (filter: any = {}) => {
-  const q = db("categories").count("* as total").where({ deleted: false });
+export const calTotalCategories = async (
+  filter: any = {},
+  deleted: boolean = false
+) => {
+  const q = db("categories").count("* as total").where({ deleted: deleted });
 
   // status = exact match
   if (filter?.status && filter.status !== "all") {
@@ -161,4 +169,16 @@ export const getCategoryWithID = async (id: number) => {
 
 export const updateCategoryWithID = async (id: number, data: any) => {
   return db("categories").where({ deleted: false, id }).update(data);
+};
+
+export const deleteCategoryWithID = async (id: number) => {
+  return db("categories").where({ id }).update({ deleted: true });
+};
+
+export const restoreCategoryWithID = async (id: number) => {
+  return db("categories").where({ id }).update({ deleted: false });
+};
+
+export const destroyCategoryWithID = async (id: number) => {
+  return db("categories").where({ id }).del();
 };

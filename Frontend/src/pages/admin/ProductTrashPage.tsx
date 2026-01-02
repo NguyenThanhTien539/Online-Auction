@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
 import Pagination from "@/components/admin/Pagination";
+import { Eye, Trash2, RotateCcw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { formatToVN } from "@/utils/format_time";
 import { useFilters } from "@/hooks/useFilters";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "@/components/common/ConfirmDeleteButton";
 
 const LIMIT = 10;
 
@@ -19,7 +20,7 @@ type ProductItem = {
   edited_at?: string;
 };
 
-export default function ProductListPage() {
+export default function ProductTrashPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState<ProductItem[]>([]);
@@ -40,6 +41,7 @@ export default function ProductListPage() {
     resetFilters,
   } = useFilters();
 
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
   const fetchItems = () => {
@@ -54,10 +56,10 @@ export default function ProductListPage() {
       {
         credentials: "include",
         method: "POST",
+        body: JSON.stringify({ is_removed: true }),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ is_removed: false }),
       }
     )
       .then((res) => res.json())
@@ -83,10 +85,10 @@ export default function ProductListPage() {
       {
         credentials: "include",
         method: "POST",
+        body: JSON.stringify({ is_removed: true }),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ is_removed: false }),
       }
     )
       .then((res) => res.json())
@@ -109,6 +111,7 @@ export default function ProductListPage() {
     }
   }, [searchFromUrl]);
 
+  // Handler khi nhấn Enter trong search box
   const handleSearchSubmit = () => {
     if (localSearch.trim() !== searchFromUrl) {
       handleSearchChange(localSearch.trim());
@@ -122,6 +125,35 @@ export default function ProductListPage() {
   useEffect(() => {
     fetchItems();
   }, [currentPage, creatorFilter, dateFrom, dateTo, searchFromUrl]);
+
+  const handleRestore = (id: number) => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/product/restore/${id}`,
+      {
+        credentials: "include",
+        method: "PATCH",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code === "success") {
+          toast.success(data.message || "Khôi phục sản phẩm thành công");
+          fetchItems();
+          fetchTotal();
+        } else {
+          toast.error(data.message || "Khôi phục sản phẩm thất bại");
+        }
+      });
+  };
+
+  const handleView = (id: number) => {
+    navigate(`/${import.meta.env.VITE_PATH_ADMIN}/product/detail/${id}`);
+  };
+
+  // ================== SELECTION ==================
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const creatorOptions: string[] = useMemo(
     () =>
@@ -137,8 +169,7 @@ export default function ProductListPage() {
     [items]
   );
 
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
+  // ================== CHECKBOX ==================
   const allChecked = useMemo(
     () =>
       items.length > 0 &&
@@ -161,31 +192,6 @@ export default function ProductListPage() {
     );
   };
 
-  const handleView = (id: number) => {
-    navigate(`/${import.meta.env.VITE_PATH_ADMIN}/product/detail/${id}`);
-  };
-
-  const handleDelete = (id: number) => {
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/product/delete/${id}`,
-      {
-        credentials: "include",
-        method: "PATCH",
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.code === "success") {
-          fetchItems();
-          fetchTotal();
-          toast.success("Xóa sản phẩm thành công");
-        } else {
-        }
-      });
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -197,7 +203,7 @@ export default function ProductListPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <h2 className="font-semibold text-2xl sm:text-3xl mb-5">
-        Quản lý sản phẩm
+        Thùng rác sản phẩm
       </h2>
 
       <FilterBar
@@ -215,12 +221,9 @@ export default function ProductListPage() {
         onResetFilters={resetFilters}
         bulkActionOptions={[
           { value: "restore", label: "Khôi phục" },
-          { value: "delete", label: "Xóa" },
+          { value: "delete", label: "Xóa vĩnh viễn" },
         ]}
         onApplyBulkAction={(action) => console.log(action, selectedIds)}
-        onTrashClick={() =>
-          navigate(`/${import.meta.env.VITE_PATH_ADMIN}/product/trash`)
-        }
       />
 
       {/* Desktop Table View */}
@@ -245,7 +248,6 @@ export default function ProductListPage() {
                 <th className="px-4 py-4 text-center font-semibold text-gray-700">
                   Tên sản phẩm
                 </th>
-
                 <th className="px-4 py-4 text-center font-semibold text-gray-700">
                   Tạo bởi
                 </th>
@@ -275,7 +277,6 @@ export default function ProductListPage() {
                           : item.product_name}
                       </span>
                     </td>
-
                     <td className="px-4 py-4 text-center">
                       <div className="font-medium">
                         {item.creator_name || "Không rõ"}
@@ -293,11 +294,25 @@ export default function ProductListPage() {
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(item.product_id)}
-                          className="cursor-pointer p-2 hover:bg-red-50 text-red-500 rounded-lg"
+                          className="cursor-pointer p-2 hover:bg-green-50 text-green-500 rounded-lg"
+                          onClick={() => handleRestore(item.product_id)}
+                        >
+                          <RotateCcw size={18} />
+                        </button>
+                        <ConfirmDeleteButton
+                          apiUrl={`${import.meta.env.VITE_API_URL}/${
+                            import.meta.env.VITE_PATH_ADMIN
+                          }/api/product/destroy/${item.product_id}`}
+                          onSuccess={(data) => {
+                            toast.success(data.message);
+                            fetchItems();
+                            fetchTotal();
+                          }}
+                          onError={(message) => toast.error(message)}
+                          className=" cursor-pointer p-2 hover:bg-red-50 text-red-500 rounded-lg"
                         >
                           <Trash2 size={18} />
-                        </button>
+                        </ConfirmDeleteButton>
                       </div>
                     </td>
                   </tr>
@@ -308,7 +323,7 @@ export default function ProductListPage() {
         </div>
         {items.length === 0 && (
           <div className="py-10 text-center text-gray-500">
-            Không có sản phẩm nào phù hợp bộ lọc
+            Không có sản phẩm nào trong thùng rác
           </div>
         )}
       </div>
@@ -353,19 +368,13 @@ export default function ProductListPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Tạo bởi:</span>
                   <span className="font-medium text-right">
-                    {item.seller_id || "Không rõ"}
+                    {item.creator_name || "Không rõ"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Ngày tạo:</span>
                   <span className="text-gray-700 text-xs text-right">
                     {formatToVN(item.created_at)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Chỉnh sửa:</span>
-                  <span className="text-gray-700 text-xs text-right">
-                    {/* {formatToVN(item.edited_at)} */}
                   </span>
                 </div>
               </div>
@@ -378,14 +387,28 @@ export default function ProductListPage() {
                   <Eye size={16} />
                   <span className="font-medium">Xem</span>
                 </button>
-
                 <button
-                  onClick={() => handleDelete(item.product_id)}
-                  className=" cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors"
+                  onClick={() => handleRestore(item.product_id)}
+                >
+                  <RotateCcw size={16} />
+                  <span className="font-medium">Khôi phục</span>
+                </button>
+                <ConfirmDeleteButton
+                  apiUrl={`${import.meta.env.VITE_API_URL}/${
+                    import.meta.env.VITE_PATH_ADMIN
+                  }/api/product/destroy/${item.product_id}`}
+                  onSuccess={(data) => {
+                    toast.success(data.message);
+                    fetchItems();
+                    fetchTotal();
+                  }}
+                  onError={(message) => toast.error(message)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                 >
                   <Trash2 size={16} />
-                  <span className="font-medium">Xóa</span>
-                </button>
+                  <span className="font-medium">Xóa vĩnh viễn</span>
+                </ConfirmDeleteButton>
               </div>
             </div>
           );
@@ -393,7 +416,7 @@ export default function ProductListPage() {
 
         {items.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 py-10 text-center text-gray-500">
-            Không có sản phẩm nào phù hợp bộ lọc
+            Không có sản phẩm nào trong thùng rác
           </div>
         )}
       </div>

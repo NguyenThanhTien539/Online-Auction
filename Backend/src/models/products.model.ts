@@ -1,31 +1,37 @@
-
 import db from "../config/database.config.ts";
-
 import { slugify } from "../helpers/slug.helper.ts";
-export async function isProductInBiddingTime (product_id: number) {
-    // Set products with end_time >= now()
-    const resultQuery = await db.raw(`
+
+export async function isProductInBiddingTime(product_id: number) {
+  // Set products with end_time >= now()
+  const resultQuery = await db.raw(
+    `
         select *
         from products
         where product_id = ? and end_time >= now()
-    `, [product_id]);
-    const result = await resultQuery.rows[0];
+    `,
+    [product_id]
+  );
+  const result = await resultQuery.rows[0];
 
-    return result ? true : false;
+  return result ? true : false;
 }
 
-export async function getSellerOfProduct (product_id: number) {
-    const query = await db.raw(`
+export async function getSellerOfProduct(product_id: number) {
+  const query = await db.raw(
+    `
         select  u.*, p.*
         from products p join
         users u on p.seller_id = u.user_id
-        where p.product_id = ?`, [product_id]);
-    const result = await query.rows[0];
-    return result;
+        where p.product_id = ?`,
+    [product_id]
+  );
+  const result = await query.rows[0];
+  return result;
 }
 
-export async function getProductById (product_id: number) {
-    let query = await db.raw(`
+export async function getProductById(product_id: number) {
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
             u1.rating AS price_owner_rating,
@@ -35,61 +41,70 @@ export async function getProductById (product_id: number) {
         LEFT JOIN users u1 ON p.price_owner_id = u1.user_id
         LEFT JOIN users u2 on p.seller_id = u2.user_id
         WHERE p.product_id = ?
-    `, [product_id]);
-    let result = await query.rows[0];
-    return result;
+    `,
+    [product_id]
+  );
+  let result = await query.rows[0];
+  return result;
 }
 
-export async function getProductsPageList(cat2_id : number, page: number, priceFilter: string, timeFilter: string) {
-    const itemsPerPage = 6;
-    const offset = (page - 1) * itemsPerPage;
-    
-    let orderBy = [];
-    if (priceFilter === "asc") {
-        orderBy.push("p.current_price ASC");
-    }
-    else if (priceFilter === "desc") {
-        orderBy.push("p.current_price DESC");
-    }
-    if (timeFilter === "asc") {
-        orderBy.push("p.end_time ASC");
-    }
-    else if (timeFilter === "desc") {
-        orderBy.push("p.end_time DESC");
-    }
+export async function getProductsPageList(
+  cat2_id: number,
+  page: number,
+  priceFilter: string,
+  timeFilter: string
+) {
+  const itemsPerPage = 6;
+  const offset = (page - 1) * itemsPerPage;
 
+  let orderBy = [];
+  if (priceFilter === "asc") {
+    orderBy.push("p.current_price ASC");
+  } else if (priceFilter === "desc") {
+    orderBy.push("p.current_price DESC");
+  }
+  if (timeFilter === "asc") {
+    orderBy.push("p.end_time ASC");
+  } else if (timeFilter === "desc") {
+    orderBy.push("p.end_time DESC");
+  }
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
             FROM products p
         LEFT JOIN users u ON p.price_owner_id = u.user_id
         WHERE p.cat2_id = ?
-        ORDER BY ${orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"}
-        LIMIT ? OFFSET ?
-    `, [cat2_id, itemsPerPage, offset]);
-    
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
-
-
-    
-    if (results) {
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
+        ORDER BY ${
+          orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"
         }
-    }
-    
-    return null;
+        LIMIT ? OFFSET ?
+    `,
+    [cat2_id, itemsPerPage, offset]
+  );
+
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+
+  return null;
 }
 
-export async function getMyFavoriteProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
+export async function getMyFavoriteProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join love_products lp on p.product_id = lp.product_id
@@ -98,24 +113,28 @@ export async function getMyFavoriteProducts(user_id: string, page: number){
         order by p.created_at desc
         limit ? offset ?
         
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
 
-    if (results){
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-} 
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+}
 
-export async function getMySellingProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
+export async function getMySellingProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
@@ -123,24 +142,28 @@ export async function getMySellingProducts(user_id: string, page: number){
         order by p.created_at desc
         limit ? offset ?
         
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
-    if (results){
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-    return null;
-} 
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+  return null;
+}
 
-export async function getMySoldProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
+export async function getMySoldProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
@@ -148,24 +171,28 @@ export async function getMySoldProducts(user_id: string, page: number){
         order by p.created_at desc
         limit ? offset ?
         
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
-    if (results){
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-    return null;
-} 
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+  return null;
+}
 
-export async function getMyWonProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
+export async function getMyWonProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
@@ -173,28 +200,29 @@ export async function getMyWonProducts(user_id: string, page: number){
         order by p.created_at desc
         limit ? offset ?
         
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
-    if (results){
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-    return null;
-} 
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+  return null;
+}
 
-export async function getMyBiddingProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
+export async function getMyBiddingProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
 
-
-
-
-    // Then get paginated results
-    let query = await db.raw(`
+  // Then get paginated results
+  let query = await db.raw(
+    `
         SELECT
             p.*,
             u.username AS price_owner_username, count(*) OVER() AS total_count
@@ -209,58 +237,79 @@ export async function getMyBiddingProducts(user_id: string, page: number){
             )
         ORDER BY p.created_at DESC
         LIMIT ? OFFSET ?
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
 
-    if (results){
-        return {
-            data: results,
-            numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-    return null;
+  if (results) {
+    return {
+      data: results,
+      numberOfPages:
+        results.length > 0
+          ? Math.ceil(results[0].total_count / itemsPerPage)
+          : 0,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+  return null;
 }
 
-export async function getMyInventoryProducts(user_id: string, page: number){
-    const itemsPerPage = 4;
-    const offset = (page - 1) * itemsPerPage;
-    let query = await db.raw(`
+export async function getMyInventoryProducts(user_id: string, page: number) {
+  const itemsPerPage = 4;
+  const offset = (page - 1) * itemsPerPage;
+  let query = await db.raw(
+    `
         select p.*, u.username as price_owner_username, count(*) over() as total_count
         from products p
         left join users u on p.price_owner_id = u.user_id
         where p.seller_id = ? and p.end_time < now() and p.price_owner_id is null
         order by p.created_at desc
         limit ? offset ?
-        `, [user_id, itemsPerPage, offset])
-    let results = await query.rows;
-    let numberOfPages = results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
-    if (results){
-        return {
-            data: results,
-            numberOfPages: numberOfPages,
-            quantity: results.length > 0 ? results[0].total_count : 0
-        }
-    }
-    return null;
+        `,
+    [user_id, itemsPerPage, offset]
+  );
+  let results = await query.rows;
+  let numberOfPages =
+    results.length > 0 ? Math.ceil(results[0].total_count / itemsPerPage) : 0;
+  if (results) {
+    return {
+      data: results,
+      numberOfPages: numberOfPages,
+      quantity: results.length > 0 ? results[0].total_count : 0,
+    };
+  }
+  return null;
 }
 
-export async function getProductDetail(product_id: string, product_slug: string) {
-    // Check slug matches
-    let queryName = await db.raw(`
+export async function getProductDetail(
+  product_id: string,
+  product_slug: string
+) {
+  // Check slug matches
+  let queryName = await db.raw(
+    `
         SELECT product_name
         FROM products
         WHERE product_id = ?
-    `, [product_id]);
-    const productName = await queryName.rows[0]?.product_name;
-    console.log ("Backend - Product name from DB:", productName);
-    const generatedSlug = slugify(productName || "");
-    console.log ("Backend - Generated slug:", generatedSlug, " vs Frontend slug: ", product_slug);
-    if (generatedSlug !== product_slug){
-        return null;
-    }
+    `,
+    [product_id]
+  );
+  const productName = await queryName.rows[0]?.product_name;
+  console.log("Backend - Product name from DB:", productName);
+  const generatedSlug = slugify(productName || "");
+  console.log(
+    "Backend - Generated slug:",
+    generatedSlug,
+    " vs Frontend slug: ",
+    product_slug
+  );
+  if (generatedSlug !== product_slug) {
+    return null;
+  }
 
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
             u1.rating AS price_owner_rating,
@@ -270,32 +319,40 @@ export async function getProductDetail(product_id: string, product_slug: string)
         LEFT JOIN users u1 ON p.price_owner_id = u1.user_id
         LEFT JOIN users u2 on p.seller_id = u2.user_id
         WHERE p.product_id = ?
-    `, [product_id]);
-    let result = await query.rows[0];
+    `,
+    [product_id]
+  );
+  let result = await query.rows[0];
 
+  return result;
+}
 
+export async function postNewProduct(productData: any) {
+  try {
+    console.log("Inserting product data:", productData);
+    const result = await db("products").insert(productData);
+    console.log("Insert result:", result);
     return result;
-
+  } catch (e) {
+    console.error("Error inserting new product: ", e);
+    throw e; // Re-throw to let controller handle the error
+  }
 }
 
-export async function postNewProduct (productData: any) {
-    try {
-        console.log("Inserting product data:", productData);
-        const result = await db('products').insert(productData);
-        console.log("Insert result:", result);
-        return result;
-    } catch (e) {
-        console.error("Error inserting new product: ", e);
-        throw e; // Re-throw to let controller handle the error
-    }
-}
-
-export async function searchProducts({query, page, limit} : {query: string, page: number, limit: number}) {
-
-    const offset = (page - 1) * limit;
-    const formatQuery = query.trim();
-    console.log ("Formatted Search Query:", formatQuery, ":");
-    let productsQuery = await db.raw(`
+export async function searchProducts({
+  query,
+  page,
+  limit,
+}: {
+  query: string;
+  page: number;
+  limit: number;
+}) {
+  const offset = (page - 1) * limit;
+  const formatQuery = query.trim();
+  console.log("Formatted Search Query:", formatQuery, ":");
+  let productsQuery = await db.raw(
+    `
         SELECT 
             p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
             FROM products p
@@ -303,19 +360,25 @@ export async function searchProducts({query, page, limit} : {query: string, page
         WHERE fts @@ websearch_to_tsquery('english', remove_accents(?))
         ORDER BY p.product_id DESC
         LIMIT ? OFFSET ?
-    `, [formatQuery, limit, offset])
+    `,
+    [formatQuery, limit, offset]
+  );
 
-    let results = await productsQuery.rows;
-    return {
-        data: results,
-        numberOfPages: results.length > 0 ? Math.ceil(results[0].total_count / limit) : 0,
-        quantity: results.length > 0 ? results[0].total_count : 0
-    }
-
+  let results = await productsQuery.rows;
+  return {
+    data: results,
+    numberOfPages:
+      results.length > 0 ? Math.ceil(results[0].total_count / limit) : 0,
+    quantity: results.length > 0 ? results[0].total_count : 0,
+  };
 }
 
-export async function getLoveStatus(user_id: number | null, product_id: number) {
-    let query = await db.raw (`
+export async function getLoveStatus(
+  user_id: number | null,
+  product_id: number
+) {
+  let query = await db.raw(
+    `
             select count(*) as total, (exists (
                 select 1 
                 from love_products 
@@ -323,52 +386,74 @@ export async function getLoveStatus(user_id: number | null, product_id: number) 
             )) as is_loved
             from love_products
             where user_id = ? and product_id = ?
-        `, [user_id, product_id, user_id, product_id]);
-    let result = await query.rows[0];
+        `,
+    [user_id, product_id, user_id, product_id]
+  );
+  let result = await query.rows[0];
 
-    return {
-        total_loves: result.total,
-        is_loved: result.is_loved
-    };
-
+  return {
+    total_loves: result.total,
+    is_loved: result.is_loved,
+  };
 }
 
-export async function updateLoveStatus(user_id: number, product_id: number, love_status: boolean) {
-    // Check current status 
-    console.log ("Updating love status for user_id:", user_id, " product_id:", product_id, " to ", love_status);
-    const currentStatusQuery = await db.raw(`
+export async function updateLoveStatus(
+  user_id: number,
+  product_id: number,
+  love_status: boolean
+) {
+  // Check current status
+  console.log(
+    "Updating love status for user_id:",
+    user_id,
+    " product_id:",
+    product_id,
+    " to ",
+    love_status
+  );
+  const currentStatusQuery = await db.raw(
+    `
         select exists (
             select 1 
             from love_products 
             where user_id = ? and product_id = ?
         ) as is_loved
-    `, [user_id, product_id]);
-    const currentStatus = await currentStatusQuery.rows[0].is_loved;
-    if (love_status && !currentStatus){
-        // Add to love
-        await db('love_products').insert({
-            user_id: user_id,
-            product_id: product_id
-        });
-    }
-    else if (!love_status && currentStatus){
-        // Remove from love
-        await db('love_products')
-            .where({
-                user_id: user_id,
-                product_id: product_id
-            })
-            .del();
-    }
-    return;
+    `,
+    [user_id, product_id]
+  );
+  const currentStatus = await currentStatusQuery.rows[0].is_loved;
+  if (love_status && !currentStatus) {
+    // Add to love
+    await db("love_products").insert({
+      user_id: user_id,
+      product_id: product_id,
+    });
+  } else if (!love_status && currentStatus) {
+    // Remove from love
+    await db("love_products")
+      .where({
+        user_id: user_id,
+        product_id: product_id,
+      })
+      .del();
+  }
+  return;
 }
 
+export async function getProductQuestions({
+  product_id,
+  page,
+  limit,
+}: {
+  product_id: number;
+  page: number;
+  limit: number;
+}) {
+  const offset = (page - 1) * limit;
 
-export async function getProductQuestions({product_id, page, limit} : {product_id: number, page: number, limit: number}) {
-    const offset = (page - 1) * limit;
-
-    // limit is the limit of parent question, and result include all children of these parents
-    let query = await db.raw (`
+  // limit is the limit of parent question, and result include all children of these parents
+  let query = await db.raw(
+    `
         WITH ParentQuestions AS (
             SELECT pq.*, u.username, u.user_id
             FROM product_questions pq 
@@ -396,54 +481,79 @@ export async function getProductQuestions({product_id, page, limit} : {product_i
         ) res
         CROSS JOIN TotalCount tc
         ORDER BY res.created_at DESC;
-        `, [product_id, limit, offset, product_id]);
-    let allQuestions = await query.rows;
-    return {
-        data : allQuestions,
-        total_questions: allQuestions.length > 0 ? allQuestions[0].total_count : 0
-    }
+        `,
+    [product_id, limit, offset, product_id]
+  );
+  let allQuestions = await query.rows;
+  return {
+    data: allQuestions,
+    total_questions: allQuestions.length > 0 ? allQuestions[0].total_count : 0,
+  };
 }
 
-
-export async function postProductQuestion({product_id, user_id, content, question_parent_id} : {product_id: number, user_id: number, content: string, question_parent_id?: number | null}) {
-    const insertData: any = {
-        product_id: product_id,
-        user_id: user_id,
-        content: content,
-    };
-    if (question_parent_id){
-        insertData.question_parent_id = question_parent_id;
-    }
-    let result = await db('product_questions').insert(insertData).returning("*");
-    const newQuestions = await result[0];
-    let query = await db.raw (`
+export async function postProductQuestion({
+  product_id,
+  user_id,
+  content,
+  question_parent_id,
+}: {
+  product_id: number;
+  user_id: number;
+  content: string;
+  question_parent_id?: number | null;
+}) {
+  const insertData: any = {
+    product_id: product_id,
+    user_id: user_id,
+    content: content,
+  };
+  if (question_parent_id) {
+    insertData.question_parent_id = question_parent_id;
+  }
+  let result = await db("product_questions").insert(insertData).returning("*");
+  const newQuestions = await result[0];
+  let query = await db.raw(
+    `
         SELECT pq.*, u.username, u.user_id
         FROM product_questions pq
         LEFT JOIN users u ON pq.user_id = u.user_id
         WHERE pq.question_id = ?
-    `, [newQuestions.question_id]);
-    result = await query.rows[0];
-    return result;
+    `,
+    [newQuestions.question_id]
+  );
+  result = await query.rows[0];
+  return result;
 }
 
 export async function getUserInParentQuestion(question_parent_id: number) {
-    let query = await db.raw (`
+  let query = await db.raw(
+    `
         SELECT u.*
         FROM product_questions pq
         LEFT JOIN users u ON pq.user_id = u.user_id
         WHERE pq.question_id = ?
-    `, [question_parent_id]);
-    let result = await query.rows[0];
-    return result;
+    `,
+    [question_parent_id]
+  );
+  let result = await query.rows[0];
+  return result;
 }
 
+export async function getRelatedProducts({
+  category_id,
+  product_id,
+  limit,
+}: {
+  category_id?: number;
+  product_id?: number | null;
+  limit: number;
+}) {
+  if (!category_id) {
+    return null;
+  }
 
-export async function getRelatedProducts({category_id, product_id, limit} : {category_id?: number, product_id?: number | null, limit: number}) {
-    if (!category_id) {
-        return null;
-    }
-
-    const query = await db.raw(`
+  const query = await db.raw(
+    `
         SELECT 
             p.*,
             u.username AS price_owner_username
@@ -454,33 +564,146 @@ export async function getRelatedProducts({category_id, product_id, limit} : {cat
             AND p.is_removed = FALSE
         ORDER BY RANDOM()
         LIMIT ?
-    `, [category_id, product_id, limit]);
+    `,
+    [category_id, product_id, limit]
+  );
 
-    return query.rows;
+  return query.rows;
 }
 
-
-
-export async function updateProductDescription({product_id, seller_id, new_description} : {product_id: number, seller_id: string, new_description: string}) {
-    // Check if the product belongs to the seller
-    const productQuery = await db.raw(`
+export async function updateProductDescription({
+  product_id,
+  seller_id,
+  new_description,
+}: {
+  product_id: number;
+  seller_id: string;
+  new_description: string;
+}) {
+  // Check if the product belongs to the seller
+  const productQuery = await db.raw(
+    `
         SELECT *
         FROM products
         WHERE product_id = ? AND seller_id = ?
-    `, [product_id, seller_id]);
-    const product = await productQuery.rows[0];
-    if (!product) {
-        return {
-            status: "403",
-            message: "You are not authorized to update this product."
-        }
-    }
-    // Update description
-    await db('products')
-        .where({ product_id: product_id })
-        .update({ description: new_description });
+    `,
+    [product_id, seller_id]
+  );
+  const product = await productQuery.rows[0];
+  if (!product) {
     return {
-        status: "200",
-        message: "Product description updated successfully."
-    }
+      status: "403",
+      message: "You are not authorized to update this product.",
+    };
+  }
+  // Update description
+  await db("products")
+    .where({ product_id: product_id })
+    .update({ description: new_description });
+  return {
+    status: "200",
+    message: "Product description updated successfully.",
+  };
+}
+
+export const getProductWithOffsetLimit = async (
+  offset: number,
+  limit: number,
+  filter: any,
+  is_removed: boolean = false
+) => {
+  const q = db("products")
+    .select("*")
+    .orderBy("product_id", "asc")
+    .where("is_removed", is_removed)
+    .offset(offset)
+    .limit(limit);
+
+  if (filter?.creator) {
+    q.andWhereILike("seller_id", `%${filter.creator}%`);
+  }
+
+  // date range (filter by created_at)
+  if (filter?.dateFrom && filter?.dateTo) {
+    q.andWhereBetween("created_at", [
+      `${filter.dateFrom} 00:00:00`,
+      `${filter.dateTo} 23:59:59`,
+    ]);
+  } else if (filter?.dateFrom) {
+    q.andWhere("created_at", ">=", `${filter.dateFrom} 00:00:00`);
+  } else if (filter?.dateTo) {
+    q.andWhere("created_at", "<=", `${filter.dateTo} 23:59:59`);
+  }
+
+  if (filter?.search) {
+    q.andWhereRaw("fts @@ websearch_to_tsquery('english', remove_accents(?))", [
+      filter.search,
+    ]);
+  }
+
+  return q;
+};
+
+export const calTotalProducts = async (
+  filter: any = {},
+  is_removed: boolean = false
+) => {
+  const q = db("products").where("is_removed", is_removed).count("* as total");
+
+  // status = exact match (is_removed field)
+  if (filter?.status && filter.status !== "all") {
+    q.andWhere("is_removed", filter.status === "true");
+  }
+
+  if (filter?.creator) {
+    q.andWhereILike("seller_id", `%${filter.creator}%`);
+  }
+
+  // date range (filter by created_at)
+  if (filter?.dateFrom && filter?.dateTo) {
+    q.andWhereBetween("created_at", [
+      `${filter.dateFrom} 00:00:00`,
+      `${filter.dateTo} 23:59:59`,
+    ]);
+  } else if (filter?.dateFrom) {
+    q.andWhere("created_at", ">=", `${filter.dateFrom} 00:00:00`);
+  } else if (filter?.dateTo) {
+    q.andWhere("created_at", "<=", `${filter.dateTo} 23:59:59`);
+  }
+
+  if (filter?.search) {
+    q.andWhereRaw("fts @@ websearch_to_tsquery('english', remove_accents(?))", [
+      filter.search,
+    ]);
+  }
+
+  const result = await q;
+  return parseInt(result[0].total as string, 10);
+};
+
+export async function countProductsByCategories(
+  categoryIds: number[]
+): Promise<number> {
+  if (categoryIds.length === 0) return 0;
+  const query = await db.raw(
+    `SELECT COUNT(*) as count FROM products WHERE cat2_id = ANY(?)`,
+    [categoryIds]
+  );
+  return query.rows[0].count;
+}
+
+export async function deleteProductById(product_id: number) {
+  await db("products")
+    .where({ product_id: product_id })
+    .update({ is_removed: true });
+}
+
+export async function restoreProductById(product_id: number) {
+  await db("products")
+    .where({ product_id: product_id })
+    .update({ is_removed: false });
+}
+
+export async function destroyProductById(product_id: number) {
+  await db("products").where({ product_id: product_id }).del();
 }

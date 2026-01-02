@@ -1,38 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Pencil, Trash2 } from "lucide-react";
 import FilterBar from "@/components/admin/FilterBar";
 import Pagination from "@/components/admin/Pagination";
+import { Pencil, Trash2, RotateCcw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { formatToVN } from "@/utils/format_time";
+import type { CategoryItem } from "@/interface/category.interface";
 import { useFilters } from "@/hooks/useFilters";
+import { slugify } from "@/utils/make_slug";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "@/components/common/ConfirmDeleteButton";
 
-const LIMIT = 10;
+const LIMIT = 5;
 
-type ProductItem = {
-  product_id: number;
-  product_name: string;
-  is_removed: boolean;
-  seller_id: string;
-  creator_name?: string;
-  created_at: string;
-  edited_at?: string;
-};
-
-export default function ProductListPage() {
+export default function CategoryTrashPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [items, setItems] = useState<ProductItem[]>([]);
+  const [items, setItems] = useState<CategoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const {
+    statusFilter,
     creatorFilter,
     dateFrom,
     dateTo,
     search: searchFromUrl,
+    handleStatusFilterChange,
     handleCreatorFilterChange,
     handleDateFromChange,
     handleDateToChange,
@@ -40,6 +35,7 @@ export default function ProductListPage() {
     resetFilters,
   } = useFilters();
 
+  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
   const fetchItems = () => {
@@ -48,16 +44,16 @@ export default function ProductListPage() {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/product/list?page=${currentPage}&limit=${LIMIT}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${encodeURIComponent(
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
         searchFromUrl
       )}`,
       {
         credentials: "include",
         method: "POST",
+        body: JSON.stringify({ deleted: true }),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ is_removed: false }),
       }
     )
       .then((res) => res.json())
@@ -77,16 +73,16 @@ export default function ProductListPage() {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/product/number-of-products?creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${encodeURIComponent(
+      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
         searchFromUrl
       )}`,
       {
         credentials: "include",
         method: "POST",
+        body: JSON.stringify({ deleted: true }),
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ is_removed: false }),
       }
     )
       .then((res) => res.json())
@@ -109,26 +105,61 @@ export default function ProductListPage() {
     }
   }, [searchFromUrl]);
 
+  // Handler khi nhấn Enter trong search box
   const handleSearchSubmit = () => {
-    if (localSearch.trim() !== searchFromUrl) {
-      handleSearchChange(localSearch.trim());
+    const slugified = slugify(localSearch);
+    if (slugified !== searchFromUrl) {
+      // Slugify search term trước khi lưu vào URL, nhưng giữ nguyên localSearch
+      handleSearchChange(slugified);
     }
   };
 
   useEffect(() => {
     fetchTotal();
-  }, [creatorFilter, dateFrom, dateTo, searchFromUrl]);
+  }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
     fetchItems();
-  }, [currentPage, creatorFilter, dateFrom, dateTo, searchFromUrl]);
+  }, [
+    currentPage,
+    statusFilter,
+    creatorFilter,
+    dateFrom,
+    dateTo,
+    searchFromUrl,
+  ]);
+
+  const handleRestore = (id: number) => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/restore/${id}`,
+      {
+        credentials: "include",
+        method: "PATCH",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code === "success") {
+          toast.success(data.message || "Khôi phục danh mục thành công");
+          fetchItems();
+          fetchTotal();
+        } else {
+          toast.error(data.message || "Khôi phục danh mục thất bại");
+        }
+      });
+  };
+
+  // ================== SELECTION ==================
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const creatorOptions: string[] = useMemo(
     () =>
       Array.from(
         new Set(
           items
-            .map((i) => i.seller_id)
+            .map((i) => i.created_by)
             .filter((v) => v != null)
             .map(String)
             .filter((v) => v.trim() !== "")
@@ -137,17 +168,14 @@ export default function ProductListPage() {
     [items]
   );
 
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
+  // ================== CHECKBOX ==================
   const allChecked = useMemo(
-    () =>
-      items.length > 0 &&
-      items.every((i) => selectedIds.includes(i.product_id)),
+    () => items.length > 0 && items.every((i) => selectedIds.includes(i.id)),
     [items, selectedIds]
   );
 
   const toggleAll = () => {
-    const itemIds = items.map((i) => i.product_id);
+    const itemIds = items.map((i) => i.id);
     setSelectedIds((prev) => {
       if (allChecked) return prev.filter((id) => !itemIds.includes(id));
       const newSet = new Set([...prev, ...itemIds]);
@@ -161,31 +189,6 @@ export default function ProductListPage() {
     );
   };
 
-  const handleView = (id: number) => {
-    navigate(`/${import.meta.env.VITE_PATH_ADMIN}/product/detail/${id}`);
-  };
-
-  const handleDelete = (id: number) => {
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/product/delete/${id}`,
-      {
-        credentials: "include",
-        method: "PATCH",
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.code === "success") {
-          fetchItems();
-          fetchTotal();
-          toast.success("Xóa sản phẩm thành công");
-        } else {
-        }
-      });
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -197,11 +200,18 @@ export default function ProductListPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <h2 className="font-semibold text-2xl sm:text-3xl mb-5">
-        Quản lý sản phẩm
+        Thùng rác danh mục
       </h2>
 
       <FilterBar
         showStatusFilter
+        statusFilter={statusFilter}
+        setStatusFilter={handleStatusFilterChange}
+        statusOptions={[
+          { value: "all", label: "Trạng thái" },
+          { value: "active", label: "Hoạt động" },
+          { value: "inactive", label: "Dừng" },
+        ]}
         creatorFilter={creatorFilter}
         setCreatorFilter={handleCreatorFilterChange}
         creatorOptions={creatorOptions}
@@ -215,12 +225,9 @@ export default function ProductListPage() {
         onResetFilters={resetFilters}
         bulkActionOptions={[
           { value: "restore", label: "Khôi phục" },
-          { value: "delete", label: "Xóa" },
+          { value: "delete", label: "Xóa vĩnh viễn" },
         ]}
         onApplyBulkAction={(action) => console.log(action, selectedIds)}
-        onTrashClick={() =>
-          navigate(`/${import.meta.env.VITE_PATH_ADMIN}/product/trash`)
-        }
       />
 
       {/* Desktop Table View */}
@@ -243,11 +250,16 @@ export default function ProductListPage() {
                   />
                 </th>
                 <th className="px-4 py-4 text-center font-semibold text-gray-700">
-                  Tên sản phẩm
+                  Tên danh mục
                 </th>
-
+                <th className="px-4 py-4 text-center font-semibold text-gray-700">
+                  Trạng thái
+                </th>
                 <th className="px-4 py-4 text-center font-semibold text-gray-700">
                   Tạo bởi
+                </th>
+                <th className="px-4 py-4 text-center font-semibold text-gray-700">
+                  Cập nhật bởi
                 </th>
                 <th className="px-4 py-4 text-center font-semibold text-gray-700">
                   Hành động
@@ -256,48 +268,71 @@ export default function ProductListPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {items.map((item) => {
-                const checked = selectedIds.includes(item.product_id);
+                const checked = selectedIds.includes(item.id);
                 return (
-                  <tr key={item.product_id} className="hover:bg-gray-50">
+                  <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <input
                         type="checkbox"
                         checked={checked}
-                        onChange={() => toggleOne(item.product_id)}
+                        onChange={() => toggleOne(item.id)}
                         className="w-4 h-4"
                       />
                     </td>
                     <td className="px-4 py-4 font-medium text-gray-900 text-center">
-                      <span title={item.product_name}>
-                        {item.product_name.split(" ").length > 5
-                          ? item.product_name.split(" ").slice(0, 5).join(" ") +
-                            "..."
-                          : item.product_name}
+                      {item.name}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <span
+                        className={`inline-flex items-center justify-center px-3 py-1 rounded-md font-semibold min-w-[90px] ${
+                          item.status === "active"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-200 text-red-600"
+                        }`}
+                      >
+                        {item.status === "active" ? "Hoạt động" : "Dừng"}
                       </span>
                     </td>
-
                     <td className="px-4 py-4 text-center">
                       <div className="font-medium">
-                        {item.creator_name || "Không rõ"}
+                        {item.created_by || "Không rõ"}
                       </div>
                       <div className="text-gray-500 text-xs mt-1">
                         {formatToVN(item.created_at)}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
+                      <div className="font-medium">
+                        {item.updated_by || "Không rõ"}
+                      </div>
+                      <div className="text-gray-500 text-xs mt-1">
+                        {formatToVN(item.updated_at)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          className="cursor-pointer p-2 hover:bg-blue-50 text-blue-500 rounded-lg"
-                          onClick={() => handleView(item.product_id)}
+                          className=" cursor-pointer p-2 hover:bg-blue-50 text-blue-500 rounded-lg"
+                          onClick={() => {
+                            handleRestore(item.id);
+                          }}
                         >
-                          <Eye size={18} />
+                          <RotateCcw size={18} />
                         </button>
-                        <button
-                          onClick={() => handleDelete(item.product_id)}
-                          className="cursor-pointer p-2 hover:bg-red-50 text-red-500 rounded-lg"
+                        <ConfirmDeleteButton
+                          apiUrl={`${import.meta.env.VITE_API_URL}/${
+                            import.meta.env.VITE_PATH_ADMIN
+                          }/api/category/destroy/${item.id}`}
+                          onSuccess={(data) => {
+                            toast.success(data.message);
+                            fetchItems();
+                            fetchTotal();
+                          }}
+                          onError={(message) => toast.error(message)}
+                          className="p-2 hover:bg-red-50 text-red-500 rounded-lg"
                         >
                           <Trash2 size={18} />
-                        </button>
+                        </ConfirmDeleteButton>
                       </div>
                     </td>
                   </tr>
@@ -308,7 +343,7 @@ export default function ProductListPage() {
         </div>
         {items.length === 0 && (
           <div className="py-10 text-center text-gray-500">
-            Không có sản phẩm nào phù hợp bộ lọc
+            Không có danh mục nào trong thùng rác
           </div>
         )}
       </div>
@@ -321,10 +356,10 @@ export default function ProductListPage() {
           </div>
         )}
         {items.map((item) => {
-          const checked = selectedIds.includes(item.product_id);
+          const checked = selectedIds.includes(item.id);
           return (
             <div
-              key={item.product_id}
+              key={item.id}
               className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
             >
               <div className="flex items-start justify-between mb-3">
@@ -332,19 +367,22 @@ export default function ProductListPage() {
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={() => toggleOne(item.product_id)}
+                    onChange={() => toggleOne(item.id)}
                     className="w-4 h-4 mt-1"
                   />
                   <div>
-                    <h3
-                      className="font-semibold text-gray-900 text-lg"
-                      title={item.product_name}
-                    >
-                      {item.product_name.split(" ").length > 5
-                        ? item.product_name.split(" ").slice(0, 5).join(" ") +
-                          "..."
-                        : item.product_name}
+                    <h3 className="font-semibold text-gray-900 text-lg">
+                      {item.name}
                     </h3>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold mt-1 ${
+                        item.status === "active"
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-200 text-red-600"
+                      }`}
+                    >
+                      {item.status === "active" ? "Hoạt động" : "Dừng"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -353,7 +391,7 @@ export default function ProductListPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-500">Tạo bởi:</span>
                   <span className="font-medium text-right">
-                    {item.seller_id || "Không rõ"}
+                    {item.created_by || "Không rõ"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -363,29 +401,44 @@ export default function ProductListPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Chỉnh sửa:</span>
+                  <span className="text-gray-500">Cập nhật bởi:</span>
+                  <span className="font-medium text-right">
+                    {item.updated_by || "Không rõ"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Ngày cập nhật:</span>
                   <span className="text-gray-700 text-xs text-right">
-                    {/* {formatToVN(item.edited_at)} */}
+                    {formatToVN(item.updated_at)}
                   </span>
                 </div>
               </div>
 
               <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                 <button
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
-                  onClick={() => handleView(item.product_id)}
+                  className="cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+                  onClick={() => {
+                    handleRestore(item.id);
+                  }}
                 >
-                  <Eye size={16} />
-                  <span className="font-medium">Xem</span>
+                  <RotateCcw size={16} />
+                  <span className="font-medium">Khôi phục</span>
                 </button>
-
-                <button
-                  onClick={() => handleDelete(item.product_id)}
-                  className=" cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                <ConfirmDeleteButton
+                  apiUrl={`${import.meta.env.VITE_API_URL}/${
+                    import.meta.env.VITE_PATH_ADMIN
+                  }/api/category/${item.id}`}
+                  onSuccess={(data) => {
+                    toast.success(data.message);
+                    fetchItems();
+                    fetchTotal();
+                  }}
+                  onError={(message) => toast.error(message)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                 >
                   <Trash2 size={16} />
-                  <span className="font-medium">Xóa</span>
-                </button>
+                  <span className="font-medium">Xóa vĩnh viễn</span>
+                </ConfirmDeleteButton>
               </div>
             </div>
           );
@@ -393,7 +446,7 @@ export default function ProductListPage() {
 
         {items.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 py-10 text-center text-gray-500">
-            Không có sản phẩm nào phù hợp bộ lọc
+            Không có danh mục nào trong thùng rác
           </div>
         )}
       </div>

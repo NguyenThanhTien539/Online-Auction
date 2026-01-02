@@ -7,6 +7,7 @@ import { formatToVN } from "@/utils/format_time";
 import type { CategoryItem } from "@/interface/category.interface";
 import { useFilters } from "@/hooks/useFilters";
 import { slugify } from "@/utils/make_slug";
+import { toast } from "sonner";
 const LIMIT = 5;
 
 export default function CategoryList() {
@@ -34,6 +35,67 @@ export default function CategoryList() {
   // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
+  const fetchItems = () => {
+    setIsPageLoading(true);
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ deleted: false }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setItems(data.list);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setIsLoading(false);
+        setIsPageLoading(false);
+      });
+  };
+
+  const fetchTotal = () => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+        searchFromUrl
+      )}`,
+      {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ deleted: false }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const total = data.total as number;
+        setTotalPages(Math.ceil(total / LIMIT));
+        const newTotalPages = Math.ceil(total / LIMIT);
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setSearchParams((prev) => ({
+            ...Object.fromEntries(prev),
+            page: "1",
+          }));
+        }
+      });
+  };
+
   useEffect(() => {
     if (!searchFromUrl) {
       setLocalSearch("");
@@ -50,50 +112,11 @@ export default function CategoryList() {
   };
 
   useEffect(() => {
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/category/number-of-categories?status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
-        searchFromUrl
-      )}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const total = data.total as number;
-        setTotalPages(Math.ceil(total / LIMIT));
-        const newTotalPages = Math.ceil(total / LIMIT);
-        if (currentPage > newTotalPages && newTotalPages > 0) {
-          setSearchParams((prev) => ({
-            ...Object.fromEntries(prev),
-            page: "1",
-          }));
-        }
-      });
+    fetchTotal();
   }, [statusFilter, creatorFilter, dateFrom, dateTo, searchFromUrl]);
 
   useEffect(() => {
-    setIsPageLoading(true);
-
-    fetch(
-      `${import.meta.env.VITE_API_URL}/${
-        import.meta.env.VITE_PATH_ADMIN
-      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
-        searchFromUrl
-      )}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setItems(data.list);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      })
-      .catch(() => {
-        setItems([]);
-        setIsLoading(false);
-        setIsPageLoading(false);
-      });
+    fetchItems();
   }, [
     currentPage,
     statusFilter,
@@ -141,6 +164,28 @@ export default function CategoryList() {
     );
   };
 
+  const handleDelete = (id: number) => {
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/category/delete/${id}`,
+      {
+        credentials: "include",
+        method: "PATCH",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code === "success") {
+          toast.success(data.message || "Xóa danh mục thành công");
+          fetchItems();
+          fetchTotal();
+        } else {
+          toast.error(data.message || "Xóa danh mục thất bại");
+        }
+      });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -181,7 +226,12 @@ export default function CategoryList() {
           { value: "delete", label: "Xóa" },
         ]}
         onApplyBulkAction={(action) => console.log(action, selectedIds)}
-        onCreateNew={() => navigate("/admin/category/create")}
+        onCreateNew={() =>
+          navigate(`/${import.meta.env.VITE_PATH_ADMIN}/category/create`)
+        }
+        onTrashClick={() =>
+          navigate(`/${import.meta.env.VITE_PATH_ADMIN}/category/trash`)
+        }
       />
 
       {/* Desktop Table View */}
@@ -277,7 +327,10 @@ export default function CategoryList() {
                         >
                           <Pencil size={18} />
                         </button>
-                        <button className="p-2 hover:bg-red-50 text-red-500 rounded-lg">
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="cursor-pointer p-2 hover:bg-red-50 text-red-500 rounded-lg"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -375,7 +428,10 @@ export default function CategoryList() {
                   <Pencil size={16} />
                   <span className="font-medium">Sửa</span>
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors">
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className=" cursor-pointer flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                >
                   <Trash2 size={16} />
                   <span className="font-medium">Xóa</span>
                 </button>

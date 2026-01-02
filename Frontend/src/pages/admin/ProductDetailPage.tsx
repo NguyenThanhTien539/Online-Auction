@@ -1,43 +1,90 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { formatToVN } from "@/utils/format_time";
 
-export default function ProductDetailMock() {
+type ProductDetail = {
+  product_id: number;
+  product_name: string;
+  is_removed: boolean;
+  seller_id: string;
+  seller_name?: string;
+  step_price: number;
+  start_price: number;
+  current_price: number;
+  start_time: string;
+  end_time: string;
+  product_images: string;
+  description: string;
+  created_at: string;
+};
+
+export default function ProductDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const editorRef = useRef(null);
-  const value = "";
-  // ============================
-  // ⭐ DỮ LIỆU GIẢ
-  // ============================
-  const product = {
-    product_id: id || 1,
-    status: "active" as "active" | "inactive",
-    product_name: "iPhone 15 Pro Max 256GB",
-    seller_name: "Nguyễn Văn A",
-    step_price: 500_000,
-    start_price: 25_000_000,
-    start_time: "2025-01-12T09:15:00",
-    end_time: "2025-01-15T21:00:00",
-    product_img:
-      "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch_natural_titanium?wid=5120&hei=2880&fmt=jpeg&qlt=80&.v=1692925920079",
-    description: `
-      <h3>Mô tả sản phẩm</h3>
-      <p>iPhone 15 Pro Max phiên bản cao cấp với khung titanium, chip A17 Pro.</p>
-      <ul>
-        <li>Chip A17 Pro</li>
-        <li>Camera 48MP</li>
-        <li>Màn hình 6.7 inch OLED</li>
-        <li>Pin dung lượng lớn, hỗ trợ sạc nhanh</li>
-      </ul>
-    `,
-  };
 
-  const formatDateTime = (value: string) => {
-    if (!value) return "";
-    return new Date(value).toLocaleString("vi-VN");
-  };
+  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/${
+        import.meta.env.VITE_PATH_ADMIN
+      }/api/product/detail/${id}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code === "success") {
+          setProduct(data.product);
+        }
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="p-6">
+        <div className="text-center text-red-500">Không tìm thấy sản phẩm</div>
+      </div>
+    );
+  }
+
+  // Parse product_images - có thể là JSON array hoặc string
+  let productImages: string[] = [];
+  if (product.product_images) {
+    if (Array.isArray(product.product_images)) {
+      productImages = product.product_images;
+    } else if (typeof product.product_images === "string") {
+      try {
+        // Thử parse JSON nếu là string
+        const parsed = JSON.parse(product.product_images);
+        productImages = Array.isArray(parsed)
+          ? parsed
+          : [product.product_images];
+      } catch {
+        // Nếu không parse được, split by comma
+        productImages = product.product_images
+          .split(",")
+          .filter((img) => img.trim());
+      }
+    }
+  }
 
   return (
     <div className="p-6">
@@ -65,43 +112,6 @@ export default function ProductDetailMock() {
 
             <div className="space-y-2">
               <label
-                htmlFor="product_id"
-                className="mb-4 block text-sm font-medium text-gray-700"
-              >
-                ID sản phẩm
-              </label>
-              <input
-                id="product_id"
-                type="text"
-                value={product.product_id}
-                disabled
-                className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
-              />
-            </div>
-          </div>
-
-          {/* Hàng 2: Trạng thái + Seller */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label
-                htmlFor="status"
-                className="mb-4 block text-sm font-medium text-gray-700"
-              >
-                Trạng thái
-              </label>
-              <select
-                id="status"
-                value={product.status}
-                disabled
-                className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
-              >
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Tạm dừng</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label
                 htmlFor="seller"
                 className="mb-4 block text-sm font-medium text-gray-700"
               >
@@ -110,7 +120,7 @@ export default function ProductDetailMock() {
               <input
                 id="seller"
                 type="text"
-                value={product.seller_name}
+                value={product.seller_name || product.seller_id || "Không rõ"}
                 disabled
                 className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
               />
@@ -164,7 +174,7 @@ export default function ProductDetailMock() {
               <input
                 id="start_time"
                 type="text"
-                value={formatDateTime(product.start_time)}
+                value={formatToVN(product.start_time)}
                 disabled
                 className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
               />
@@ -180,7 +190,7 @@ export default function ProductDetailMock() {
               <input
                 id="end_time"
                 type="text"
-                value={formatDateTime(product.end_time)}
+                value={formatToVN(product.end_time)}
                 disabled
                 className="w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm outline-none cursor-default"
               />
@@ -192,22 +202,31 @@ export default function ProductDetailMock() {
             <label className="mb-4 block text-sm font-medium text-gray-700">
               Hình ảnh sản phẩm
             </label>
-            <div className="border rounded-2xl bg-gray-50 p-4 flex items-center justify-center">
-              {product.product_img ? (
-                <img
-                  src={product.product_img}
-                  alt={product.product_name}
-                  className="max-h-64 object-contain"
-                />
+            <div className="border rounded-2xl bg-gray-50 p-4">
+              {productImages.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {productImages.map((img, index) => (
+                    <img
+                      key={index}
+                      src={img.trim()}
+                      alt={`${product.product_name} - ${index + 1}`}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  ))}
+                </div>
               ) : (
-                <span className="text-sm text-gray-400">Không có hình ảnh</span>
+                <div className="flex items-center justify-center py-8">
+                  <span className="text-sm text-gray-400">
+                    Không có hình ảnh
+                  </span>
+                </div>
               )}
             </div>
           </div>
 
           <TinyMCEEditor
             editorRef={editorRef}
-            value={value}
+            value={product.description || ""}
             isReadOnly={true}
           />
 
