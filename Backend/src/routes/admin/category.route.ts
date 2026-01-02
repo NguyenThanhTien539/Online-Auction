@@ -8,13 +8,11 @@ route.post("/create", categoriesController.createPost);
 
 route.post("/number-of-categories", categoriesController.calTotalCategories);
 
-route.get("/list", categoriesController.list);
+route.post("/list", categoriesController.list);
 
 route.get("/edit/:id", categoriesController.edit);
 
 route.patch("/edit/:id", categoriesController.editPatch);
-
-route.get("/trash/list", categoriesController.trashList);
 
 route.patch("/delete/:id", categoriesController.deleteCategory);
 

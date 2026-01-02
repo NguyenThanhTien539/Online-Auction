@@ -44,10 +44,17 @@ export default function CategoryTrashPage() {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
-      }/api/category/trash/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
+      }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
         searchFromUrl
       )}`,
-      { credentials: "include" }
+      {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ deleted: true }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     )
       .then((res) => res.json())
       .then((data) => {

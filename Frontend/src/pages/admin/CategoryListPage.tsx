@@ -44,7 +44,14 @@ export default function CategoryList() {
       }/api/category/list?page=${currentPage}&limit=${LIMIT}&status=${statusFilter}&creator=${creatorFilter}&dateFrom=${dateFrom}&dateTo=${dateTo}&search=${slugify(
         searchFromUrl
       )}`,
-      { credentials: "include" }
+      {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ deleted: false }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     )
       .then((res) => res.json())
       .then((data) => {

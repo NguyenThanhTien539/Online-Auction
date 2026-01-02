@@ -66,6 +66,7 @@ export async function list(req: AccountRequest, res: Response) {
   const page = req.query.page ? Number(req.query.page) : 1;
   const limit = req.query.limit ? Number(req.query.limit) : 10;
   const filter = {};
+  const deleted = req.body.deleted || false;
   if (req.query.status) {
     Object.assign(filter, { status: req.query.status });
   }
@@ -84,7 +85,8 @@ export async function list(req: AccountRequest, res: Response) {
   const list = await categoriesModel.getCategoryWithOffsetLimit(
     (page - 1) * limit,
     limit,
-    filter
+    filter,
+    deleted
   );
   for (const category of list) {
     const detailedAccount = await accountModel.findAcountById(
@@ -128,57 +130,6 @@ export async function editPatch(req: Request, res: Response) {
     res.json({ code: "success", message: "Cập nhật thành công" });
   } catch (error) {
     res.json({ code: "error", message: "Có lỗi xảy ra ở đây" });
-  }
-}
-
-export async function trashList(req: Request, res: Response) {
-  try {
-    const deleted = true;
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
-    const filter = {};
-    if (req.query.status) {
-      Object.assign(filter, { status: req.query.status });
-    }
-    if (req.query.creator) {
-      Object.assign(filter, { creator: req.query.creator });
-    }
-    if (req.query.dateFrom) {
-      Object.assign(filter, { dateFrom: req.query.dateFrom });
-    }
-    if (req.query.dateTo) {
-      Object.assign(filter, { dateTo: req.query.dateTo });
-    }
-    if (req.query.search) {
-      Object.assign(filter, { search: req.query.search as string });
-    }
-    const list = await categoriesModel.getCategoryWithOffsetLimit(
-      (page - 1) * limit,
-      limit,
-      filter,
-      deleted
-    );
-    for (const category of list) {
-      const detailedAccount = await accountModel.findAcountById(
-        category.created_by
-      );
-      category.created_by = detailedAccount
-        ? detailedAccount.full_name
-        : "Không xác định";
-      const detailedAccountUpdated = await accountModel.findAcountById(
-        category.updated_by
-      );
-      category.updated_by = detailedAccountUpdated
-        ? detailedAccountUpdated.full_name
-        : "Không xác định";
-    }
-    res.json({
-      code: "success",
-      message: "Thành công",
-      list: list,
-    });
-  } catch (error) {
-    res.json({ code: "error", message: "Có lỗi xảy ra", list: [] });
   }
 }
 
