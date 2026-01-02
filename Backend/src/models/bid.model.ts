@@ -163,3 +163,18 @@ export async function getBidHistoryByProductId (product_id: number){
 }
 
 
+export async function checkRatingUser (user_id : number, valid_rating: number){
+
+    const query = await db.raw (`
+            select *
+            from users
+            where user_id = ?
+        `, [user_id]);
+    const result = await query.rows;
+    if (result[0].rating_count === 0) // Skip new user account with no rating
+        return true;
+    const user_rating = result[0].rating;
+    if (user_rating < valid_rating)
+        return false;
+    return true;
+}

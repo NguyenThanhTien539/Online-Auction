@@ -33,6 +33,16 @@ export async function playBid(req: Request, res: Response) {
         message: "Người bán không thể đặt giá sản phẩm của chính họ",
       });
     }
+
+    // Check rating of user 
+    const currentUserRating = await bidModels.checkRatingUser(user_id, 8);
+    if (!currentUserRating) {
+      return res.status(400).json({
+        status: "error",
+        message: "Người dùng không đủ điều kiện để đặt giá (rating < 8)",
+      });
+    }
+
     // Play bid
     await bidModels.playBid(user_id, product_id, max_price);
 

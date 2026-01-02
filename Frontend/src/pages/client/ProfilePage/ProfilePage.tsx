@@ -121,7 +121,7 @@ export default function ProfilePage() {
 
                 <div className="flex items-center bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
                   <Star className="w-5 h-5 text-yellow-500 fill-current mr-2" />
-                  <span className="font-bold text-yellow-700 mr-1">{userProfile.rating}</span>
+                  <span className="font-bold text-yellow-700 mr-1">{userProfile.rating.toFixed(1)}</span>
                   <span className="text-yellow-600">({userProfile.rating_count} đánh giá)</span>
                 </div>
               </div>
@@ -135,7 +135,7 @@ export default function ProfilePage() {
                   />
                 ))}
                 <span className="ml-3 text-gray-600 font-medium">
-                  {userProfile.rating} / 5.0
+                  {userProfile.rating.toFixed(1)} / 5.0
                 </span>
               </div>
 

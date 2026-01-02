@@ -33,6 +33,8 @@ import ListSearchProductPage from "@/pages/client/ListSearchProductPage";
 import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
 import EditProfilePage from "@/pages/client/ProfilePage/components/EditProfilePage";
 import SellerApplicationDetailPage from "@/pages/admin/SellerApplicationDetailPage";
+import RateUserPage from "@/pages/client/RateUserPage";
+import RateHistoryPage from "@/pages/client/ProfilePage/components/RateHistoryPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -98,6 +100,14 @@ const routers = createBrowserRouter([
       {
         path: "profile/change-password",
         element : <ChangePassword />
+      },
+      {
+        path: "rating/:username_id",
+        element : <RateUserPage />
+      },
+      {
+        path: "/profile/:username_id/rate",
+        element: <RateHistoryPage/>
       }
     ],
   },
