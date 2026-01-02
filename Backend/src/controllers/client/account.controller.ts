@@ -6,8 +6,14 @@ import * as VerifyModel from "../../models/verify.model.ts";
 import { generateOTP } from "../../helpers/generate.helper.ts";
 import { sendMail } from "../../helpers/mail.helper.ts";
 import dotenv from "dotenv";
+import { jwtDecode } from "jwt-decode";
 
 dotenv.config();
+
+type GoogleIdTokenPayload = {
+  email: string;
+  name: string;
+};
 
 // Hasing password function
 const SALT_ROUNDS = 10;
@@ -23,28 +29,27 @@ export async function comparePassword(
   return await bcrypt.compare(password, hashedPassword);
 }
 
+async function verifyCaptcha(token: string) {
+  try {
+    const secretKey = process.env.CAPTCHA_SECRET_KEY as string;
 
-async function verifyCaptcha(token: string){
-  try{
-      const secretKey = process.env.CAPTCHA_SECRET_KEY as string;
-
-      const response = await fetch ("https://www.google.com/recaptcha/api/siteverify", {
+    const response = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: `secret=${secretKey}&response=${token}`,
-      });
-      const data = await response.json();
-      console.log("Captcha verification data:", data);
-      return data;
-  }
-  catch (error) {
+      }
+    );
+    const data = await response.json();
+    console.log("Captcha verification data:", data);
+    return data;
+  } catch (error) {
     console.error("Error verifying CAPTCHA:", error);
     return null;
   }
- 
-
 }
 
 //  JWT token generation functions
@@ -209,11 +214,16 @@ export const registerVerifyPost = async (req: Request, res: Response) => {
 };
 
 export const loginPost = async (req: Request, res: Response) => {
-
   const captchaResponse = await verifyCaptcha(req.body.captchaToken);
 
-  if (!captchaResponse || (!captchaResponse as any).success || (captchaResponse as any).score < 0.5) {
-    res.status(404).json({ code: "error", message: "CAPTCHA verification failed" });
+  if (
+    !captchaResponse ||
+    (!captchaResponse as any).success ||
+    (captchaResponse as any).score < 0.5
+  ) {
+    res
+      .status(404)
+      .json({ code: "error", message: "CAPTCHA verification failed" });
     return;
   }
   const existedAccount = await AccountModel.findEmail(req.body.email);
@@ -348,10 +358,76 @@ export const resetPassword = async (req: Request, res: Response) => {
   });
 };
 
-
 export const logoutPost = async (_: Request, res: Response) => {
   res.clearCookie("accessToken");
-  res.json({ code: "success", message: "Đăng xuất thành công" , data : null});
+  res.json({ code: "success", message: "Đăng xuất thành công", data: null });
+};
+
+export const googleLoginPost = async (req: Request, res: Response) => {
+  try {
+    console.log("Google Login Request Body:", req.body);
+    const { credential } = req.body;
+    const infoUser = jwtDecode<GoogleIdTokenPayload>(credential);
+
+    const existedAccount = await AccountModel.findEmail(
+      (infoUser as any).email
+    );
+
+    if (existedAccount) {
+      const accessToken = generateAccessToken(
+        { user_id: existedAccount.user_id, role: existedAccount.role },
+        req.body.rememberMe
+      );
+
+      res.cookie("accessToken", accessToken, {
+        maxAge: req.body.rememberMe
+          ? 3 * 24 * 60 * 60 * 1000
+          : 24 * 60 * 60 * 1000, //3 days or 1 days
+        httpOnly: true,
+        secure: false, //https sets true and http sets false
+        sameSite: "lax", //allow send cookie between domains
+      });
+
+      res.json({
+        code: "success",
+        role: existedAccount.role,
+        message: "Chúc mừng bạn đã đến website của chúng tôi!",
+      });
+    } else {
+      const finalData: any = {
+        full_name: infoUser.name,
+        email: infoUser.email,
+        username: infoUser.name,
+        address: null, // Có thể cập nhật sau
+      };
+
+      await AccountModel.insertAccount(finalData);
+
+      const newAccount = await AccountModel.findEmail(infoUser.email);
+      const accessToken = generateAccessToken(
+        { user_id: newAccount.user_id, role: newAccount.role },
+        req.body.rememberMe
+      );
+
+      res.cookie("accessToken", accessToken, {
+        maxAge: req.body.rememberMe
+          ? 3 * 24 * 60 * 60 * 1000
+          : 24 * 60 * 60 * 1000, //3 days or 1 days
+        httpOnly: true,
+        secure: false, //https sets true and http sets false
+        sameSite: "lax", //allow send cookie between domains
+      });
+
+      res.json({
+        code: "success",
+        role: newAccount.role,
+        message: "Chúc mừng bạn đã đến website của chúng tôi!",
+      });
+    }
+  } catch (error) {
+    console.error("googleLoginPost error:", error);
+    res.status(500).json({ code: "error", message: "Internal server error" });
+  }
 };
 
 // [POST] /accounts/change-password

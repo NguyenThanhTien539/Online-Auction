@@ -1,6 +1,6 @@
 import * as accountController from "../../controllers/client/account.controller.ts";
 import * as accountValidate from "../../validates/client/account.validate.ts";
-import {verifyToken} from "../../middlewares/auth.middleware.ts";
+import { verifyToken } from "../../middlewares/auth.middleware.ts";
 import express from "express";
 const route = express.Router();
 
@@ -33,7 +33,9 @@ route.post(
 
 route.post("/login", accountValidate.loginPost, accountController.loginPost);
 
-route.post("/logout", verifyToken, accountController.logoutPost); 
+route.post("/google-login", accountController.googleLoginPost);
+
+route.post("/logout", verifyToken, accountController.logoutPost);
 
 // route.post("/refresh-token", accountController.refreshToken);
 
