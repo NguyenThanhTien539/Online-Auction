@@ -14,14 +14,14 @@ export async function getProductsPageList(req: Request, res: Response){
     const page = parseInt(req.query.page as string) || 1;
     const priceFilter = req.query.price as string || "";
     const timeFilter = req.query.time as string || "";
-    
+    const searchKeyword = req.query.search as string || "";
     
     // Validate cat2_id
     if (!cat2_id){
         return res.status(400).json({message: "cat2_id is required"});
     }
 
-    const result = await productsModel.getProductsPageList(parseInt(cat2_id), page, priceFilter, timeFilter);
+    const result = await productsModel.getProductsPageList(parseInt(cat2_id), page, priceFilter, timeFilter, searchKeyword);
 
     if (result === null){
         

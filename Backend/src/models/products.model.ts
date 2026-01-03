@@ -53,7 +53,8 @@ export async function getProductsPageList(
   cat2_id: number,
   page: number,
   priceFilter: string,
-  timeFilter: string
+  timeFilter: string,
+  searchKeyword: string
 ) {
   const itemsPerPage = 6;
   const offset = (page - 1) * itemsPerPage;
@@ -69,20 +70,36 @@ export async function getProductsPageList(
   } else if (timeFilter === "desc") {
     orderBy.push("p.end_time DESC");
   }
+  // Modify search keyword for full-text search
+
+  let searchCondition = "";
+  const bindings : any = [cat2_id]; 
+
+
+  if (searchKeyword && searchKeyword.trim() !== "") {
+
+    searchCondition = "AND p.fts @@ websearch_to_tsquery('english', remove_accents(?))";
+    bindings.push(searchKeyword);
+  }
+
+
+  bindings.push(itemsPerPage, offset);
+
 
   let query = await db.raw(
     `
-        SELECT 
-            p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
-            FROM products p
-        LEFT JOIN users u ON p.price_owner_id = u.user_id
-        WHERE p.cat2_id = ?
-        ORDER BY ${
-          orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"
-        }
-        LIMIT ? OFFSET ?
+      SELECT 
+          p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
+      FROM products p
+      LEFT JOIN users u ON p.price_owner_id = u.user_id
+      WHERE p.cat2_id = ? AND p.is_removed = false
+      ${searchCondition}  
+      ORDER BY ${
+        orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"
+      }
+      LIMIT ? OFFSET ?
     `,
-    [cat2_id, itemsPerPage, offset]
+    bindings
   );
 
   let results = await query.rows;
@@ -342,10 +359,6 @@ export async function searchProducts({
 }) {
   const offset = (page - 1) * limit;
   let formatQuery = query.trim();
-  // add & in each chareacter to perform AND search
-  // e.g. "smart phone" -> "s & m & a & r & t &   & p & h & o & n & e"
-  formatQuery = formatQuery.split(" ").join(" & ");
-  console.log("Formatted Search Query:", formatQuery, ":");
 
   let productsQuery = await db.raw(
     `
@@ -353,7 +366,7 @@ export async function searchProducts({
             p.*, u.username AS price_owner_username, count(*) OVER() AS total_count
             FROM products p
         LEFT JOIN users u ON p.price_owner_id = u.user_id
-        WHERE fts @@ to_tsquery('english', remove_accents(?))
+        WHERE fts @@ websearch_to_tsquery('english', remove_accents(?))
         ORDER BY p.product_id DESC
         LIMIT ? OFFSET ?
     `,

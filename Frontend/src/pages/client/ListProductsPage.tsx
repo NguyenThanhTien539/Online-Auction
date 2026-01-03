@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { slugify } from "@/utils/make_slug";
 import Loading from "@/components/common/Loading";
+import { Search } from "lucide-react";
 
 type Products = {
   product_id: number;
@@ -27,6 +28,7 @@ function ListProductsPage() {
   // 3 parameters for this page
   const [price, setFilterPrice] = useState(searchParams.get("price") || "");
   const [time, setFilterTime] = useState(searchParams.get("time") || "");
+  const [searchText, setSearchText] = useState(searchParams.get("search") || "");
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get("page")) || 1
   );
@@ -63,13 +65,15 @@ function ListProductsPage() {
         const cat2_id = searchParams.get("cat2_id");
         const priceFilter = searchParams.get("price");
         const timeFilter = searchParams.get("time");
+        const searchFilter = searchParams.get("search");
 
         setFilterPrice(priceFilter || "");
         setFilterTime(timeFilter || "");
+        setSearchText(searchFilter || "");
         const response = await fetch(
           `${
             import.meta.env.VITE_API_URL
-          }/api/products/page_list?cat2_id=${cat2_id}&page=${page}&price=${priceFilter}&time=${timeFilter}`
+          }/api/products/page_list?cat2_id=${cat2_id}&page=${page}&price=${priceFilter}&time=${timeFilter}&search=${searchFilter || ''}`
         );
         const data = await response.json();
 
@@ -134,6 +138,8 @@ function ListProductsPage() {
     const newUrl = new URLSearchParams(searchParams.toString());
     if (filTime) newUrl.set("time", filTime);
     if (filPrice) newUrl.set("price", filPrice);
+    if (searchText) newUrl.set("search", searchText);
+    else newUrl.delete("search");
     navigate(`/products?${newUrl.toString()}`);
   };
 
@@ -154,31 +160,55 @@ function ListProductsPage() {
           </div>
 
           {/* Filter Section */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <SelectComponent
-                items={filterPrice}
-                placeholder="Sắp xếp theo giá"
-                value={price}
-                setState={setFilterPrice}
-              />
-              <SelectComponent
-                items={filterTime}
-                placeholder="Sắp xếp theo thời gian"
-                value={time}
-                setState={setFilterTime}
-              />
-              <button
-                type="submit"
-                className="bg-gray-600 hover:bg-gray-700 w-[300px] cursor-pointer text-white px-4 rounded-lg font-sm transition-colors duration-200 shadow-sm"
-                onClick={handleSubmitFilter}
-              >
-                Áp dụng
-              </button>
+          <div className="flex flex-col gap-4">
+            {/* Search Input - Top Row */}
+            <div className="w-full max-w-md relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitFilter();
+              }}>
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-full outline-none focus:border-blue-500 focus:bg-white transition-all duration-200 text-sm"
+                />
+              </form>
             </div>
 
-            <div className="text-sm text-gray-500">
-              {quantity && <span>{quantity} sản phẩm</span>}
+            {/* Filters - Bottom Row */}
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="w-full sm:w-48">
+                  <SelectComponent
+                    items={filterPrice}
+                    placeholder="Sắp xếp theo giá"
+                    value={price}
+                    setState={setFilterPrice}
+                  />
+                </div>
+                <div className="w-full sm:w-56">
+                  <SelectComponent
+                    items={filterTime}
+                    placeholder="Sắp xếp theo thời gian"
+                    value={time}
+                    setState={setFilterTime}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-gray-600 hover:bg-gray-700 w-full sm:w-[140px] cursor-pointer text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 shadow-sm"
+                  onClick={handleSubmitFilter}
+                >
+                  Áp dụng
+                </button>
+              </div>
+
+              <div className="text-sm text-gray-500">
+                {quantity && <span>{quantity} sản phẩm</span>}
+              </div>
             </div>
           </div>
         </div>
