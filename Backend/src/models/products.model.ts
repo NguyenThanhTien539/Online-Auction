@@ -81,9 +81,9 @@ export async function getProductById(product_id: number) {
   let query = await db.raw(
     `
         SELECT 
-            p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
+            p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id, u1.avatar AS price_owner_avatar,
             u1.rating AS price_owner_rating,
-            u2.username AS seller_username, u2.user_id AS seller_id,
+            u2.username AS seller_username, u2.user_id AS seller_id, u2.avatar AS seller_avatar,
             u2.rating AS seller_rating
             FROM products p
         LEFT JOIN users u1 ON p.price_owner_id = u1.user_id

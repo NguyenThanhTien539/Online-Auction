@@ -6,7 +6,7 @@ type ProductType = {
 }
 import Loading from "@/components/common/Loading";
 
-export default function BidHistorySection({product} : {product?: ProductType | null}){
+export default function BidHistorySection({product, isSeller} : {product?: ProductType | null, isSeller?: boolean}) {
   const [bidHistory, setBidHistory] = useState<{
     bidding_id: number,
     user_id: number,

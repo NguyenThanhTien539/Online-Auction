@@ -41,6 +41,7 @@ type ProductType = {
   price_owner_id?: number;
   price_owner_username?: string;
   price_owner_rating?: number;
+  price_owner_avatar?: string;
 
   start_time: string;
   end_time: string;
@@ -339,11 +340,26 @@ function DetailProductPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+                  { isSeller ? (
+                    <Link to = {`/profile/${products.price_owner_username}_${products.price_owner_id}`}>
+                      {products?.price_owner_avatar ? (<img
+                        src={products.price_owner_avatar}
+                        alt={products.price_owner_username}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />)
+                      : (<div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                          {products.price_owner_username.charAt(0).toUpperCase()}
+                        </span>
+                      </div>)
+                    }
+                    </Link>
+                  ) :
+                    <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-lg">
                       {products.price_owner_username.charAt(0).toUpperCase()}
                     </span>
-                  </div>
+                  </div>}
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center">
                     <Award className="w-3 h-3 text-white" />
                   </div>
@@ -496,7 +512,7 @@ function TabSection({
           )}
           {activeTab === "bidHistory" && authUser && (
             <div className="bg-white py-2 px-2 rounded-lg">
-              <BidHistorySection product={products} />
+              <BidHistorySection product={products} isSeller = {isSeller}/>
             </div>
           )}
           {activeTab === "qa" && (
