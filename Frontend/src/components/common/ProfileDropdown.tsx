@@ -106,10 +106,10 @@ export default function ProfileDropdown({ menuItems }: ProfileDropdownProps) {
         { auth?.avatar ? (<img
               src={auth.avatar}
               alt="User Avatar"
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover border-2 border-blue-300 shadow-[0_0_15px_rgba(0,0,0,0.1)] shadow-blue-300"
             />
           ) :
-          <div className="w-10 h-10 rounded-full bg-linear-30 from-black via-blue-500 to-blue-300 flex items-center justify-center text-white font-semibold">
+          <div className="w-11 h-11 border-2 border-blue-300 rounded-full bg-linear-30 from-black via-blue-500 to-blue-300 flex items-center justify-center text-white font-semibold">
           {initials}
         </div>}
 

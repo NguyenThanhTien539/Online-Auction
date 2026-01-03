@@ -64,6 +64,11 @@ export default function ProfilePage() {
   }, []);
 
   const getRoleLabel = (role: string) => {
+    // If not owner and role is admin, display as seller to hide admin identity
+    if (!isOwner && role === 'admin') {
+      return 'Người bán';
+    }
+    
     switch(role) {
       case 'admin': return 'Quản trị viên';
       case 'seller': return 'Người bán';
@@ -73,10 +78,15 @@ export default function ProfilePage() {
   };
 
   const getRoleBadgeColor = (role: string) => {
+    // If not owner and role is admin, display as seller color to hide admin identity
+    if (!isOwner && role === 'admin') {
+      return 'bg-gradient-to-r from-yellow-300 to-yellow-500 text-white';
+    }
+    
     switch(role) {
-      case 'admin': return 'bg-gradient-to-r from-gray-600 to-gray-700 text-white';
-      case 'seller': return 'bg-gradient-to-r from-blue-500 to-blue-600 text-white';
-      case 'user': return 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white';
+      case 'admin': return 'bg-gradient-to-r from-rose-300 to-rose-500 text-white';
+      case 'seller': return 'bg-gradient-to-r from-yellow-300 to-yellow-500 text-white';
+      case 'user': return 'bg-gradient-to-r from-blue-300 to-blue-500 text-white';
       default: return 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
     }
   };
@@ -154,7 +164,7 @@ export default function ProfilePage() {
                 <div className="mt-6 flex justify-center md:justify-start">
                   <button
                     onClick={() => navigate('/profile/edit')}
-                    className="inline-flex items-center px-4 py-2 cursor-pointer bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-colors duration-200"
+                    className="inline-flex items-center px-4 py-2 cursor-pointer bg-blue-400 hover:bg-blue-300 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-colors duration-200"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Chỉnh sửa hồ sơ
@@ -227,9 +237,12 @@ export default function ProfilePage() {
                 <Award className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
                 <div>
                   <p className="text-sm text-gray-500">Vai trò</p>
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getRoleBadgeColor(userProfile.role)}`}>
-                    {getRoleLabel(userProfile.role)}
-                  </span>
+
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getRoleBadgeColor(userProfile.role)}`}>
+                      {getRoleLabel(userProfile.role)}
+                    </span>
+  
+
                 </div>
               </div>
             </div>
