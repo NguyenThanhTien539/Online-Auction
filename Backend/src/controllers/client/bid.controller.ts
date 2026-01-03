@@ -8,6 +8,52 @@ import * as productModels from "@/models/products.model.ts";
 
 
 
+export async function buyNowProduct(req: Request, res: Response) {
+  try{
+    const user_id = (req as any).user.user_id;
+    const product_id = req.body.product_id;
+    const buy_price = req.body.buy_price;
+    // check seller is not buyer
+    const isSeller = await bidModels.checkUserIsSeller(user_id, product_id);
+    if (isSeller){
+      return res.status(400).json({
+        status: "error",
+        message: "Người bán không thể mua sản phẩm của chính họ",
+      });
+    }
+
+    // check product is in buy now time
+    const isInBuyNowTime = await productModels.isProductInBiddingTime(product_id);
+    if (!isInBuyNowTime){
+      return res.status(400).json({
+        status: "error",
+        message: "Sản phẩm không trong thời gian mua ngay",
+      });
+    }
+
+    // process buy now
+    const order = await bidModels.buyNowProduct(user_id, product_id, buy_price);
+
+    const productInfo = await productModels.getProductById(product_id);
+    io.to(`bidding_room_${product_id}`).emit("new_bid", {
+      data: productInfo,
+    });
+    
+    return  res.status(200).json({
+      status: "success",
+      order_id: order.order_id,
+      end_time: order.end_time,
+    });
+  }
+  catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ khi mua ngay sản phẩm",
+    });
+  }
+}
+
 export async function handleNewUserPlayBid(req: Request, res: Response, next: Function) {
   try {
     const user_id = (req as any).user.user_id;
@@ -67,8 +113,17 @@ export async function playBid(req: Request, res: Response) {
       });
     }
 
-    // Play bid
-    await bidModels.playBid(user_id, product_id, max_price);
+
+    // Check if price >= buy now price
+    const isBuyNowExceeded = await bidModels.isBidExceedBuyNowPrice(product_id, max_price);
+    if (isBuyNowExceeded.result) {
+      // process buy now
+      await bidModels.buyNowProduct(user_id, product_id, isBuyNowExceeded.buy_now_price!);
+    }
+    else {
+      // Play bid
+      await bidModels.playBid(user_id, product_id, max_price);
+    }
 
     const productInfo = await productModels.getProductById(product_id);
     io.to(`bidding_room_${product_id}`).emit("new_bid", {

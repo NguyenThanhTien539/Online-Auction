@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { DateTime } from "luxon";
 import { useAuth } from "@/routes/ProtectedRouter";
 import PlayBidSection from "./components/PlayBidSection";
+import BuyNowSection from "./components/BuyNowSection";
 import BidHistorySection from "./components/BidHistorySection";
 import QASection from "./components/QASection";
 import ProductDescriptionSection from "./components/ProductDescriptionSection";
@@ -135,7 +136,7 @@ function DetailProductPage() {
       }, 1000);
       return () => clearInterval(interval);
     }
-  });
+  }, [products]);
 
   // Start time take day, month, year
 
@@ -168,7 +169,7 @@ function DetailProductPage() {
     } else if (hours >= 1) {
       result = `Còn ${Math.floor(hours)} giờ ${Math.floor(minutes)} phút`;
       setIsExpired(false);
-    } else if (minutes >= 0) {
+    } else if (minutes >= 0 && seconds >= 0) {
       result = `Còn ${Math.floor(minutes)} phút ${Math.floor(seconds)} giây`;
       setIsExpired(false);
     } else {
@@ -195,7 +196,7 @@ function DetailProductPage() {
   const maskName = (name: string) => {
     const len = name.length;
     const thirdLen = Math.floor(len / 3);
-    return name.substring(0, len - thirdLen) + "***";
+    return name.substring(0, len - thirdLen) + "*****";
   };
 
   return isLoading ? (
@@ -432,7 +433,17 @@ function DetailProductPage() {
             product_id={products?.product_id}
             current_price={products?.current_price}
             step_price={products?.step_price}
+            buy_now_price={products?.buy_now_price}
+          
           />
+          {products?.buy_now_price && (
+            <BuyNowSection
+              product_id={products?.product_id}
+              buy_now_price={products?.buy_now_price}
+              product_name={products?.product_name}
+
+            />
+          )}
         </div>
       )}
 

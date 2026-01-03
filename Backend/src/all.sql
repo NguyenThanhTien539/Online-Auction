@@ -34,6 +34,8 @@ select * FROM products WHERE fts @@ to_tsquery('english', 'dien  thoai' );
         LIMIT 100 OFFSET 0
 
 
-
 update products
-set bid_turns = 0 where bid_turns is null;
+set end_time = now() + interval '1 day'
+where product_id = 96;
+
+

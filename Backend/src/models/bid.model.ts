@@ -185,3 +185,66 @@ export async function checkRatingUser (user_id : number, valid_rating: number){
         return false;
     return true;
 }
+
+export async function isBidExceedBuyNowPrice (product_id: number, bid_price: number) {
+    const query = await db.raw (`
+            select buy_now_price
+            from products
+            where product_id = ?
+        `, [product_id]);
+    const result = await query.rows;
+    const buy_now_price = result[0].buy_now_price;
+    if (buy_now_price === null)
+        return { result: false, buy_now_price: null };
+    return {
+        result: bid_price >= buy_now_price,
+        buy_now_price: buy_now_price
+    }
+}
+
+export async function buyNowProduct (user_id: number, product_id : number, buy_price : number) {
+    // SET endtime = now(), current_price = buy_now_price, price_owner_id = user_id, bid_turns = bid_turns + 1
+    await db.raw(`
+        update products
+        set end_time = NOW(),
+            current_price = ?,
+            price_owner_id = ?,
+            bid_turns = COALESCE(bid_turns, 0) + 1
+        where product_id = ?
+    `, [buy_price, user_id, product_id]);
+
+    const isPriceOwner = await isCurrentPriceOwner(user_id, product_id);
+
+    if (isPriceOwner){
+        console.log(`Updating max_price for existing bid of user ${user_id}`);
+        //  just update max_price in bidding_history (no update timestamp)
+        await db.raw(`
+            update bidding_history
+            set max_price = ?, product_price = ?
+            where product_id = ? and user_id = ? and created_at = 
+            (select MAX(created_at) from bidding_history where product_id = ? and user_id = ?)
+        `, [buy_price, buy_price, product_id, user_id, product_id, user_id]);
+        
+    }
+    else {
+        // Insert new bid
+        await db.raw(`
+            insert into bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
+            values (?, ?, ?, ?, ?)
+        `, [user_id, product_id, buy_price, buy_price, user_id]);
+    }
+
+
+
+    // Create order for the user
+    const newOrder = await db.raw(`
+        insert into orders (user_id, product_id)
+        values (?, ?)
+        RETURNING order_id
+    `, [user_id, product_id]);
+    const order_id = newOrder.rows[0].order_id;
+    return {
+        order_id: order_id,
+        end_time: new Date().toISOString(),
+    }
+}

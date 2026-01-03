@@ -9,5 +9,5 @@ import * as bidController from "../../controllers/client/bid.controller.ts";
 
 route.post("/play", bidController.playBid);
 route.get("/history",  bidController.getBidHistoryByProductId);
-
+route.post("/buy_now", bidController.buyNowProduct);
 export default route;
