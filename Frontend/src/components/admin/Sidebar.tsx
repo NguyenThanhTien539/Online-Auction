@@ -1,13 +1,13 @@
 import {
-  FiClock,
-  FiGrid,
-  FiMap,
+  FiHome,
+  FiTag,
+  FiPackage,
   FiUsers,
+  FiFileText,
   FiUser,
   FiSettings,
   FiUserCheck,
   FiLogOut,
-  FiUserPlus,
 } from "react-icons/fi";
 import { NavLink, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -45,7 +45,7 @@ export default function Sidebar() {
           `${baseLinkClass} ${isActive ? activeClass : normalClass}`
         }
       >
-        <FiClock className="text-lg" />
+        <FiHome className="text-lg" />
         <span>Tổng quan</span>
       </NavLink>
 
@@ -55,7 +55,7 @@ export default function Sidebar() {
           `${baseLinkClass} ${isCategoryActive ? activeClass : normalClass}`
         }
       >
-        <FiGrid className="text-lg" />
+        <FiTag className="text-lg" />
         <span>Quản lý danh mục</span>
       </NavLink>
 
@@ -65,7 +65,7 @@ export default function Sidebar() {
           `${baseLinkClass} ${isActive ? activeClass : normalClass}`
         }
       >
-        <FiMap className="text-lg" />
+        <FiPackage className="text-lg" />
         <span>Quản lý sản phẩm</span>
       </NavLink>
 
@@ -85,31 +85,11 @@ export default function Sidebar() {
           `${baseLinkClass} ${isBidderFormActive ? activeClass : normalClass}`
         }
       >
-        <FiUserPlus className="text-lg" />
+        <FiFileText className="text-lg" />
         <span>Quản lý form đăng ký</span>
       </NavLink>
 
-      <NavLink
-        to={`/${import.meta.env.VITE_PATH_ADMIN}/contacts`}
-        className={({ isActive }) =>
-          `${baseLinkClass} ${isActive ? activeClass : normalClass}`
-        }
-      >
-        <FiUser className="text-lg" />
-        <span>Thông tin liên hệ</span>
-      </NavLink>
-
       <div className="pt-4 mt-4 border-t">
-        <NavLink
-          to={`/${import.meta.env.VITE_PATH_ADMIN}/settings`}
-          className={({ isActive }) =>
-            `${baseLinkClass} ${isActive ? activeClass : normalClass}`
-          }
-        >
-          <FiSettings className="text-lg" />
-          <span>Cài đặt chung</span>
-        </NavLink>
-
         <NavLink
           to={`/${import.meta.env.VITE_PATH_ADMIN}/profile`}
           className={({ isActive }) =>
@@ -125,6 +105,7 @@ export default function Sidebar() {
           onClick={() => {
             fetch(`${import.meta.env.VITE_API_URL}/accounts/logout`, {
               credentials: "include",
+              method: "POST",
             })
               .then((res) => res.json())
               .then((data) => {

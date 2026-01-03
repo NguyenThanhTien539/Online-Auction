@@ -28,6 +28,7 @@ import UserDetailPage from "@/pages/admin/UserDetailPage";
 import BidderFormDetailPage from "@/pages/admin/SellerApplicationDetailPage";
 import PostProductPage from "@/pages/client/ProfilePage/components/PostProductPage";
 import ProfilePage from "@/pages/client/ProfilePage/ProfilePage";
+import AdminProfilePage from "@/pages/admin/ProfilePage";
 import MyProductsPage from "@/pages/client/ProfilePage/components/MyProductsPage";
 import ListSearchProductPage from "@/pages/client/ListSearchProductPage";
 import RegisterSellerPage from "@/pages/client/ProfilePage/components/RegisterSellerPage";
@@ -100,16 +101,16 @@ const routers = createBrowserRouter([
       },
       {
         path: "profile/change-password",
-        element : <ChangePassword />
+        element: <ChangePassword />,
       },
       {
         path: "rating/:username_id",
-        element : <RateUserPage />
+        element: <RateUserPage />,
       },
       {
         path: "/profile/:username_id/rate",
-        element: <RateHistoryPage/>
-      }
+        element: <RateHistoryPage />,
+      },
     ],
   },
   {
@@ -198,6 +199,10 @@ const routers = createBrowserRouter([
       {
         path: "seller/application/detail/:id",
         element: <SellerApplicationDetailPage />,
+      },
+      {
+        path: "profile",
+        element: <AdminProfilePage />,
       },
     ],
   },

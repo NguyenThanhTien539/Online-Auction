@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext<any>(null);
 export type AuthType = {
@@ -33,12 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
   useEffect(() => {
-    console.log("User data fetched:");
-
     getUserData();
   }, []);
 
-  return <AuthContext.Provider value={{auth :user, setAuth: setUser}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ auth: user, setAuth: setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

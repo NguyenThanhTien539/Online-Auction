@@ -23,55 +23,48 @@ export async function editUserProfile(req: Request, res: Response) {
 
         const results = await profileModel.editUserProfile(data);
 
-        res.status(200).json({
-            status: "success",
-            message: "Hồ sơ người dùng đã được cập nhật thành công.",
-            data: results[0]
-        });
-    }
-    catch (e){
-        console.error("Error editing user profile:", e);
-        return res.status(500).json({
-            status: "error",
-            message: "Lỗi máy chủ khi cập nhật hồ sơ người dùng."
-        });
-    }
+    res.status(200).json({
+      status: "success",
+      message: "Hồ sơ người dùng đã được cập nhật thành công.",
+      data: results[0],
+    });
+  } catch (e) {
+    console.error("Error editing user profile:", e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ khi cập nhật hồ sơ người dùng.",
+    });
+  }
 }
 
-export async function getUserProfileDetail (req : Request, res : Response) {
-    try {
-        const username = req.query.username as string;
-        const user_id = req.query.user_id as string;
-        // To define is this the owner of the profile
-        const user = (req as any).user;
-        if (!username || !user_id){
-            return res.status(400).json({
-                status: "error",
-                message: "username và user_id là bắt buộc"
-            });
-        }
-        const profileDetail = await profileModel.getUserProfileDetail(
-            {
-                username: username,
-                user_id: parseInt(user_id),
-                current_user_id: user ? user.user_id : null
-            }
-        )
-        if (!profileDetail){
-            return res.status(404).json({
-                status: "error",
-                message: "Không tìm thấy hồ sơ người dùng"
-            });
-        }
-        console.log ("Profile Data: ", profileDetail);
-        return res.status(200).json({
-            status: "success",
-            data: profileDetail.data,
-            is_owner: profileDetail.is_owner
-        });
-
+export async function getUserProfileDetail(req: Request, res: Response) {
+  try {
+    const username = req.query.username as string;
+    const user_id = req.query.user_id as string;
+    // To define is this the owner of the profile
+    const user = (req as any).user;
+    if (!username || !user_id) {
+      return res.status(400).json({
+        status: "error",
+        message: "username và user_id là bắt buộc",
+      });
     }
-    catch (e){
-
+    const profileDetail = await profileModel.getUserProfileDetail({
+      username: username,
+      user_id: parseInt(user_id),
+      current_user_id: user ? user.user_id : null,
+    });
+    if (!profileDetail) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy hồ sơ người dùng",
+      });
     }
+    console.log("Profile Data: ", profileDetail);
+    return res.status(200).json({
+      status: "success",
+      data: profileDetail.data,
+      is_owner: profileDetail.is_owner,
+    });
+  } catch (e) {}
 }

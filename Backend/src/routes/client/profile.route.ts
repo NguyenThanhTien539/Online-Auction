@@ -8,4 +8,6 @@ const route = express.Router();
 
 route.patch("/edit", upload.single("avatar"), profileController.editUserProfile);
 route.get("/detail", justDecodeToken, profileController.getUserProfileDetail);
+
+
 export default route;

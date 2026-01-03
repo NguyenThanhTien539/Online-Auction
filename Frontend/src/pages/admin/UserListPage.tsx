@@ -33,17 +33,14 @@ export default function UserListPage() {
     resetFilters,
   } = useFilters();
 
-  // Local search state (giữ text gốc có dấu, không sync với slug từ URL)
   const [localSearch, setLocalSearch] = useState("");
 
-  // Chỉ clear local search khi reset filters (searchFromUrl = "")
   useEffect(() => {
     if (!search) {
       setLocalSearch("");
     }
   }, [search]);
 
-  // Handler khi nhấn Enter trong search box
   const handleSearchSubmit = () => {
     const slugified = slugify(localSearch);
     if (slugified !== search) {
@@ -153,70 +150,91 @@ export default function UserListPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {items.map((user) => {
-                  return (
-                    <tr
-                      key={user.user_id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-3 lg:px-4 py-3 lg:py-4">
-                        <div className="flex items-center gap-3">
-                          {user.avatar ? (
-                            <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg lg:rounded-xl overflow-hidden border border-gray-200 shrink-0">
-                              <img
-                                src={user.avatar}
-                                alt={user.full_name}
-                                className="h-full w-full object-cover"
-                              />
+                {isLoading
+                  ? // Loading skeleton for desktop
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-3 lg:px-4 py-3 lg:py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg lg:rounded-xl bg-gray-200"></div>
+                            <div className="h-4 bg-gray-200 rounded w-32"></div>
+                          </div>
+                        </td>
+                        <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                          <div className="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+                        </td>
+                        <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                          <div className="h-4 bg-gray-200 rounded w-20 mx-auto"></div>
+                        </td>
+                        <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                          <div className="h-8 w-8 bg-gray-200 rounded mx-auto"></div>
+                        </td>
+                      </tr>
+                    ))
+                  : items.map((user) => {
+                      return (
+                        <tr
+                          key={user.user_id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-3 lg:px-4 py-3 lg:py-4">
+                            <div className="flex items-center gap-3">
+                              {user.avatar ? (
+                                <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg lg:rounded-xl overflow-hidden border border-gray-200 shrink-0">
+                                  <img
+                                    src={user.avatar}
+                                    alt={user.full_name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg lg:rounded-xl bg-blue-500 text-white flex items-center justify-center font-bold text-sm lg:text-base shrink-0">
+                                  {getInitials(user.full_name)}
+                                </div>
+                              )}
+                              <span className="font-medium text-gray-900 text-sm lg:text-base">
+                                {user.full_name}
+                              </span>
                             </div>
-                          ) : (
-                            <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg lg:rounded-xl bg-blue-500 text-white flex items-center justify-center font-bold text-sm lg:text-base shrink-0">
-                              {getInitials(user.full_name)}
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
+                            <div className="max-w-[200px] mx-auto truncate">
+                              {user.email}
                             </div>
-                          )}
-                          <span className="font-medium text-gray-900 text-sm lg:text-base">
-                            {user.full_name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
-                        <div className="max-w-[200px] mx-auto truncate">
-                          {user.email}
-                        </div>
-                      </td>
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
-                        {user.role === "user"
-                          ? "Người dùng"
-                          : user.role === "seller"
-                          ? "Người bán"
-                          : user.role === "admin"
-                          ? "Quản trị viên"
-                          : user.role}
-                      </td>
+                          </td>
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center text-gray-700 text-sm lg:text-base">
+                            {user.role === "user"
+                              ? "Người dùng"
+                              : user.role === "seller"
+                              ? "Người bán"
+                              : user.role === "admin"
+                              ? "Quản trị viên"
+                              : user.role}
+                          </td>
 
-                      <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
-                        <div className="flex items-center justify-center gap-1 lg:gap-2">
-                          <button
-                            className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                            onClick={() =>
-                              navigate(`/admin/user/detail/${user.user_id}`)
-                            }
-                            title="Chỉnh sửa"
-                          >
-                            <Pencil
-                              size={16}
-                              className="lg:w-[18px] lg:h-[18px]"
-                            />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          <td className="px-3 lg:px-4 py-3 lg:py-4 text-center">
+                            <div className="flex items-center justify-center gap-1 lg:gap-2">
+                              <button
+                                className="p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                                onClick={() =>
+                                  navigate(`/admin/user/detail/${user.user_id}`)
+                                }
+                                title="Chỉnh sửa"
+                              >
+                                <Pencil
+                                  size={16}
+                                  className="lg:w-[18px] lg:h-[18px]"
+                                />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
               </tbody>
             </table>
           </div>
-          {items.length === 0 && (
+          {!isLoading && items.length === 0 && (
             <div className="py-8 lg:py-10 text-center text-gray-500 text-sm lg:text-base">
               Không có người dùng nào phù hợp bộ lọc
             </div>
@@ -225,74 +243,82 @@ export default function UserListPage() {
 
         {/* Tablet/Mobile Card View - Show on screens < 1280px */}
         <div className="mt-4 sm:mt-5 grid grid-row-1 sm:grid-row-2 gap-3 sm:gap-4 xl:hidden">
-          {items.map((user) => {
-            return (
-              <div
-                key={user.user_id}
-                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                  {user.avatar ? (
-                    <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 shrink-0">
-                      <img
-                        src={user.avatar}
-                        alt={user.full_name}
-                        className="h-full w-full object-cover"
-                      />
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            items.map((user) => {
+              return (
+                <div
+                  key={user.user_id}
+                  className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    {user.avatar ? (
+                      <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 shrink-0">
+                        <img
+                          src={user.avatar}
+                          alt={user.full_name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg sm:rounded-xl bg-blue-500 text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
+                        {getInitials(user.full_name)}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1">
+                        {user.full_name}
+                      </h3>
                     </div>
-                  ) : (
-                    <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-lg sm:rounded-xl bg-blue-500 text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
-                      {getInitials(user.full_name)}
+                  </div>
+
+                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm mb-3 sm:mb-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-gray-500 font-medium">Email:</span>
+                      <span className="font-medium text-gray-900 break-all">
+                        {user.email}
+                      </span>
                     </div>
-                  )}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1">
-                      {user.full_name}
-                    </h3>
+
+                    <div className="flex flex-col gap-1">
+                      <span className="text-gray-500 font-medium">
+                        Quyền người dùng:
+                      </span>
+                      <span className="font-medium text-gray-900">
+                        {user.role === "user"
+                          ? "Người dùng"
+                          : user.role === "seller"
+                          ? "Người bán"
+                          : user.role === "admin"
+                          ? "Quản trị viên"
+                          : user.role}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Buttons - Vertical on mobile, Horizontal on larger screens */}
+                  <div className="flex flex-col xs:flex-row gap-2 pt-3 sm:pt-4 border-t border-gray-100">
+                    <button
+                      className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                      onClick={() =>
+                        navigate(`/admin/user/detail/${user.user_id}`)
+                      }
+                    >
+                      <Pencil size={16} className="shrink-0" />
+                      <span className="font-medium text-xs sm:text-sm">
+                        Sửa
+                      </span>
+                    </button>
                   </div>
                 </div>
+              );
+            })
+          )}
 
-                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm mb-3 sm:mb-4">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-gray-500 font-medium">Email:</span>
-                    <span className="font-medium text-gray-900 break-all">
-                      {user.email}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-gray-500 font-medium">
-                      Quyền người dùng:
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {user.role === "user"
-                        ? "Người dùng"
-                        : user.role === "seller"
-                        ? "Người bán"
-                        : user.role === "admin"
-                        ? "Quản trị viên"
-                        : user.role}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Buttons - Vertical on mobile, Horizontal on larger screens */}
-                <div className="flex flex-col xs:flex-row gap-2 pt-3 sm:pt-4 border-t border-gray-100">
-                  <button
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-                    onClick={() =>
-                      navigate(`/admin/user/detail/${user.user_id}`)
-                    }
-                  >
-                    <Pencil size={16} className="shrink-0" />
-                    <span className="font-medium text-xs sm:text-sm">Sửa</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-
-          {items.length === 0 && (
+          {!isLoading && items.length === 0 && (
             <div className="col-span-full bg-white rounded-lg sm:rounded-xl border border-gray-200 py-8 sm:py-10 text-center text-gray-500 text-sm sm:text-base">
               Không có người dùng nào phù hợp bộ lọc
             </div>

@@ -375,7 +375,7 @@ export const googleLoginPost = async (req: Request, res: Response) => {
 
     if (existedAccount) {
       console.log("Existed Account:", existedAccount);
-      if (  existedAccount.password) {
+      if (existedAccount.password) {
         res.json({
           code: "error",
           message:
