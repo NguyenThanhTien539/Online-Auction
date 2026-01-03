@@ -4,15 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { Lock, Mail, LogIn, ShieldCheck, Eye, EyeOff } from "lucide-react";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import ReCAPTCHA from "react-google-recaptcha";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
 function AccountLogin() {
   const navigate = useNavigate();
   const [isCaptchaChecked, setIsCaptchaChecked] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
   const googleButtonRef = useRef<HTMLDivElement>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
     const validate = new JustValidate("#loginForm", { lockForm: false });
@@ -36,18 +37,10 @@ function AccountLogin() {
         const password = event.target.password.value;
         const rememberPassword = event.target.rememberPassword.checked;
 
-        if (!isCaptchaChecked) {
+        if (!isCaptchaChecked || !captchaToken) {
           toast.error("Vui lòng xác nhận bạn không phải robot!");
           return;
         }
-
-        if (!executeRecaptcha) {
-          toast.error("Đang tải reCAPTCHA, vui lòng thử lại!");
-          return;
-        }
-
-        // Lấy token từ reCAPTCHA v3
-        const captchaToken = await executeRecaptcha("login");
 
         const dataFinal = {
           email: email,
@@ -82,7 +75,7 @@ function AccountLogin() {
     return () => {
       validate.destroy();
     };
-  }, [isCaptchaChecked, executeRecaptcha]);
+  }, [isCaptchaChecked, captchaToken]);
 
   const handleSuccessGoogleLogin = async (credentialResponse: any) => {
     const { credential } = credentialResponse;
@@ -204,51 +197,25 @@ function AccountLogin() {
                 Quên mật khẩu?
               </span>
             </div>
-            {/* reCAPTCHA Custom Checkbox */}
-            <div
-              className={`border-2 rounded-xl p-3 cursor-pointer transition-all duration-200 ${
-                isCaptchaChecked
-                  ? "border-blue-500 bg-blue-50 shadow-md"
-                  : "border-gray-200 bg-gray-50 hover:border-blue-400 hover:bg-white"
-              }`}
-              onClick={() => setIsCaptchaChecked(!isCaptchaChecked)}
-            >
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={`w-6 h-6 border-2 rounded-md flex items-center justify-center transition-all ${
-                    isCaptchaChecked
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-300 bg-white"
-                  }`}
-                >
-                  {isCaptchaChecked && (
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex flex-col flex-1">
-                  <span className="text-xs font-semibold text-gray-700">
-                    Xác minh con người
-                  </span>
-                  <span className="text-[10px] text-gray-400">reCAPTCHA</span>
-                </div>
-                <img
-                  src="https://www.gstatic.com/recaptcha/api2/logo_48.png"
-                  alt="reCAPTCHA"
-                  className="w-8 h-8"
-                />
-              </div>
+            {/* Google reCAPTCHA v2 */}
+            <div className="flex justify-center py-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
+                onChange={(token) => {
+                  setIsCaptchaChecked(!!token);
+                  setCaptchaToken(token);
+                }}
+                onExpired={() => {
+                  setIsCaptchaChecked(false);
+                  setCaptchaToken(null);
+                }}
+                onErrored={() => {
+                  setIsCaptchaChecked(false);
+                  setCaptchaToken(null);
+                  toast.error("Lỗi khi tải reCAPTCHA, vui lòng thử lại!");
+                }}
+              />
             </div>
             {/* Submit Button */}
             <div className="pt-2">
