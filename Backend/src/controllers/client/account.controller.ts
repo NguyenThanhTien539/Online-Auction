@@ -29,9 +29,43 @@ export async function comparePassword(
   return await bcrypt.compare(password, hashedPassword);
 }
 
-async function verifyCaptcha(token: string) {
+// async function verifyCaptcha(token: string) {
+//   try {
+//     const secretKey = process.env.CAPTCHA_SECRET_KEY as string;
+
+//     const response = await fetch(
+//       "https://www.google.com/recaptcha/api/siteverify",
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: `secret=${secretKey}&response=${token}`,
+//       }
+//     );
+//     const data = await response.json();
+//     console.log("Captcha verification data:", data);
+//     return data;
+//   } catch (error) {
+//     console.error("Error verifying CAPTCHA:", error);
+//     return null;
+//   }
+// }
+
+export async function verifyCaptcha(token: string) {
   try {
-    const secretKey = process.env.CAPTCHA_SECRET_KEY as string;
+    const secretKey = process.env.CAPTCHA_SECRET_KEY;
+    
+    // Kiểm tra xem có key chưa, tránh lỗi ngớ ngẩn
+    if (!secretKey) {
+        console.error("Thiếu CAPTCHA_SECRET_KEY trong file .env");
+        return false;
+    }
+
+    const params = new URLSearchParams({
+      secret: secretKey,
+      response: token,
+    });
 
     const response = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
@@ -40,15 +74,21 @@ async function verifyCaptcha(token: string) {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: `secret=${secretKey}&response=${token}`,
+        body: params.toString(),
       }
     );
+
     const data = await response.json();
-    console.log("Captcha verification data:", data);
-    return data;
+    
+    // Log để debug xem Google trả về gì
+    // console.log("Google ReCaptcha Response:", data);
+
+    // Chỉ cần trả về true/false cho gọn
+    return (data as any).success === true; 
+
   } catch (error) {
-    console.error("Error verifying CAPTCHA:", error);
-    return null;
+    console.error("Lỗi verify CAPTCHA:", error);
+    return false; // Có lỗi thì coi như verify thất bại
   }
 }
 
@@ -216,16 +256,12 @@ export const registerVerifyPost = async (req: Request, res: Response) => {
 export const loginPost = async (req: Request, res: Response) => {
   const captchaResponse = await verifyCaptcha(req.body.captchaToken);
 
-  if (
-    !captchaResponse ||
-    (!captchaResponse as any).success ||
-    (captchaResponse as any).score < 0.5
-  ) {
-    res
-      .status(404)
-      .json({ code: "error", message: "CAPTCHA verification failed" });
+  if (!captchaResponse) {
+    res.json({ code: "error", message: "Captcha không hợp lệ" });
     return;
   }
+
+    
   const existedAccount = await AccountModel.findEmail(req.body.email);
   if (!existedAccount) {
     res.json({ code: "error", message: "Email chưa tồn tại trong hệ thống" });

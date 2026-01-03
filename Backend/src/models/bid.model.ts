@@ -68,10 +68,10 @@ export async function playBid (user_id: number, product_id: number, max_price: n
 
     if (isPriceOwner){
         console.log(`Updating max_price for existing bid of user ${user_id}`);
-        //  just update max_price in bidding_history
+        //  just update max_price in bidding_history (no update timestamp)
         await db.raw(`
             update bidding_history
-            set max_price = ?, created_at = now()
+            set max_price = ?
             where product_id = ? and user_id = ? and created_at = 
             (select MAX(created_at) from bidding_history where product_id = ? and user_id = ?)
         `, [max_price, product_id, user_id, product_id, user_id]);
