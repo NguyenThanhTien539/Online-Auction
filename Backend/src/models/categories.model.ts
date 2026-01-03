@@ -52,9 +52,14 @@ export const getAllCategoriesLv2 = async (catId: number, slug: string) => {
 };
 
 export const getCategoryLv2ById = async (cat2_id: number) => {
-  const result = await db.raw("select * from categories where id = ?", [
-    cat2_id,
-  ]);
+  const result = await db.raw(`
+      select c2.id as cat2_id, c2.name as cat2_name, c2.slug as cat2_slug, c1.id as cat1_id, c1.name as cat1_name, c1.slug as cat1_slug
+      from categories c2 
+      left join categories c1 on c2.parent_id = c1.id
+      where c2.id = ?
+    `,
+    [cat2_id]
+  )
   const data = result.rows[0];
   if (!data) {
     return null;

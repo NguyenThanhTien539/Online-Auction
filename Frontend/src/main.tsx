@@ -3,31 +3,32 @@ import { RouterProvider } from "react-router-dom";
 import routers from "./routes/AppRouter.tsx";
 import "@/assets/styles/global.css";
 import { Toaster } from "sonner";
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { BreadcrumbProvider } from "@/contexts/BreadcrumbContext";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <>
-
-    
     <GoogleReCaptchaProvider
       reCaptchaKey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
       scriptProps={{ async: true, defer: true, appendTo: 'head'}}
     >
-      <Toaster
-        richColors
-        closeButton
-        position="top-right"
-        toastOptions={{
-          style: {
-            fontSize: "14px",
-            padding: "8px 12px",
-            width: "auto",
-            height: "50px",
-            borderRadius: "8px",
-          },
-        }}
-      />
-      <RouterProvider router={routers} />
+      <BreadcrumbProvider>
+        <Toaster
+          richColors
+          closeButton
+          position="top-right"
+          toastOptions={{
+            style: {
+              fontSize: "14px",
+              padding: "8px 12px",
+              width: "auto",
+              height: "50px",
+              borderRadius: "8px",
+            },
+          }}
+        />
+        <RouterProvider router={routers} />
+      </BreadcrumbProvider>
     </GoogleReCaptchaProvider>
   </>
 );

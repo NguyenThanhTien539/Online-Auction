@@ -38,12 +38,15 @@ import CategoryTrashPage from "@/pages/admin/CategoryTrashPage";
 import ProductTrashPage from "@/pages/admin/ProductTrashPage";
 import RateUserPage from "@/pages/client/RateUserPage";
 import RateHistoryPage from "@/pages/client/ProfilePage/components/RateHistoryPage";
+import {BreadcrumbProvider} from "@/contexts/BreadcrumbContext";
 const routers = createBrowserRouter([
   {
     path: "/",
     element: (
       <AuthProvider>
-        <MainLayout />
+          <BreadcrumbProvider>
+            <MainLayout />
+          </BreadcrumbProvider>
       </AuthProvider>
     ),
     children: [

@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom"
 import {slugify} from "@/utils/make_slug"
 import Loading from "@/components/common/Loading";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 const getLevelCategoriesList = async(level : number, catId? : number, catSlug? : string) =>{
     
@@ -44,6 +45,7 @@ interface CategoryData {
 }
 function AllCategoriesPage({level} : {level : number}){
     const navigate = useNavigate();
+    const { setBreadcrumbs } = useBreadcrumb();
     const [subCategories, setSubCategories] =useState<CategoryData[]> ([]);
     const [isLoading, setLoading] = useState(true);
     const [cat1_name, setCat1_name] = useState("");
@@ -72,7 +74,21 @@ function AllCategoriesPage({level} : {level : number}){
             if(finalData){
                 setSubCategories(finalData.data);
                 if (level == 2 && finalData.cat1_name){
-                    setCat1_name(finalData.cat1_name);
+                    const cat1Name = finalData.cat1_name;
+                    setCat1_name(cat1Name);
+                    
+                    // Update breadcrumb for level 2
+                    setBreadcrumbs([
+                        { label: "Trang chủ", path: "/" },
+                        { label: "Danh mục", path: "/categories" },
+                        { label: cat1Name, path: null }
+                    ]);
+                } else if (level == 1) {
+                    // Update breadcrumb for level 1
+                    setBreadcrumbs([
+                        { label: "Trang chủ", path: "/" },
+                        { label: "Danh mục", path: null }
+                    ]);
                 }
                 console.log("Data for all subcategories",finalData);
                 setLoading(false);
@@ -102,7 +118,7 @@ function AllCategoriesPage({level} : {level : number}){
     return(
         isLoading ? <Loading></Loading> : <>
             {/* Clean background */}
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen ">
                 {/* Main content */}
                 <div className="container mx-auto px-4 py-8">
                     {/* Header section */}

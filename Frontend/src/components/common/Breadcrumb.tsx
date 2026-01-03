@@ -1,68 +1,56 @@
-import {Link, useLocation} from  "react-router-dom"
+import { Link, useLocation } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { SlashIcon } from "lucide-react"
-
-function formatSlug(slug: string) {
-  // loại bỏ id nếu có
-  const parts = slug.split("-");
-  if (!isNaN(Number(parts[parts.length - 1]))) parts.pop();
-  return parts.join(" "); // "dien thoai"
-}
+} from "@/components/ui/breadcrumb";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import { useEffect } from "react";
 
 function Breadcrumbs() {
+  const { breadcrumbs, setBreadcrumbs } = useBreadcrumb();
+  const location = useLocation();
 
-  const Location = useLocation();
-  const pathname = location.pathname.split("?")[0]; // No query
-  const pathSegments = pathname.split("/").filter(Boolean);
-  
+  // Tự động clear breadcrumb khi chuyển route
+  useEffect(() => {
+    setBreadcrumbs([]);
+  }, [location.pathname]);
 
+  // Không hiển thị gì nếu breadcrumbs rỗng
+  if (breadcrumbs.length === 0) return null;
 
-  return(
-    <div>
-      <Breadcrumb>
-        <BreadcrumbList>
+  return (
+    <div className="border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 pb-3 ">
+        <Breadcrumb>
+          <BreadcrumbList>
+            {breadcrumbs.map((item, index) => {
+              const isLast = index === breadcrumbs.length - 1;
 
-        {/* First Item: Home */}
-        {pathSegments.length > 0 ?
-          <>
-          <BreadcrumbItem>
-            <Link to = "/" className = "hover:text-gray-300 transition-all duration-100">Home</Link>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator/>
-          </>
-          : null
-        }
-    
-        {/* Dynamic Items */}
-        {pathSegments.map((item, index) => {
-          const path = "/" + pathSegments.slice(0, index + 1).join("/");
-          const isLast = index === pathSegments.length - 1;
-          const displayName = formatSlug(item);
-          return (
-            <BreadcrumbItem key={index}>
-                <Link to = {path}
-                 className = {`hover:text-gray-300 transition-all duration-100 `}>
-                    {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
-                </Link>
-                {!isLast ? <BreadcrumbSeparator/> : null}
-            </BreadcrumbItem>
-    
-          )
-        })}
-
-        </BreadcrumbList>
-      </Breadcrumb>
-
+              return (
+                <BreadcrumbItem key={index}>
+                  {item.path ? (
+                    // Link nếu có path
+                    <Link
+                      to={item.path}
+                      className="text-gray-500 hover:text-gray-300 font-bold transition-all duration-100 max-w-[500px] truncate"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    // Text thường nếu là trang hiện tại (path = null)
+                    <span className="text-gray-400 font-medium max-w-[500px] truncate">{item.label}</span>
+                  )}
+                  {!isLast ? <BreadcrumbSeparator /> : null}
+                </BreadcrumbItem>
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
     </div>
   );
-
 }
 
 export default Breadcrumbs;

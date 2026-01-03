@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { slugify } from "@/utils/make_slug";
 import Loading from "@/components/common/Loading";
 import { Search } from "lucide-react";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 
 type Products = {
   product_id: number;
@@ -20,10 +21,16 @@ type Products = {
   price_owner_username: string;
   bid_turns: string;
 };
+
+type Cat = {
+  cat_id: number;
+  cat_name: string;
+}
 function ListProductsPage() {
   usePreventBodyLock();
   const [searchParams, setSeachParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setBreadcrumbs } = useBreadcrumb();
 
   // 3 parameters for this page
   const [price, setFilterPrice] = useState(searchParams.get("price") || "");
@@ -37,10 +44,12 @@ function ListProductsPage() {
 
   const [products, setProducts] = useState<Products[]>();
   const [isLoading, setLoading] = useState(true);
-  const [nameCat2, setNameCat2] = useState("");
+  const [cat2, setCat2] = useState<Cat | null>(null);
+
+  
   useEffect(() => {
     const cat2_id = searchParams.get("cat2_id");
-    fetch(`http://localhost:5000/api/categories/cat2?cat2_id=${cat2_id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/categories/cat2?cat2_id=${cat2_id}`)
       .then((response) => {
         if (!response.ok) {
           toast.error("Có lỗi khi lấy tên danh mục");
@@ -49,7 +58,21 @@ function ListProductsPage() {
         return response.json();
       })
       .then((data) => {
-        setNameCat2(data.data.name);
+
+
+        setCat2 ({
+          cat_id: data.data.cat2_id,
+          cat_name: data.data.cat2_name,
+        })
+
+        
+        // Update breadcrumb
+        setBreadcrumbs([
+          { label: "Trang chủ", path: "/" },
+          { label: "Danh mục", path: "/categories" },
+          { label: data.data.cat1_name, path: `/categories/${slugify(data.data.cat1_name)}-${data.data.cat1_id}` },
+          { label: data.data.cat2_name, path: null },
+        ]);
       })
       .catch((error) => {
         toast.error(error.message || "Lỗi kết nối máy chủ");
@@ -152,7 +175,7 @@ function ListProductsPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-              {nameCat2}
+              {cat2?.cat_name}
             </h1>
             <p className="text-gray-600">
               Khám phá các sản phẩm đấu giá trong danh mục này

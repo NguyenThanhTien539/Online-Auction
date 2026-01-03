@@ -23,7 +23,8 @@ import {
 import useSocketBidding from "@/hooks/useSocketBidding";
 import PreviewImage from "./components/PreviewProductModal";
 import Loading from "@/components/common/Loading";
-
+import { slugify } from "@/utils/make_slug";
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 type ProductType = {
   product_id: number;
   product_name: string;
@@ -50,6 +51,8 @@ type ProductType = {
 
   cat2_id: number;
 };
+
+
 function DetailProductPage() {
   // Auth user useContext
   const { auth } = useAuth();
@@ -74,7 +77,7 @@ function DetailProductPage() {
   const [isExpired, setIsExpired] = useState(false);
 
   const [isLoading, setLoading] = useState(true);
-
+  const { setBreadcrumbs } = useBreadcrumb();
   // Initial loading data
   useEffect(() => {
     // Fetch product data from API
@@ -100,7 +103,39 @@ function DetailProductPage() {
       setLoading(false);
     }
     fetchProduct();
+    
   }, [slugid]);
+
+  useEffect (() => {
+    async function fetchBreadCrumbs() {
+      fetch(`${import.meta.env.VITE_API_URL}/api/categories/cat2?cat2_id=${products?.cat2_id}`)
+            .then((response) => {
+              if (!response.ok) {
+                toast.error("Có lỗi khi lấy tên danh mục");
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+          
+              
+              // Update breadcrumb
+              setBreadcrumbs([
+                { label: "Trang chủ", path: "/" },
+                { label: "Danh mục", path: "/categories" },
+                { label: data.data.cat1_name, path: `/categories/${slugify(data.data.cat1_name)}-${data.data.cat1_id}` },
+                { label: data.data.cat2_name, path: `/products?cat2_id=${data.data.cat2_id}`},
+                { label: products?.product_name || "Chi tiết sản phẩm", path: null },
+              ]);
+            })
+            .catch((error) => {
+              toast.error(error.message || "Lỗi kết nối máy chủ");
+            });
+    }
+    if (products){
+      fetchBreadCrumbs();
+    }
+  }, [products]);
   useEffect(() => {
     // Check if auth user is seller of this product
     if (auth && products) {
