@@ -32,7 +32,6 @@ export async function getUserProfileDetail(params: {
   const result = await db.raw(sql, [params.username, params.user_id]);
 
   const data = await result.rows[0];
-  console.log("Fetched user profile data: ", data);
   if (!data) {
     return null;
   }

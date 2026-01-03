@@ -1,8 +1,8 @@
 import db from "../config/database.config.ts";
 
-
 export async function fetchTopHighestPriceProducts(limit: number) {
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
             u1.rating AS price_owner_rating,
@@ -14,13 +14,16 @@ export async function fetchTopHighestPriceProducts(limit: number) {
         where p.is_removed = false
         ORDER BY p.current_price DESC
         LIMIT ? OFFSET 0
-    `, [limit]);
-    let result = await query.rows;
-    return result;
+    `,
+    [limit]
+  );
+  let result = await query.rows;
+  return result;
 }
 
 export async function fetchTopMostBidProducts(limit: number) {
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
             u1.rating AS price_owner_rating,
@@ -32,14 +35,16 @@ export async function fetchTopMostBidProducts(limit: number) {
         where p.is_removed = false
         ORDER BY p.bid_turns DESC
         LIMIT ? OFFSET 0
-    `, [limit]);
-    let result = await query.rows;
-    return result;
+    `,
+    [limit]
+  );
+  let result = await query.rows;
+  return result;
 }
 
-
 export async function fetchTopEndingSoonProducts(limit: number) {
-    let query = await db.raw(`
+  let query = await db.raw(
+    `
         SELECT 
             p.*, u1.username AS price_owner_username, u1.user_id AS price_owner_id,
             u1.rating AS price_owner_rating,
@@ -51,8 +56,9 @@ export async function fetchTopEndingSoonProducts(limit: number) {
         where p.is_removed = false and p.end_time > NOW()
         ORDER BY p.end_time ASC
         LIMIT ? OFFSET 0
-    `, [limit]);
-    let result = await query.rows;
-    console.log ("Ending Soon Products: ", result);
-    return result;
+    `,
+    [limit]
+  );
+  let result = await query.rows;
+  return result;
 }
