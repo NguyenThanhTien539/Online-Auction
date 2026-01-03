@@ -33,7 +33,7 @@ export async function fetchTopMostBidProducts(limit: number) {
         LEFT JOIN users u1 ON p.price_owner_id = u1.user_id
         LEFT JOIN users u2 on p.seller_id = u2.user_id
         where p.is_removed = false
-        ORDER BY p.bid_turns DESC
+        ORDER BY COALESCE(p.bid_turns, 0) DESC
         LIMIT ? OFFSET 0
     `,
     [limit]

@@ -114,10 +114,10 @@ export default function ProfileDropdown({ menuItems }: ProfileDropdownProps) {
         </div>}
 
         <div className="hidden md:flex flex-col text-left">
-          <span className="text-sm font-semibold text-gray-700">
+          <span className="text-sm font-semibold text-gray-700 max-w-[150px] truncate">
             {auth?.full_name || auth?.username}
           </span>
-          <span className="text-xs text-gray-500">{auth?.email}</span>
+          <span className="text-xs text-gray-500 max-w-[150px] truncate">{auth?.email}</span>
         </div>
 
         <ChevronDown

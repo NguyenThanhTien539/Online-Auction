@@ -72,8 +72,8 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         await db.raw(`
             update bidding_history
             set max_price = ?, created_at = now()
-            where product_id = ? and price_owner_id = ? and created_at = 
-            (select MAX(created_at) from bidding_history where product_id = ? and price_owner_id = ?)
+            where product_id = ? and user_id = ? and created_at = 
+            (select MAX(created_at) from bidding_history where product_id = ? and user_id = ?)
         `, [max_price, product_id, user_id, product_id, user_id]);
         return;
     }
@@ -94,7 +94,7 @@ export async function playBid (user_id: number, product_id: number, max_price: n
     //  Handle product_price update
     let newProductPrice = oldProductPrice
     let newPriceOwnerId = oldPriceOwnerId;
-    let bidTurns = 0;
+    
     // First bid
     if (oldMaxPrice === null){
         // get current_price 
@@ -106,7 +106,7 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         const currentPrice = await findCurrentPrice.rows[0].current_price;
         newProductPrice = Number(currentPrice);
         newPriceOwnerId = user_id;
-        bidTurns = 1;
+  
     }
     else{
         if (max_price <= oldMaxPrice){
@@ -121,8 +121,7 @@ export async function playBid (user_id: number, product_id: number, max_price: n
                 where product_id = ?
             `, [product_id]);
             const stepPrice = await findStepPrice.rows[0].step_price;
-            const oldBidTurns = await findStepPrice.rows[0].bid_turns;
-            bidTurns = Number(oldBidTurns) + 1;
+
             // Update bid_turns in products table
             newProductPrice = Number(oldMaxPrice) + Number(stepPrice);
             newPriceOwnerId = user_id;
@@ -136,6 +135,14 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         values (?, ?, ?, ?, ?)
     `, [user_id, product_id, max_price, newProductPrice, newPriceOwnerId]);
 
+    // Update bid_turns in products table
+    const bidTurnsQuery = await db.raw(`
+        select count(*) as bid_turns
+        from bidding_history
+        where product_id = ?
+    `, [product_id]);
+    const bidTurns = await bidTurnsQuery.rows[0].bid_turns;
+    console.log(`Total bid turns for product ${product_id} is ${bidTurns}`);
     // Update products table
     await db.raw(`
         update products

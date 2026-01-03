@@ -1,12 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {toast} from "sonner"
 import {NumericFormat} from "react-number-format";
-import { TrendingUp, AlertCircle, Zap } from "lucide-react";
+import { TrendingUp, AlertCircle, Zap, ChevronDown } from "lucide-react";
 import JustValidate from "just-validate";
 import { useNavigate } from "react-router-dom";
 export default function PlayBidSection({product_id, current_price, step_price} : {product_id?: number, current_price?: number, step_price?: number}){
   const [isSubmit, setIsSubmit] = useState (false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [bidValue, setBidValue] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    if (showSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSuggestions]);
+  
   useEffect (() => {
     const validate = new JustValidate ("#bidForm");
     validate.addField (
@@ -82,6 +103,21 @@ export default function PlayBidSection({product_id, current_price, step_price} :
 
   }, [product_id, current_price, step_price]);
 
+  // Generate suggested bid prices
+  const getSuggestedPrices = () => {
+    const minBid = (current_price ?? 0);
+    const multipliers = [1, 2, 3, 4, 5, 10, 12, 15, 17, 20, 25, 30, 35, 38, 40];
+    return multipliers.map(mult => ({
+      price: minBid + (step_price ?? 0) * mult,
+      multiplier: mult
+    }));
+  };
+
+  const handleSuggestionClick = (price: number) => {
+    setBidValue(price.toLocaleString('vi-VN'));
+    setShowSuggestions(false);
+  };
+
 
 
 
@@ -124,18 +160,62 @@ export default function PlayBidSection({product_id, current_price, step_price} :
               Nhập giá đấu của bạn
             </label>
             <div className="flex gap-3">
-              <div className="relative flex-1">
+              <div className="relative flex-1" ref={dropdownRef}>
                 <NumericFormat
                   name = "max_price"
                   id = "max_price"
+                  value={bidValue}
+                  onValueChange={(values) => setBidValue(values.formattedValue)}
                   thousandSeparator= "."
                   decimalSeparator= ","
                   placeholder="Ví dụ: 1.500.000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg pr-16"
+                  onFocus={() => setShowSuggestions(true)}
+                  autoComplete="off"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg pr-24"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
                   VNĐ
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestions(!showSuggestions)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${showSuggestions ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Suggestions Dropdown */}
+                {showSuggestions && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto scrollbar-hide">
+                    <div className="p-2">
+                      <div className="text-xs font-semibold text-gray-500 px-3 py-2">
+                        Gợi ý mức giá hợp lý
+                      </div>
+                      {getSuggestedPrices().map((item, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestionClick(item.price)}
+                          className="w-full text-left px-3 py-2.5 hover:bg-blue-50 rounded-md transition-colors flex items-center justify-between group"
+                        >
+                          <span className="font-semibold text-gray-800 group-hover:text-blue-600">
+                            {item.price.toLocaleString('vi-VN')} VNĐ
+                          </span>
+                          <div className="flex items-center gap-2">
+                            {item.multiplier === 1 && (
+                              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
+                                Tối thiểu
+                              </span>
+                            )}
+                            <span className="text-xs text-gray-500 font-medium">
+                              x{item.multiplier} bước giá
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <button
                 type="submit"

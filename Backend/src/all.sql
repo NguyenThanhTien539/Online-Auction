@@ -35,3 +35,5 @@ select * FROM products WHERE fts @@ to_tsquery('english', 'dien  thoai' );
 
 
 
+update products
+set bid_turns = 0 where bid_turns is null;

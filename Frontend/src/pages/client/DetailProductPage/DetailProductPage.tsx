@@ -440,7 +440,7 @@ function DetailProductPage() {
       <TabSection
         products={products}
         isSeller={isSeller}
-        isExpired={isExpired}
+
       />
 
       {/* Related Products */}
@@ -466,22 +466,18 @@ function DetailProductPage() {
 function TabSection({
   products,
   isSeller,
-  isExpired,
+
 }: {
   products?: ProductType;
   isSeller?: boolean;
-  isExpired?: boolean;
+
 }) {
   const authUser = useAuth();
   const [activeTab, setActiveTab] = useState<
     "description" | "bidHistory" | "qa"
   >("description");
 
-  useEffect(() => {
-    if (isExpired && activeTab === "bidHistory") {
-      setActiveTab("description");
-    }
-  }, [isExpired, activeTab]);
+
   return (
     <>
       {/* Tabs Section */}
@@ -498,7 +494,7 @@ function TabSection({
           >
             Mô tả sản phẩm
           </button>
-          {!isExpired && (
+          {(
             <button
               onClick={() => setActiveTab("bidHistory")}
               className={`px-6 py-3 font-medium transition-colors cursor-pointer ${

@@ -17,6 +17,14 @@ const httpServer = createServer(app); // Create HTTP server
 
 // Create Socket.io server
 export const io = new Server(httpServer, {
+
+  
+  pingInterval: 25000, // (Mặc định là 25000ms - 25s). Server sẽ gửi "ping" xuống client mỗi 25s.
+  pingTimeout: 20000,  // (Mặc định là 20000ms - 20s). Nếu sau 20s client không phản hồi, server sẽ đóng kết nối.
+  connectionStateRecovery: { // (Tính năng mới của Socket.io v4.6+)
+    maxDisconnectionDuration: 2 * 60 * 1000, // Cho phép phục hồi trạng thái trong 2 phút nếu mất mạng
+    skipMiddlewares: true,
+  },
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
