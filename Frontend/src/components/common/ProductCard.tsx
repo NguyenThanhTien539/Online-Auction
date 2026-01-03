@@ -96,8 +96,11 @@ function ProductCard({
   // Function to mask buyer name (hide half with ***)
   const maskName = (name: string) => {
     const len = name.length;
-    const thirdLen = Math.floor(len / 3);
-    return name.substring(0, len - thirdLen) + "***";
+    if (len >= 20){
+      return name.substring(0, 10) + "*****";
+    }
+    const thirdLen = Math.floor(len / 2);
+    return name.substring(0, len - thirdLen) + "*****";
   };
 
   const { ref, hasIntersected } = useIntersectionObserver();

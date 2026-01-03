@@ -52,8 +52,8 @@ export default function BidHistorySection({product, isSeller} : {product?: Produ
   // Function to mask buyer name (hide half with ***)
   const maskName = (name: string) => {
     const len = name.length;
-    const thirdLen = Math.floor(len / 3);
-    return name.substring(0, len - thirdLen) + '***';
+    const thirdLen = Math.floor(len / 2);
+    return name.substring(0, len - thirdLen) + "*****";
   };
 
 

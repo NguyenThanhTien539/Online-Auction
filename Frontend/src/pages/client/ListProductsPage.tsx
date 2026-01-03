@@ -54,7 +54,7 @@ function ListProductsPage() {
       .catch((error) => {
         toast.error(error.message || "Lỗi kết nối máy chủ");
       });
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     const getData = async () => {
