@@ -11,20 +11,18 @@ import BidHistorySection from "./components/BidHistorySection";
 import QASection from "./components/QASection";
 import ProductDescriptionSection from "./components/ProductDescriptionSection";
 import RelatedProductsSection from "./components/RelatedProductsSection";
+import ProductImageGallery from "./components/ProductImageGallery";
 import {
-  Eye,
   Clock,
   Calendar,
   User,
   Star,
   Award,
-  FileText,
   TrendingUp,
 } from "lucide-react";
 import useSocketBidding from "@/hooks/useSocketBidding";
 import PreviewImage from "./components/PreviewProductModal";
 import Loading from "@/components/common/Loading";
-import AddToLove from "@/components/common/AddToLove";
 
 type ProductType = {
   product_id: number;
@@ -47,6 +45,7 @@ type ProductType = {
   start_time: string;
   end_time: string;
   description: string;
+  auto_extended?: boolean;
 
   cat2_id: number;
 };
@@ -179,13 +178,8 @@ function DetailProductPage() {
     setTimeLeft(result);
   };
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
-
-  const handleImageClick = (index: number) => {
-    setCurrentImageIndex(index);
-  };
 
   const openImageModal = (index: number) => {
     setModalImageIndex(index);
@@ -210,59 +204,12 @@ function DetailProductPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] gap-8">
         {/* Main Image and Related Images */}
-        <div className="space-y-4 min-w-0">
-          {/* Main Image */}
-          <div className="flex justify-center relative min-w-0">
-            {products &&
-            products.product_images &&
-            products.product_images.length > 0 ? (
-              <img
-                src={products?.product_images[currentImageIndex]}
-                alt={products?.product_name}
-                loading="lazy"
-                className="w-full h-[600px] object-cover rounded-lg shadow-lg cursor-pointer"
-                onClick={() => openImageModal(currentImageIndex)}
-              />
-            ) : (
-              <div className="w-full h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
-                <FileText className="w-16 h-16 text-gray-400" />
-              </div>
-            )}
-            <div onClick={(e) => e.stopPropagation()}>
-              <AddToLove
-                product_id={products?.product_id || 0}
-                className="w-[100px] right-20 top-5"
-              ></AddToLove>
-            </div>
-            <div
-              className="absolute top-5 right-5 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 backdrop-blur-sm"
-              onClick={() => openImageModal(currentImageIndex)}
-              title="Xem chi tiết hình ảnh"
-            >
-              <Eye className="w-5 h-5 text-white" />
-            </div>
-          </div>
-
-          {/* Related Images - Horizontal Scroll */}
-          <div className="max-w-[80%] mx-auto">
-            <div className="flex overflow-x-auto space-x-2 pb-4 pt-2">
-              {products?.product_images?.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Image ${index + 1}`}
-                  loading="lazy"
-                  className={`w-28 h-20 object-cover rounded-lg shadow-md cursor-pointer transition-all duration-200 hover:scale-105 flex-shrink-0 ${
-                    index === currentImageIndex
-                      ? "ring-2 ring-blue-500"
-                      : "hover:ring-1 hover:ring-gray-300"
-                  }`}
-                  onClick={() => handleImageClick(index)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <ProductImageGallery
+          product_id={products?.product_id}
+          product_name={products?.product_name}
+          product_images={products?.product_images}
+          onOpenImageModal={openImageModal}
+        />
 
         {/* Product Details - Right Column */}
         <div className="space-y-4">
@@ -321,6 +268,16 @@ function DetailProductPage() {
                   <p className="text-lg font-bold text-red-600">{timeLeft}</p>
                 </div>
               </div>
+              {products?.auto_extended && (
+                <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-1.5 flex-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <p className="text-xs font-medium text-blue-700">
+                      Tự động gia hạn
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ProductType = {
@@ -13,17 +14,47 @@ type ProductType = {
 }
 
 export default function PreviewImage({images, name, modalImageIndex, setModalImageIndex, setImageModalOpen}: {images : string[], name: string, modalImageIndex: number, setModalImageIndex: any, setImageModalOpen: (isOpen: boolean) => void}) {
+    const [oldImageIndex, setOldImageIndex] = useState<number | null>(null);
+    const [oldImageAnimation, setOldImageAnimation] = useState("");
+    const [newImageAnimation, setNewImageAnimation] = useState("");
+    
+    const animateTransition = (newIndex: number, direction: "left" | "right") => {
+        // Set old image to fade out
+        setOldImageIndex(modalImageIndex);
+        setOldImageAnimation(direction === "right" ? "animate__animated animate__fadeOutLeft animate__faster" : "animate__animated animate__fadeOutRight animate__faster");
+        
+        // Set new image to fade in
+        setNewImageAnimation(direction === "right" ? "animate__animated animate__fadeInRight animate__faster" : "animate__animated animate__fadeInLeft animate__faster");
+        
+        setModalImageIndex(newIndex);
+        
+        // Clean up after animation
+        setTimeout(() => {
+            setOldImageIndex(null);
+            setOldImageAnimation("");
+            setNewImageAnimation("");
+        }, 600);
+    };
     
     const nextImage = () => {
         if (images) {
-        setModalImageIndex((prev : any) => (prev + 1) % images.length);
+            const newIndex = (modalImageIndex + 1) % images.length;
+            animateTransition(newIndex, "right");
         }
     };
 
     const prevImage = () => {
         if (images) {
-        setModalImageIndex((prev : any) => (prev - 1 + images.length) % images.length);
+            const newIndex = (modalImageIndex - 1 + images.length) % images.length;
+            animateTransition(newIndex, "left");
         }
+    };
+    
+    const handleThumbnailClick = (index: number) => {
+        if (index === modalImageIndex) return;
+        
+        const direction = index > modalImageIndex ? "right" : "left";
+        animateTransition(index, direction);
     };
     return(
         <>
@@ -46,11 +77,22 @@ export default function PreviewImage({images, name, modalImageIndex, setModalIma
             
             {/* Modal Body */}
             <div className="relative bg-white/30">
-              <div className="relative p-6 py-2">
+              <div className="relative p-6 py-2 min-h-[70vh] flex items-center justify-center">
+                {/* Old image fading out */}
+                {oldImageIndex !== null && (
+                  <img
+                    key={`old-${oldImageIndex}`}
+                    src={images[oldImageIndex]}
+                    alt={`${name} - Image ${oldImageIndex + 1}`}
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg ${oldImageAnimation}`}
+                  />
+                )}
+                {/* New image fading in */}
                 <img
+                  key={`current-${modalImageIndex}`}
                   src={images[modalImageIndex]}
                   alt={`${name} - Image ${modalImageIndex + 1}`}
-                  className="max-w-full max-h-[70vh] object-contain mx-auto rounded-lg shadow-lg"
+                  className={`max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg ${newImageAnimation}`}
                 />
                 
                 {/* Navigation Arrows */}
@@ -88,7 +130,7 @@ export default function PreviewImage({images, name, modalImageIndex, setModalIma
                             ? 'ring-2 ring-pink-500  ring-offset-2' 
                             : 'opacity-70 hover:opacity-100'
                         }`}
-                        onClick={() => setModalImageIndex(index)}
+                        onClick={() => handleThumbnailClick(index)}
                       />
                     ))}
                   </div>
