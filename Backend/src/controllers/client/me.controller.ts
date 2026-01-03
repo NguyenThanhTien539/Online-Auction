@@ -12,7 +12,8 @@ export function getMeInfo(req: AccountRequest, res: Response) {
       rating: req.user.rating,
       rating_count: req.user.rating_count,
       address: req.user.address,
-      date_of_birth: req.user.date_of_birth
+      date_of_birth: req.user.date_of_birth,
+      avatar: req.user.avatar
     },
   });
 }

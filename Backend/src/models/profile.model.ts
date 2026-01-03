@@ -9,6 +9,7 @@ export async function editUserProfile(data: any) {
       full_name: data.full_name,
       address: data.address,
       date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : null,
+      avatar: data.avatar,
     })
     .returning("*");
   return sql;

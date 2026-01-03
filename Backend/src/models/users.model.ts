@@ -79,7 +79,7 @@ export async function getUserRatingCount({user_id, username}: {user_id: number, 
 
 export async function getUserRatingHistory({user_id, username, offset, limit}: {user_id: number, username: string, offset: number, limit: number}) {
   const ratingHistoryQuery = await db.raw(`
-      select ur.*, rater.username as rater_username, rater.full_name as rater_full_name, count (*) over() as total_count
+      select ur.*, rater.username as rater_username, rater.full_name as rater_full_name, rater.avatar as rater_avatar, count (*) over() as total_count
       from user_rating ur
       left join users rater on ur.rater_id = rater.user_id
       left join users u on ur.user_id = u.user_id

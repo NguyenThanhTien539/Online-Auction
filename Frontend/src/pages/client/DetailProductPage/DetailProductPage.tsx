@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import { formatPrice, parsePrice } from '@/utils/format_price';
 import { NumericFormat } from "react-number-format";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { DateTime } from "luxon";
 import { useAuth } from "@/routes/ProtectedRouter";
@@ -33,6 +33,7 @@ type ProductType = {
   seller_id: number;
   seller_username: string;
   seller_rating: number;
+  seller_avatar?: string;
 
   current_price: number;
   step_price: number;
@@ -328,13 +329,20 @@ function DetailProductPage() {
               <User className="w-5 h-5 text-indigo-600" />
               <h4 className="text-lg font-semibold text-gray-900">Người bán</h4>
             </div>
-            <div className="flex items-center gap-3">
+            <Link to = {`/profile/${products?.seller_username}_${products?.seller_id}`} className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
+                { products?.seller_avatar ? (
+                    <img
+                      src={products.seller_avatar}
+                      alt={products.seller_username}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) :
+                  <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-lg">
                     {products?.seller_username?.charAt(0).toUpperCase()}
                   </span>
-                </div>
+                </div>}
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div className="flex-1">
@@ -359,7 +367,7 @@ function DetailProductPage() {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Highest Bidder Info */}

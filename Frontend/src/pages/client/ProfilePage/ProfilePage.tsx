@@ -24,6 +24,7 @@ interface UserProfile {
   date_of_birth: string;
   rating: number;
   rating_count: number;
+  avatar?: string;
 }
 
 export default function ProfilePage() {
@@ -101,12 +102,21 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
             {/* Avatar */}
             <div className="relative">
+              {userProfile.avatar ?
+              <div className="w-32 h-32 rounded-full overflow-hidden shadow-lg">
+                <img
+                  src={userProfile.avatar}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              :
               <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-gray-600 rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-4xl font-bold text-white">
                   {userProfile.full_name?.charAt(0).toUpperCase()}
                 </span>
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full border-4 border-white shadow-md"></div>
+              </div>}
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-400 rounded-full border-4 border-white shadow-md"></div>
             </div>
 
             {/* Profile Info */}

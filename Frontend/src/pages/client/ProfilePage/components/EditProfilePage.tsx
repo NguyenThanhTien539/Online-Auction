@@ -11,7 +11,8 @@ import {
   Calendar, 
   Save, 
   ArrowLeft, 
-  Edit3 
+  Edit3,
+  Camera
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,6 +22,7 @@ interface ProfileData {
   full_name: string;
   address: string;
   date_of_birth: string;
+  avatar?: string;  
 }
 
 export default function EditProfilePage() {
@@ -29,6 +31,8 @@ export default function EditProfilePage() {
   const {auth, setAuth} = useAuth();
   const [date, setDate] = useState<Date | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null); // Ensure form is initialized only once
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
   
   // Form state
   const [formData, setFormData] = useState<ProfileData | null>(null);
@@ -41,10 +45,14 @@ export default function EditProfilePage() {
             email: auth.email,
             full_name: auth.full_name,
             address: auth.address,
-            date_of_birth : auth.date_of_birth 
+            date_of_birth : auth.date_of_birth ,
+            avatar: auth.avatar
         });
         const parsedDate = auth.date_of_birth ? new Date(auth.date_of_birth) : null;
         setDate(parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : null);
+        if (auth.avatar) {
+          setAvatarPreview(auth.avatar);
+        }
         console.log ("Form data initialized:", formData);
     }
     }, [auth]);
@@ -73,23 +81,44 @@ export default function EditProfilePage() {
     })
   }, [formData]);
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Kích thước ảnh không được vượt quá 10MB");
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error("Vui lòng chọn file ảnh");
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (event : any) => {
     event.preventDefault();
     if (!isSubmitting) return; // Prevent multiple submissions
-    const formSubmit = {
-        username: event.target.username.value,
-        email: event.target.email.value,
-        full_name: event.target.full_name.value,
-        address: event.target.address.value,
-        date_of_birth: date ? date.toLocaleDateString('en-CA') : ''
+    
+    const formSubmitData = new FormData();
+    formSubmitData.append('username', event.target.username.value);
+    formSubmitData.append('email', event.target.email.value);
+    formSubmitData.append('full_name', event.target.full_name.value);
+    formSubmitData.append('address', event.target.address.value);
+    formSubmitData.append('date_of_birth', date ? date.toLocaleDateString('en-CA') : '');
+    if (avatarFile) {
+      formSubmitData.append('avatar', avatarFile);
     }
+    
     fetch (`${import.meta.env.VITE_API_URL}/api/profile/edit`, {
         method: "PATCH",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify (formSubmit)
+        body: formSubmitData
     })
     .then (res => { 
         if (!res.ok){
@@ -146,6 +175,41 @@ export default function EditProfilePage() {
           {/* Form Content */}
           <form id = "edit-profile-form" onSubmit = {handleSubmit} className="p-8">
             <div className="space-y-6">
+              {/* Avatar Upload */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                    {avatarPreview ? (
+                      <img 
+                        src={avatarPreview} 
+                        alt="Avatar preview" 
+                        defaultValue={formData.avatar}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                        <User className="w-16 h-16 text-gray-500" />
+                      </div>
+                    )}
+                  </div>
+                  <label 
+                    htmlFor="avatar-upload"
+                    className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full cursor-pointer shadow-lg transition-colors"
+                  >
+                    <Camera className="w-5 h-5" />
+                  </label>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mt-3">Click vào biểu tượng camera để thay đổi ảnh đại diện</p>
+                <p className="text-xs text-gray-400 mt-1">Định dạng: JPG, PNG. Tối đa 10MB</p>
+              </div>
+
               {/* Username */}
               <div>
                 <label htmlFor="#username" className="block text-sm font-medium text-gray-700 mb-2">

@@ -13,6 +13,7 @@ interface RatingItem {
   rater_id: number;
   rater_username: string;
   rater_full_name: string;
+  rater_avatar: string;
   rater_rating?: number;
   rater_rating_count?: number;
   total_count?: number;
@@ -169,9 +170,14 @@ export default function RatingHistoryPage() {
                   <div className="flex items-start gap-4 flex-1">
                     {/* Avatar */}
                     <Link to={`/profile/${rating.rater_username}_${rating.rater_id}`} className="w-14 h-14 bg-gradient-to-br from-blue-500 to-gray-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
-                      <span className="text-xl font-bold text-white">
+                      { rating.rater_avatar ? <img
+                        src={rating.rater_avatar}
+                        alt="Rater Avatar"
+                        className="w-14 h-14 rounded-full object-cover"
+                      /> :
+                        <span className="text-xl font-bold text-white">
                         {rating.rater_full_name?.charAt(0).toUpperCase()}
-                      </span>
+                      </span>}
                     </Link>
 
                     {/* Info */}
@@ -252,11 +258,16 @@ export default function RatingHistoryPage() {
               {/* Modal Body */}
               <div className="p-6 space-y-5">
                 {/* Rater Information */}
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+                <Link to = {`/profile/${selectedRating.rater_username}_${selectedRating.rater_id}`} className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-gray-600 rounded-full flex items-center justify-center shadow-sm">
-                    <span className="text-xl font-bold text-white">
+                    { selectedRating.rater_avatar ? <img
+                      src={selectedRating.rater_avatar}
+                      alt="Rater Avatar"
+                      className="w-14 h-14 rounded-full object-cover"
+                    /> :
+                      <span className="text-xl font-bold text-white">
                       {selectedRating.rater_full_name?.charAt(0).toUpperCase()}
-                    </span>
+                    </span>}
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">
@@ -264,7 +275,7 @@ export default function RatingHistoryPage() {
                     </h4>
                     <p className="text-sm text-gray-500">@{selectedRating.rater_username}</p>
                   </div>
-                </div>
+                </Link>
 
                 {/* Rating Type */}
                 <div className="flex justify-center py-2">

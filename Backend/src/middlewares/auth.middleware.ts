@@ -17,7 +17,7 @@ export async function verifyToken(
     token,
     process.env.JWT_SECRET as string
   ) as JwtPayload;
-  const account = await accountModel.findAcountById(decoded?.user_id);
+  const account = await accountModel.findAccountById(decoded?.user_id);
 
   if (!account) {
     return res.status(403).json({ message: "Invalid access token" });
@@ -54,7 +54,7 @@ export async function justDecodeToken(req: Request, _: Response, next: NextFunct
       token,
       process.env.JWT_SECRET as string
     ) as JwtPayload;
-    const account = await accountModel.findAcountById(decoded?.user_id);
+    const account = await accountModel.findAccountById(decoded?.user_id);
     if (account) {
       (req as any).user = account;
     }

@@ -32,3 +32,6 @@ select * FROM products WHERE fts @@ to_tsquery('english', 'dien  thoai' );
         --   orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"
         -- }
         LIMIT 100 OFFSET 0
+
+
+

@@ -103,9 +103,15 @@ export default function ProfileDropdown({ menuItems }: ProfileDropdownProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center cursor-pointer space-x-3 px-3 py-2 rounded-full hover:shadow-md transition-all duration-200 bg-white/90 hover:bg-white"
       >
-        <div className="w-10 h-10 rounded-full bg-linear-30 from-black via-blue-500 to-blue-300 flex items-center justify-center text-white font-semibold">
+        { auth?.avatar ? (<img
+              src={auth.avatar}
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) :
+          <div className="w-10 h-10 rounded-full bg-linear-30 from-black via-blue-500 to-blue-300 flex items-center justify-center text-white font-semibold">
           {initials}
-        </div>
+        </div>}
 
         <div className="hidden md:flex flex-col text-left">
           <span className="text-sm font-semibold text-gray-700">
