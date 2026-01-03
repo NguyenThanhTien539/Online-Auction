@@ -35,7 +35,7 @@ select * FROM products WHERE fts @@ to_tsquery('english', 'dien  thoai' );
 
 
 update products
-set end_time = now() + interval '1 day'
-where product_id = 96;
+set end_time = now() + interval '5 minutes'
+where product_id = 8;
 
-
+select * from products where product_id = 8

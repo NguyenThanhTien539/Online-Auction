@@ -1,7 +1,7 @@
 import { format } from "path";
 import db from "../config/database.config.ts";
 import { slugify } from "../helpers/slug.helper.ts";
-
+import { io } from "@/server.ts";
 export async function isProductInBiddingTime(product_id: number) {
   // Set products with end_time >= now()
   const resultQuery = await db.raw(
@@ -15,6 +15,53 @@ export async function isProductInBiddingTime(product_id: number) {
   const result = await resultQuery.rows[0];
 
   return result ? true : false;
+}
+
+export async function extendBiddingTimeIfNeeded(product_id: number) {
+  // Check product need to extend time
+  const productQuery = await db.raw(`
+        select *
+        from products
+        where auto_extended = true and product_id = ?
+    `,[product_id]);
+  
+  if (productQuery.rows.length === 0) {
+    return;
+  }
+  
+  const product = productQuery.rows[0];
+  
+  // Get extend time settings
+  const settingQuery = await db.raw(`
+        select extend_time, threshold_time from extend_bidding_time limit 1
+    `)
+  const setting = await settingQuery.rows[0];
+  if (!setting) {
+    return;
+  }
+  const extend_time = setting.extend_time; // in minutes
+  const threshold_time = setting.threshold_time; // in minutes
+  
+
+  const currentTime = new Date();
+  const endTime = new Date(product.end_time);
+  const timeDiff = (endTime.getTime() - currentTime.getTime()) / (1000 * 60); // in minutes
+  console.log ("Time difference: ", timeDiff);
+  if (timeDiff <= threshold_time) {
+    // Extend bidding time
+    const newEndTime = new Date(endTime.getTime() + extend_time * 60 * 1000);
+    await db("products")
+      .where({ product_id: product_id })
+      .update({ end_time: newEndTime });
+    
+    const productInfo = await getProductById(product_id);
+        io.to(`bidding_room_${product_id}`).emit("new_bid", {
+          data: productInfo,
+        });
+  }
+
+  return;
+
 }
 
 export async function getSellerOfProduct(product_id: number) {

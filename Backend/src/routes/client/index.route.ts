@@ -9,6 +9,7 @@ import meRoutes from "./me.route.ts";
 import bidRoutes from "./bid.route.ts";
 import userRotes from "./user.route.ts";
 import profileRoutes from "./profile.route.ts";
+import settingRoutes from "./setting.route.ts";
 import {verifyToken} from "../../middlewares/auth.middleware.ts";
 route.use("/", homeRoute);
 
@@ -25,5 +26,7 @@ route.use("/api/bid", verifyToken, bidRoutes);
 route.use("/api/profile", verifyToken, profileRoutes);
 
 route.use("/api/user", userRotes);
+
+route.use("/api/setting", settingRoutes);
 
 export default route;

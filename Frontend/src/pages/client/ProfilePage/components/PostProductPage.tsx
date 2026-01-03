@@ -19,6 +19,10 @@ type CatType = {
     id: number;
     name: string;
 }
+type ExtendSettingType = {
+    extend_time_minutes: number;
+    threshold_minutes: number;
+}
 function PostProductPage(){
     usePreventBodyLock ();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +34,7 @@ function PostProductPage(){
 
     const [catlv1, setCatlv1] = useState<CatType[]>();
     const [catlv2, setCatlv2] = useState<CatType[]>();
-
+    const [extendTime, setExtendTime] = useState<ExtendSettingType>(); // in minutes
 
 
 
@@ -55,6 +59,17 @@ function PostProductPage(){
         }
     }, [selectedCat1])
 
+    useEffect (() => {
+        fetch(`${import.meta.env.VITE_API_URL}/api/setting/auto_extend_time`)
+        .then (res => res.json())
+        .then (data => {
+            if (data.status === "success") {
+                setExtendTime(data.data);
+            } else {
+                toast.error("Lấy cài đặt gia hạn tự động thất bại!");
+            }
+        })
+    }, [])
     // Đồng bộ hidden inputs khi state thay đổi
     useEffect (() => {
         console.log ("Selected Cat1 changed: ", selectedCat1);
@@ -499,7 +514,7 @@ function PostProductPage(){
                                 id="autoExtend"
                             />
                             <label htmlFor="autoExtend" className="ml-2 text-sm font-medium text-gray-700">
-                                Tự động gia hạn đấu giá khi có người đặt giá trong 5 phút cuối
+                                Tự động gia hạn đấu giá thêm <span className = "font-bold underline">{extendTime?.extend_time_minutes}</span> phút khi có người đặt giá trong  <span className = "font-bold underline">{extendTime?.threshold_minutes}</span> phút cuối
                             </label>
                         </div>
 

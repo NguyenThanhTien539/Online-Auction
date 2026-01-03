@@ -72,6 +72,14 @@ export async function handleNewUserPlayBid(req: Request, res: Response, next: Fu
   }
 }
 
+export async function autoExtendBiddingTime(product_id : number) {
+  try {
+    await productModels.extendBiddingTimeIfNeeded(product_id);
+  }
+  catch (e){
+    console.error(e);
+  }
+}
 export async function playBid(req: Request, res: Response) {
   try {
     const user_id = (req as any).user.user_id;
@@ -122,6 +130,7 @@ export async function playBid(req: Request, res: Response) {
     }
     else {
       // Play bid
+      autoExtendBiddingTime(product_id);
       await bidModels.playBid(user_id, product_id, max_price);
     }
 
