@@ -60,8 +60,8 @@ export default function ProfilePage() {
       console.error("Can't connect to backend:", error);
       navigate("/");
     })
-
-  }, []);
+    
+  }, [params]);
 
   const getRoleLabel = (role: string) => {
     // If not owner and role is admin, display as seller to hide admin identity
