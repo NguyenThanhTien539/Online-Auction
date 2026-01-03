@@ -4,10 +4,10 @@ export async function editUserProfile(data: any) {
   const sql = await db("users")
     .where({ user_id: data.user_id })
     .update({
-      username: data.username,
-      email: data.email,
-      full_name: data.full_name,
-      address: data.address,
+      username: data.username || null,
+      email: data.email || null,
+      full_name: data.full_name || null,
+      address: data.address || null,
       date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : null,
     })
     .returning("*");
