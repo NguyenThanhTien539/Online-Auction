@@ -297,14 +297,7 @@ export async function getProductDetail(
     [product_id]
   );
   const productName = await queryName.rows[0]?.product_name;
-  console.log("Backend - Product name from DB:", productName);
   const generatedSlug = slugify(productName || "");
-  console.log(
-    "Backend - Generated slug:",
-    generatedSlug,
-    " vs Frontend slug: ",
-    product_slug
-  );
   if (generatedSlug !== product_slug) {
     return null;
   }
@@ -330,9 +323,7 @@ export async function getProductDetail(
 
 export async function postNewProduct(productData: any) {
   try {
-    console.log("Inserting product data:", productData);
     const result = await db("products").insert(productData);
-    console.log("Insert result:", result);
     return result;
   } catch (e) {
     console.error("Error inserting new product: ", e);
@@ -407,15 +398,6 @@ export async function updateLoveStatus(
   product_id: number,
   love_status: boolean
 ) {
-  // Check current status
-  console.log(
-    "Updating love status for user_id:",
-    user_id,
-    " product_id:",
-    product_id,
-    " to ",
-    love_status
-  );
   const currentStatusQuery = await db.raw(
     `
         select exists (
