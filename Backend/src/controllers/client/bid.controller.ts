@@ -1,7 +1,31 @@
 import { Request, Response } from "express";
 import * as bidModels from "../../models/bid.model.ts";
+import * as userModels from "../../models/users.model.ts";
 import { io } from "@/server.ts";
 import * as productModels from "@/models/products.model.ts";
+
+
+
+
+
+export async function handleNewUserPlayBid(req: Request, res: Response, next: Function) {
+  try {
+    const user_id = (req as any).user.user_id;
+    const userInfo = await userModels.getUserById(user_id);
+    if (userInfo.rating_count === 0){
+
+    }
+    next();
+  }
+  catch (e){
+    console.error(e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ kiểm tra tài khoản đấu giá",
+    });
+  }
+}
+
 export async function playBid(req: Request, res: Response) {
   try {
     const user_id = (req as any).user.user_id;
@@ -35,11 +59,11 @@ export async function playBid(req: Request, res: Response) {
     }
 
     // Check rating of user 
-    const currentUserRating = await bidModels.checkRatingUser(user_id, 8);
+    const currentUserRating = await bidModels.checkRatingUser(user_id, 4); // Follow 5 star rating system
     if (!currentUserRating) {
       return res.status(400).json({
         status: "error",
-        message: "Người dùng không đủ điều kiện để đặt giá (rating < 8)",
+        message: "Người dùng không đủ điều kiện để đặt giá (rating < 4)",
       });
     }
 

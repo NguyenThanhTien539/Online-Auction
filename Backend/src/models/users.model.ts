@@ -10,6 +10,8 @@ export async function getUserById(user_id: number) {
   return result;
 }
 
+
+
 export async function registerSellerRequest(user_id: number, reason: string) {
   await db.raw(
     `

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , useLocation, Link} from 'react-router-dom';
 import {useAuth} from "@/routes/ProtectedRouter";
 import {useParams} from "react-router-dom"
 import Loading from '@/components/common/Loading';
@@ -32,8 +32,8 @@ export default function ProfilePage() {
   const params = useParams();
   const [isOwner , setIsOwner] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  
-  
+  const location = useLocation();
+
   useEffect (() => {
 
     const username = params.username_id?.trim().split("_")[0];
@@ -119,11 +119,11 @@ export default function ProfilePage() {
                   {getRoleLabel(userProfile.role)}
                 </span>
 
-                <div className="flex items-center bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
+                <Link to ={`${location.pathname}/rate`} className="flex items-center bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200">
                   <Star className="w-5 h-5 text-yellow-500 fill-current mr-2" />
                   <span className="font-bold text-yellow-700 mr-1">{userProfile.rating.toFixed(1)}</span>
                   <span className="text-yellow-600">({userProfile.rating_count} đánh giá)</span>
-                </div>
+                </Link>
               </div>
 
               {/* Rating Stars */}
