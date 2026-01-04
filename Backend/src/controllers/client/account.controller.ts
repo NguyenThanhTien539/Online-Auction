@@ -55,11 +55,11 @@ export async function comparePassword(
 export async function verifyCaptcha(token: string) {
   try {
     const secretKey = process.env.CAPTCHA_SECRET_KEY;
-    
+
     // Kiểm tra xem có key chưa, tránh lỗi ngớ ngẩn
     if (!secretKey) {
-        console.error("Thiếu CAPTCHA_SECRET_KEY trong file .env");
-        return false;
+      console.error("Thiếu CAPTCHA_SECRET_KEY trong file .env");
+      return false;
     }
 
     const params = new URLSearchParams({
@@ -79,13 +79,12 @@ export async function verifyCaptcha(token: string) {
     );
 
     const data = await response.json();
-    
+
     // Log để debug xem Google trả về gì
     // console.log("Google ReCaptcha Response:", data);
 
     // Chỉ cần trả về true/false cho gọn
-    return (data as any).success === true; 
-
+    return (data as any).success === true;
   } catch (error) {
     console.error("Lỗi verify CAPTCHA:", error);
     return false; // Có lỗi thì coi như verify thất bại
@@ -261,7 +260,6 @@ export const loginPost = async (req: Request, res: Response) => {
     return;
   }
 
-    
   const existedAccount = await AccountModel.findEmail(req.body.email);
   if (!existedAccount) {
     res.json({ code: "error", message: "Email chưa tồn tại trong hệ thống" });
@@ -277,6 +275,15 @@ export const loginPost = async (req: Request, res: Response) => {
     res.json({
       code: "error",
       message: "Mật khẩu không đúng",
+    });
+    return;
+  }
+
+  if (existedAccount.status === "inactive") {
+    res.json({
+      code: "error",
+      message:
+        "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.",
     });
     return;
   }

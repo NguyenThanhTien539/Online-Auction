@@ -67,7 +67,7 @@ export async function detail(req: Request, res: Response) {
 export async function editRole(req: Request, res: Response) {
   try {
     const user_id = Number(req.params.user_id);
-    const { role } = req.body;
+    const { role, status } = req.body;
     const user = await userModel.getUserById(user_id);
     if (!user) {
       return res
@@ -75,6 +75,7 @@ export async function editRole(req: Request, res: Response) {
         .json({ code: "error", message: "Người dùng không tồn tại" });
     }
     await userModel.updateUserRole(user_id, role);
+    await userModel.updateUserStatus(user_id, status);
     res.json({ code: "success", message: "Cập nhật vai trò thành công" });
   } catch (error) {
     res.status(500).json({ code: "error", message: "Lỗi máy chủ" });

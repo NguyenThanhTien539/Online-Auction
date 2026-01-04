@@ -4,6 +4,7 @@ export type UserItem = {
   username: string;
   address: string;
   role: string;
+  status: string;
   email: string;
   date_of_birth: string;
   rating: number;

@@ -181,6 +181,10 @@ export async function updateUserRole(user_id: number, role: string) {
   await db("users").where({ user_id }).update({ role });
 }
 
+export async function updateUserStatus(user_id: number, status: string) {
+  await db("users").where({ user_id }).update({ status });
+}
+
 export async function resetUserPassword(user_id: number, newPassword: string) {
   await db("users").where({ user_id }).update({ password: newPassword });
 }

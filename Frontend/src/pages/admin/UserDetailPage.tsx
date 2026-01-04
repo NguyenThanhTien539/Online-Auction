@@ -10,6 +10,7 @@ export default function UserDetailPage() {
   const navigate = useNavigate();
   const [userDetail, setUserDetail] = useState<UserItem | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
@@ -21,13 +22,14 @@ export default function UserDetailPage() {
       .then((data) => {
         setUserDetail(data.user);
         setSelectedRole(data.user.role);
+        setSelectedStatus(data.user.status);
       })
       .catch(() => {
         setUserDetail(null);
       });
   }, [id]);
 
-  const handleSave = (role: string) => {
+  const handleSave = () => {
     fetch(
       `${import.meta.env.VITE_API_URL}/${
         import.meta.env.VITE_PATH_ADMIN
@@ -35,21 +37,25 @@ export default function UserDetailPage() {
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
+        body: JSON.stringify({ role: selectedRole, status: selectedStatus }),
         credentials: "include",
       }
     )
       .then((res) => res.json())
       .then((data) => {
         if (data.code == "success") {
-          toast.success("Cập nhật vai trò thành công!");
-          setUserDetail((prev) => (prev ? { ...prev, role } : null));
+          toast.success("Cập nhật thành công!");
+          setUserDetail((prev) =>
+            prev
+              ? { ...prev, role: selectedRole, status: selectedStatus }
+              : null
+          );
         } else {
-          toast.error("Cập nhật vai trò thất bại.");
+          toast.error("Cập nhật thất bại.");
         }
       })
       .catch(() => {
-        toast.error("Có lỗi xảy ra khi cập nhật vai trò.");
+        toast.error("Có lỗi xảy ra khi cập nhật.");
       });
   };
 
@@ -151,8 +157,8 @@ export default function UserDetailPage() {
             </div>
           </div>
 
-          {/* Row 3: Vai trò & Ngày sinh */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
+          {/* Row 3: Vai trò, Trạng thái & Ngày sinh */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-6 md:mb-8">
             <div>
               <label className="block mb-2 font-medium text-gray-700">
                 Vai trò
@@ -164,6 +170,20 @@ export default function UserDetailPage() {
               >
                 <option value="user">Người dùng</option>
                 <option value="seller">Người bán</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium text-gray-700">
+                Trạng thái tài khoản
+              </label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="active">Hoạt động</option>
+                <option value="inactive">Không hoạt động</option>
               </select>
             </div>
 
@@ -215,7 +235,7 @@ export default function UserDetailPage() {
               Quay về danh sách
             </button>
             <button
-              onClick={() => handleSave(selectedRole)}
+              onClick={handleSave}
               className=" cursor-pointer px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-base font-medium transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               Lưu thay đổi
