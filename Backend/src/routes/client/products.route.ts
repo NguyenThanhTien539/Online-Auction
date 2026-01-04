@@ -23,6 +23,8 @@ route.get("/ending_soon", topProductsController.getTopEndingSoonProducts);
 route.get("/highest_price", topProductsController.getTopHighestPriceProducts);
 route.get("/most_bids", topProductsController.getTopMostBidProducts);
 
+route.get("/detail-for-winner", verifyToken, productsController.getProductDetailForWinner);
+
 
 route.get("/related", productsController.getRelatedProducts);
 export default route;

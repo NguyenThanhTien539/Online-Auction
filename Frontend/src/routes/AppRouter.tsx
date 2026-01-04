@@ -39,6 +39,7 @@ import ProductTrashPage from "@/pages/admin/ProductTrashPage";
 import RateUserPage from "@/pages/client/RateUserPage";
 import RateHistoryPage from "@/pages/client/ProfilePage/components/RateHistoryPage";
 import {BreadcrumbProvider} from "@/contexts/BreadcrumbContext";
+import WinnerOrderCompletionPage from "@/pages/client/OrderPage/WinnerOrderCompletionPage";
 const routers = createBrowserRouter([
   {
     path: "/",
@@ -113,6 +114,10 @@ const routers = createBrowserRouter([
       {
         path: "/profile/:username_id/rate",
         element: <RateHistoryPage />,
+      },
+      {
+        path: "/winner-order",
+        element: <WinnerOrderCompletionPage />,
       },
     ],
   },

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 // import { formatPrice, parsePrice } from '@/utils/format_price';
-import { NumericFormat } from "react-number-format";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { DateTime } from "luxon";
@@ -12,14 +11,7 @@ import QASection from "./components/QASection";
 import ProductDescriptionSection from "./components/ProductDescriptionSection";
 import RelatedProductsSection from "./components/RelatedProductsSection";
 import ProductImageGallery from "./components/ProductImageGallery";
-import {
-  Clock,
-  Calendar,
-  User,
-  Star,
-  Award,
-  TrendingUp,
-} from "lucide-react";
+import { Clock, Calendar, User, Star, Award, TrendingUp } from "lucide-react";
 import useSocketBidding from "@/hooks/useSocketBidding";
 import PreviewImage from "./components/PreviewProductModal";
 import Loading from "@/components/common/Loading";
@@ -52,9 +44,9 @@ type ProductType = {
   cat2_id: number;
 };
 
-
 function DetailProductPage() {
   // Auth user useContext
+  const navigator = useNavigate();
   const { auth } = useAuth();
   const [isSeller, setIsSeller] = useState(false);
   // Sample product data - in a real app, this would come from props or API
@@ -103,36 +95,48 @@ function DetailProductPage() {
       setLoading(false);
     }
     fetchProduct();
-    
   }, [slugid]);
 
-  useEffect (() => {
+  useEffect(() => {
     async function fetchBreadCrumbs() {
-      fetch(`${import.meta.env.VITE_API_URL}/api/categories/cat2?cat2_id=${products?.cat2_id}`)
-            .then((response) => {
-              if (!response.ok) {
-                toast.error("Có lỗi khi lấy tên danh mục");
-                throw new Error("Network response was not ok");
-              }
-              return response.json();
-            })
-            .then((data) => {
-          
-              
-              // Update breadcrumb
-              setBreadcrumbs([
-                { label: "Trang chủ", path: "/" },
-                { label: "Danh mục", path: "/categories" },
-                { label: data.data.cat1_name, path: `/categories/${slugify(data.data.cat1_name)}-${data.data.cat1_id}` },
-                { label: data.data.cat2_name, path: `/products?cat2_id=${data.data.cat2_id}`},
-                { label: products?.product_name || "Chi tiết sản phẩm", path: null },
-              ]);
-            })
-            .catch((error) => {
-              toast.error(error.message || "Lỗi kết nối máy chủ");
-            });
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/categories/cat2?cat2_id=${
+          products?.cat2_id
+        }`
+      )
+        .then((response) => {
+          if (!response.ok) {
+            toast.error("Có lỗi khi lấy tên danh mục");
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Update breadcrumb
+          setBreadcrumbs([
+            { label: "Trang chủ", path: "/" },
+            { label: "Danh mục", path: "/categories" },
+            {
+              label: data.data.cat1_name,
+              path: `/categories/${slugify(data.data.cat1_name)}-${
+                data.data.cat1_id
+              }`,
+            },
+            {
+              label: data.data.cat2_name,
+              path: `/products?cat2_id=${data.data.cat2_id}`,
+            },
+            {
+              label: products?.product_name || "Chi tiết sản phẩm",
+              path: null,
+            },
+          ]);
+        })
+        .catch((error) => {
+          toast.error(error.message || "Lỗi kết nối máy chủ");
+        });
     }
-    if (products){
+    if (products) {
       fetchBreadCrumbs();
     }
   }, [products]);
@@ -323,20 +327,24 @@ function DetailProductPage() {
               <User className="w-5 h-5 text-indigo-600" />
               <h4 className="text-lg font-semibold text-gray-900">Người bán</h4>
             </div>
-            <Link to = {`/profile/${products?.seller_username}_${products?.seller_id}`} className="flex items-center gap-3">
+            <Link
+              to={`/profile/${products?.seller_username}_${products?.seller_id}`}
+              className="flex items-center gap-3"
+            >
               <div className="relative">
-                { products?.seller_avatar ? (
-                    <img
-                      src={products.seller_avatar}
-                      alt={products.seller_username}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) :
+                {products?.seller_avatar ? (
+                  <img
+                    src={products.seller_avatar}
+                    alt={products.seller_username}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
                   <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">
-                    {products?.seller_username?.charAt(0).toUpperCase()}
-                  </span>
-                </div>}
+                    <span className="text-white font-bold text-lg">
+                      {products?.seller_username?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div className="flex-1">
@@ -375,26 +383,33 @@ function DetailProductPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  { isSeller ? (
-                    <Link to = {`/profile/${products.price_owner_username}_${products.price_owner_id}`}>
-                      {products?.price_owner_avatar ? (<img
-                        src={products.price_owner_avatar}
-                        alt={products.price_owner_username}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />)
-                      : (<div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                          {products.price_owner_username.charAt(0).toUpperCase()}
-                        </span>
-                      </div>)
-                    }
+                  {isSeller ? (
+                    <Link
+                      to={`/profile/${products.price_owner_username}_${products.price_owner_id}`}
+                    >
+                      {products?.price_owner_avatar ? (
+                        <img
+                          src={products.price_owner_avatar}
+                          alt={products.price_owner_username}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-lg">
+                            {products.price_owner_username
+                              .charAt(0)
+                              .toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                     </Link>
-                  ) :
+                  ) : (
                     <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">
-                      {products.price_owner_username.charAt(0).toUpperCase()}
-                    </span>
-                  </div>}
+                      <span className="text-white font-bold text-lg">
+                        {products.price_owner_username.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center">
                     <Award className="w-3 h-3 text-white" />
                   </div>
@@ -424,7 +439,14 @@ function DetailProductPage() {
               </div>
               {products.price_owner_id === auth?.user_id && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <button className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                  <button
+                    onClick={() => {
+                      navigator(
+                        `/winner-order?product_id=${products.product_id}`
+                      );
+                    }}
+                    className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  >
                     Xác nhận đơn hàng
                   </button>
                 </div>
@@ -442,25 +464,19 @@ function DetailProductPage() {
             current_price={products?.current_price}
             step_price={products?.step_price}
             buy_now_price={products?.buy_now_price}
-          
           />
           {products?.buy_now_price && (
             <BuyNowSection
               product_id={products?.product_id}
               buy_now_price={products?.buy_now_price}
               product_name={products?.product_name}
-
             />
           )}
         </div>
       )}
 
       {/* Tab Section */}
-      <TabSection
-        products={products}
-        isSeller={isSeller}
-
-      />
+      <TabSection products={products} isSeller={isSeller} />
 
       {/* Related Products */}
       <RelatedProductsSection
@@ -485,17 +501,14 @@ function DetailProductPage() {
 function TabSection({
   products,
   isSeller,
-
 }: {
   products?: ProductType;
   isSeller?: boolean;
-
 }) {
   const authUser = useAuth();
   const [activeTab, setActiveTab] = useState<
     "description" | "bidHistory" | "qa"
   >("description");
-
 
   return (
     <>
@@ -513,7 +526,7 @@ function TabSection({
           >
             Mô tả sản phẩm
           </button>
-          {(
+          {
             <button
               onClick={() => setActiveTab("bidHistory")}
               className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
@@ -524,7 +537,7 @@ function TabSection({
             >
               Lịch sử đấu giá
             </button>
-          )}
+          }
           <button
             onClick={() => setActiveTab("qa")}
             className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
@@ -547,7 +560,7 @@ function TabSection({
           )}
           {activeTab === "bidHistory" && authUser && (
             <div className="bg-white py-2 px-2 rounded-lg">
-              <BidHistorySection product={products} isSeller = {isSeller}/>
+              <BidHistorySection product={products} isSeller={isSeller} />
             </div>
           )}
           {activeTab === "qa" && (

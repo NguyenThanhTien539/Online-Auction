@@ -1,4 +1,3 @@
-
 import db from "../config/database.config.ts";
 import { slugify } from "../helpers/slug.helper.ts";
 import { io } from "@/server.ts";
@@ -19,49 +18,50 @@ export async function isProductInBiddingTime(product_id: number) {
 
 export async function extendBiddingTimeIfNeeded(product_id: number) {
   // Check product need to extend time
-  const productQuery = await db.raw(`
+  const productQuery = await db.raw(
+    `
         select *
         from products
         where auto_extended = true and product_id = ?
-    `,[product_id]);
-  
+    `,
+    [product_id]
+  );
+
   if (productQuery.rows.length === 0) {
     return;
   }
-  
+
   const product = productQuery.rows[0];
-  
+
   // Get extend time settings
   const settingQuery = await db.raw(`
         select extend_time, threshold_time from extend_bidding_time limit 1
-    `)
+    `);
   const setting = await settingQuery.rows[0];
   if (!setting) {
     return;
   }
   const extend_time = setting.extend_time; // in minutes
   const threshold_time = setting.threshold_time; // in minutes
-  
 
   const currentTime = new Date();
   const endTime = new Date(product.end_time);
   const timeDiff = (endTime.getTime() - currentTime.getTime()) / (1000 * 60); // in minutes
-  console.log ("Time difference: ", timeDiff);
+  console.log("Time difference: ", timeDiff);
   if (timeDiff <= threshold_time) {
     // Extend bidding time
     const newEndTime = new Date(endTime.getTime() + extend_time * 60 * 1000);
     await db("products")
       .where({ product_id: product_id })
       .update({ end_time: newEndTime });
-    
+
     const productInfo = await getProductById(product_id);
-        io.to(`bidding_room_${product_id}`).emit("new_bid", {
-          data: productInfo,
-        });
+    io.to(`bidding_room_${product_id}`).emit("new_bid", {
+      data: productInfo,
+    });
   }
 
   return;
-
 }
 
 export async function getSellerOfProduct(product_id: number) {
@@ -120,18 +120,15 @@ export async function getProductsPageList(
   // Modify search keyword for full-text search
 
   let searchCondition = "";
-  const bindings : any = [cat2_id]; 
-
+  const bindings: any = [cat2_id];
 
   if (searchKeyword && searchKeyword.trim() !== "") {
-
-    searchCondition = "AND p.fts @@ websearch_to_tsquery('english', remove_accents(?))";
+    searchCondition =
+      "AND p.fts @@ websearch_to_tsquery('english', remove_accents(?))";
     bindings.push(searchKeyword);
   }
 
-
   bindings.push(itemsPerPage, offset);
-
 
   let query = await db.raw(
     `
@@ -141,9 +138,7 @@ export async function getProductsPageList(
       LEFT JOIN users u ON p.price_owner_id = u.user_id
       WHERE p.cat2_id = ? AND p.is_removed = false
       ${searchCondition}  
-      ORDER BY ${
-        orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"
-      }
+      ORDER BY ${orderBy.length > 0 ? orderBy.join(", ") : "p.product_id DESC"}
       LIMIT ? OFFSET ?
     `,
     bindings
@@ -753,4 +748,15 @@ export async function restoreProductById(product_id: number) {
 
 export async function destroyProductById(product_id: number) {
   await db("products").where({ product_id: product_id }).del();
+}
+
+export async function getProductDetailForWinner(
+  product_id: number,
+  winner_id: string
+) {
+  const result = await db("products")
+    .where({ product_id: product_id, price_owner_id: winner_id })
+    .andWhere("end_time", "<", db.raw("now()"))
+    .first();
+  return result;
 }
