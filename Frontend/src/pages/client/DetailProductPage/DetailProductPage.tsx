@@ -437,20 +437,37 @@ function DetailProductPage() {
                   </div>
                 </div>
               </div>
-              {products.price_owner_id === auth?.user_id && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <button
-                    onClick={() => {
-                      navigator(
-                        `/winner-order?product_id=${products.product_id}`
-                      );
-                    }}
-                    className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                  >
-                    Xác nhận đơn hàng
-                  </button>
-                </div>
-              )}
+              {products.price_owner_id === auth?.user_id &&
+                new Date(products.end_time).getTime() < Date.now() && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        navigator(
+                          `/winner-order?product_id=${products.product_id}`
+                        );
+                      }}
+                      className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Xác nhận đơn hàng
+                    </button>
+                  </div>
+                )}
+              {products.seller_id === auth?.user_id &&
+                new Date(products.end_time).getTime() < Date.now() &&
+                products.price_owner_id && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        navigator(
+                          `/seller-order?product_id=${products.product_id}`
+                        );
+                      }}
+                      className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Xem hóa đơn
+                    </button>
+                  </div>
+                )}
             </div>
           )}
         </div>

@@ -13,6 +13,7 @@ import {
   Mail,
   Image as ImageIcon,
   X,
+  XCircle,
 } from "lucide-react";
 
 import { useAuth } from "@/routes/ProtectedRouter";
@@ -72,7 +73,6 @@ export default function WinnerOrderCompletionPage() {
         const data = await response.json();
 
         if (data.status === "error") {
-          toast.error(data.message);
           setOrderInfo(null);
           setInfoUser(null);
         } else {
@@ -92,15 +92,11 @@ export default function WinnerOrderCompletionPage() {
 
         if (orderData.status === "success" && orderData.data) {
           setOrderData(orderData.data);
-
-          // Set step based on order_status
           if (orderData.data.order_status === "pending") {
             setCurrentStep(2);
-            // Load payment proof image if exists
             if (orderData.data.payment_proof_image_url) {
               setPaymentProofPreview(orderData.data.payment_proof_image_url);
             }
-            // Load saved phone and address
             if (orderData.data.phone_number) {
               setPhoneNumber(orderData.data.phone_number);
             }
@@ -119,12 +115,22 @@ export default function WinnerOrderCompletionPage() {
             if (orderData.data.shipping_address) {
               setAddress(orderData.data.shipping_address);
             }
+          } else if (orderData.data.order_status === "rejected") {
+            setCurrentStep(4);
+            // Load payment proof to show what was rejected
+            if (orderData.data.payment_proof_image_url) {
+              setPaymentProofPreview(orderData.data.payment_proof_image_url);
+            }
+            if (orderData.data.phone_number) {
+              setPhoneNumber(orderData.data.phone_number);
+            }
+            if (orderData.data.shipping_address) {
+              setAddress(orderData.data.shipping_address);
+            }
           } else {
-            // Default to step 1 if status is unknown
             setCurrentStep(1);
           }
         } else {
-          // No order exists yet, stay at step 1
           setCurrentStep(1);
         }
       } catch (e) {
@@ -591,6 +597,49 @@ export default function WinnerOrderCompletionPage() {
                 <button
                   onClick={() => navigate("/")}
                   className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Quay về trang chủ
+                </button>
+              </div>
+            )}
+
+            {/* Rejected Card */}
+            {currentStep === 4 && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <XCircle className="text-red-600" size={24} />
+                  Đơn Hàng Đã Bị Từ Chối
+                </h2>
+
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-4">
+                    <XCircle className="text-red-600" size={40} />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Đơn hàng đã bị người bán từ chối
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Rất tiếc, người bán đã từ chối đơn hàng của bạn. <br />
+                    Vui lòng liên hệ với người bán để biết thêm chi tiết.
+                  </p>
+
+                  {paymentProofPreview && (
+                    <div className="mt-6">
+                      <p className="text-sm font-medium text-gray-700 mb-2">
+                        Ảnh chuyển khoản đã gửi:
+                      </p>
+                      <img
+                        src={paymentProofPreview}
+                        alt="Payment proof"
+                        className="mx-auto max-w-md max-h-64 object-contain rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => navigate("/")}
+                  className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Quay về trang chủ
                 </button>

@@ -38,16 +38,17 @@ import CategoryTrashPage from "@/pages/admin/CategoryTrashPage";
 import ProductTrashPage from "@/pages/admin/ProductTrashPage";
 import RateUserPage from "@/pages/client/RateUserPage";
 import RateHistoryPage from "@/pages/client/ProfilePage/components/RateHistoryPage";
-import {BreadcrumbProvider} from "@/contexts/BreadcrumbContext";
+import { BreadcrumbProvider } from "@/contexts/BreadcrumbContext";
 import WinnerOrderCompletionPage from "@/pages/client/OrderPage/WinnerOrderCompletionPage";
+import SellerOrderPage from "@/pages/client/OrderPage/SellerOrderPage";
 const routers = createBrowserRouter([
   {
     path: "/",
     element: (
       <AuthProvider>
-          <BreadcrumbProvider>
-            <MainLayout />
-          </BreadcrumbProvider>
+        <BreadcrumbProvider>
+          <MainLayout />
+        </BreadcrumbProvider>
       </AuthProvider>
     ),
     children: [
@@ -118,6 +119,10 @@ const routers = createBrowserRouter([
       {
         path: "/winner-order",
         element: <WinnerOrderCompletionPage />,
+      },
+      {
+        path: "/seller-order",
+        element: <SellerOrderPage />,
       },
     ],
   },
