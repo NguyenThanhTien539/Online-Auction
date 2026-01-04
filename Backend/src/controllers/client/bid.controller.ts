@@ -112,14 +112,6 @@ export async function playBid(req: Request, res: Response) {
       });
     }
 
-    // Check rating of user 
-    const currentUserRating = await bidModels.checkRatingUser(user_id, 4); // Follow 5 star rating system
-    if (!currentUserRating) {
-      return res.status(400).json({
-        status: "error",
-        message: "Người dùng không đủ điều kiện để đặt giá (rating < 4)",
-      });
-    }
 
 
     // Check if price >= buy now price
@@ -171,6 +163,84 @@ export async function getBidHistoryByProductId(req: Request, res: Response) {
     return res.status(500).json({
       status: "error",
       message: "Lỗi máy chủ",
+    });
+  }
+}
+
+
+export async function banBidder(req: Request, res: Response) {
+  try{
+    const ban_user_id = req.body.banned_user_id;
+    const product_id = req.body.product_id;
+    const reason = req.body.reason;
+    // is user already banned ?
+    const isAlreadyBanned = await bidModels.isBannedBidder(product_id, ban_user_id);
+    if (isAlreadyBanned){
+      return res.status(400).json({
+        status: "error",
+        message: "Người đấu giá đã bị cấm trước đó",
+      });
+    }
+    const data = await bidModels.banBidder(product_id, ban_user_id, reason);
+    const productInfo = await productModels.getProductById(product_id);
+    io.to(`bidding_room_${product_id}`).emit("new_bid", {
+      data: productInfo,
+    });
+    return res.status(200).json({
+      status: "success",
+      data: data,
+    });
+
+  }
+  catch (e){
+    console.error(e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ khi cấm người đấu giá",
+    });
+  }
+}
+
+
+export async function checkBannedBidder(req: Request, res: Response, next: Function){
+  try{
+    const user_id = (req as any).user.user_id;
+    const product_id = req.body.product_id;
+    const isBanned = await bidModels.isBannedBidder(product_id, user_id);
+    if (isBanned){
+      return res.status(403).json({
+        status: "error",
+        message: "Bạn đã bị cấm đấu giá sản phẩm này",
+      });
+    }
+    next();
+  }
+  catch (e){
+    console.error(e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ khi kiểm tra người đấu giá bị cấm",
+    });
+  }
+}
+
+export async function checkRatingUser (req: Request, res: Response, next: Function){
+  try{
+    const user_id = (req as any).user.user_id;
+    const currentUserRating = await bidModels.checkRatingUser(user_id, 4);
+    if (!currentUserRating) {
+      return res.status(400).json({
+        status: "error",
+        message: "Người dùng không đủ điều kiện để đặt giá (rating < 4)",
+      });
+    }
+    next();
+  }
+  catch (e){
+    console.error(e);
+    return res.status(500).json({
+      status: "error",
+      message: "Lỗi máy chủ khi kiểm tra đánh giá người dùng",
     });
   }
 }

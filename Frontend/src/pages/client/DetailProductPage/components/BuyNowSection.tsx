@@ -139,7 +139,7 @@ export default function BuyNowSection({
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/30  flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200 animate__animated animate__zoomIn animate__fast">
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">

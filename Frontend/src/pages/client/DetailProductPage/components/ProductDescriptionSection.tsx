@@ -5,9 +5,10 @@ import { FileText, ChevronDown, ChevronUp, Edit3 } from 'lucide-react';
 interface ProductDescriptionSectionProps {
   description: string;
   isSeller?: boolean;
+  isExpired?: boolean;
 }
 
-const ProductDescriptionSection: React.FC<ProductDescriptionSectionProps> = ({ description, isSeller }) => {
+const ProductDescriptionSection: React.FC<ProductDescriptionSectionProps> = ({ description, isSeller, isExpired }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +34,7 @@ const ProductDescriptionSection: React.FC<ProductDescriptionSectionProps> = ({ d
         </div>
         
         {/* Edit Button - Only visible for seller */}
-        {isSeller && (
+        {isSeller && !isExpired && (
           <button
             onClick={handleEditClick}
             className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-gradient-to-r from-blue-300 to-blue-600 text-white rounded-lg hover:from-blue-400 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium text-sm"

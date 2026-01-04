@@ -267,7 +267,7 @@ function DetailProductPage() {
                   Giá hiện tại:
                 </span>
                 <span className="text-2xl font-bold text-blue-600">
-                  {products?.current_price.toLocaleString()} VNĐ
+                  {products?.current_price?.toLocaleString()} VNĐ
                 </span>
               </div>
               {products?.buy_now_price && (
@@ -276,7 +276,7 @@ function DetailProductPage() {
                     Giá mua ngay:
                   </span>
                   <span className="text-lg font-bold text-rose-600">
-                    {products.buy_now_price.toLocaleString()} VNĐ
+                    {products.buy_now_price?.toLocaleString()} VNĐ
                   </span>
                 </div>
               )}
@@ -498,7 +498,7 @@ function DetailProductPage() {
       </div>
 
       {/* Bid Section - Full Width */}
-      {!isExpired && (
+      {!isExpired && !isSeller && (
         <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm">
           <PlayBidSection
             product_id={products?.product_id}
@@ -517,7 +517,7 @@ function DetailProductPage() {
       )}
 
       {/* Tab Section */}
-      <TabSection products={products} isSeller={isSeller} />
+      <TabSection products={products} isSeller={isSeller} isExpired = {isExpired}/>
 
       {/* Related Products */}
       <RelatedProductsSection
@@ -535,6 +535,7 @@ function DetailProductPage() {
           setImageModalOpen={setImageModalOpen}
         />
       )}
+      
     </div>
   );
 }
@@ -542,9 +543,11 @@ function DetailProductPage() {
 function TabSection({
   products,
   isSeller,
+  isExpired,
 }: {
   products?: ProductType;
   isSeller?: boolean;
+  isExpired?: boolean;
 }) {
   const authUser = useAuth();
   const [activeTab, setActiveTab] = useState<
@@ -597,11 +600,12 @@ function TabSection({
             <ProductDescriptionSection
               description={products.description}
               isSeller={isSeller}
+              isExpired={isExpired}
             />
           )}
           {activeTab === "bidHistory" && authUser && (
             <div className="bg-white py-2 px-2 rounded-lg">
-              <BidHistorySection product={products} isSeller={isSeller} />
+              <BidHistorySection product={products} isSeller={isSeller} isExpired = {isExpired}/>
             </div>
           )}
           {activeTab === "qa" && (

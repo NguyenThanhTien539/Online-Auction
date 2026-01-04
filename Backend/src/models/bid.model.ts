@@ -248,3 +248,21 @@ export async function buyNowProduct (user_id: number, product_id : number, buy_p
         end_time: new Date().toISOString(),
     }
 }
+
+export async function banBidder (product_id: number, banned_user_id: number, reason: string) {
+    console.log (`Banning user ${banned_user_id} from product ${product_id} for reason: ${reason}`);
+    const query = await db.raw (`
+            select * from ban_auction_user (?, ?, ?)
+        `, [product_id, banned_user_id, reason]);
+    return query.rows[0].ban_auction_user;
+}
+
+export async function isBannedBidder (product_id: number, user_id: number) {
+    const query = await db.raw (`
+            select 1
+            from bidding_ban_user
+            where product_id = ? and user_id = ?
+        `, [product_id, user_id]);
+    const result = await query.rows;
+    return (result && result.length > 0);
+}
