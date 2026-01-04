@@ -1,5 +1,7 @@
 import * as userModel from "../../models/users.model.ts";
 import { Request, Response } from "express";
+import { sendMail } from "@/helpers/mail.helper.ts";
+import bcrypt from "bcryptjs";
 
 export async function list(req: Request, res: Response) {
   try {
@@ -74,6 +76,37 @@ export async function editRole(req: Request, res: Response) {
     }
     await userModel.updateUserRole(user_id, role);
     res.json({ code: "success", message: "Cập nhật vai trò thành công" });
+  } catch (error) {
+    res.status(500).json({ code: "error", message: "Lỗi máy chủ" });
+  }
+}
+
+const NEW_PASSWORD = "OnlineAuction123@";
+const SALT_ROUNDS = 10;
+export async function hashPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  try {
+    const user_id = Number(req.params.user_id);
+    const user = await userModel.getUserById(user_id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ code: "error", message: "Người dùng không tồn tại" });
+    }
+
+    const title = "Tài khoản của bạn đã được yêu cầu đặt lại mật khẩu";
+    const content = `Mật khẩu mới của bạn là: ${NEW_PASSWORD}. Vui lòng đăng nhập và thay đổi mật khẩu ngay lập tức.`;
+    sendMail(user.email, title, content);
+    const hashedPassword = await hashPassword(NEW_PASSWORD);
+    await userModel.resetUserPassword(user_id, hashedPassword);
+    // res.clearCookie("accessToken");
+    res.json({ code: "success", message: "Reset mật khẩu thành công" });
   } catch (error) {
     res.status(500).json({ code: "error", message: "Lỗi máy chủ" });
   }

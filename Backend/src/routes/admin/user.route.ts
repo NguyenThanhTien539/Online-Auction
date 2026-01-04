@@ -10,4 +10,6 @@ route.get("/detail/:user_id", userController.detail);
 
 route.patch("/edit-role/:user_id", userController.editRole);
 
+route.patch("/reset-password/:user_id", userController.resetPassword);
+
 export default route;

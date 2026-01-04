@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import type { UserItem } from "@/interface/user.interface";
 import { formatDateOfBirth } from "@/utils/format_time";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 
 export default function UserDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [userDetail, setUserDetail] = useState<UserItem | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
   useEffect(() => {
@@ -49,6 +51,42 @@ export default function UserDetailPage() {
       .catch(() => {
         toast.error("Có lỗi xảy ra khi cập nhật vai trò.");
       });
+  };
+
+  const handleResetPassword = () => {
+    Swal.fire({
+      title: "Bạn có chắc muốn reset mật khẩu?",
+      text: "Hành động này sẽ không được khôi phục được",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Vẫn reset",
+      cancelButtonText: "Không reset",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(
+          `${import.meta.env.VITE_API_URL}/${
+            import.meta.env.VITE_PATH_ADMIN
+          }/api/user/reset-password/${id}`,
+          {
+            method: "PATCH",
+            credentials: "include",
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.code == "success") {
+              toast.success(data.message);
+            } else {
+              toast.error(data.message);
+            }
+          })
+          .catch(() => {
+            toast.error("Có lỗi xảy ra khi reset mật khẩu.");
+          });
+      }
+    });
   };
 
   return (
@@ -171,10 +209,22 @@ export default function UserDetailPage() {
           {/* Action Buttons */}
           <div className="flex justify-center sm:flex-row gap-3 sm:gap-4">
             <button
+              onClick={() => navigate("/admin/user/list")}
+              className="cursor-pointer px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-base font-medium transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Quay về danh sách
+            </button>
+            <button
               onClick={() => handleSave(selectedRole)}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-base font-medium transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className=" cursor-pointer px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-base font-medium transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               Lưu thay đổi
+            </button>
+            <button
+              onClick={handleResetPassword}
+              className=" cursor-pointer px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-base font-medium transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              Reset mật khẩu
             </button>
           </div>
         </div>
