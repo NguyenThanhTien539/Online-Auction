@@ -9,6 +9,7 @@ import { useFilters } from "@/hooks/useFilters";
 import { slugify } from "@/utils/make_slug";
 import { toast } from "sonner";
 import Loading from "@/components/common/Loading";
+import PaginationComponent from "@/components/common/Pagination";
 const LIMIT = 5;
 
 export default function CategoryList() {
@@ -18,7 +19,7 @@ export default function CategoryList() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1", 10));
   const {
     statusFilter,
     creatorFilter,
@@ -350,9 +351,7 @@ export default function CategoryList() {
       {/* Mobile/Tablet Card View */}
       <div className="mt-5 space-y-4 lg:hidden relative">
         {isPageLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex justify-center items-center z-10 rounded-xl">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          </div>
+          <Loading></Loading>
         )}
         {items.map((item) => {
           const checked = selectedIds.includes(item.id);
@@ -446,11 +445,7 @@ export default function CategoryList() {
         )}
       </div>
 
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        isPageLoading={isPageLoading}
-      />
+      <PaginationComponent numberOfPages = {totalPages} currentPage = {currentPage} controlPage = {setCurrentPage}></PaginationComponent>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
+
 import { formatToVN } from "@/utils/format_time";
 import Loading from "@/components/common/Loading";
 interface ApplicationInfo {
@@ -205,11 +205,11 @@ export default function SellerApplicationDetailPage() {
                 Lý do xin nâng cấp
               </label>
               <div className="border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
-                <TinyMCEEditor
-                  editorRef={editorRef}
-                  value={detailForm.description}
-                  isReadOnly={true}
-                />
+                <div className="p-4 prose max-w-none">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: detailForm.description }}
+                  ></div>
+                </div>
               </div>
               <p className="text-sm text-gray-500 mt-2">
                 * Nội dung này chỉ để xem, không thể chỉnh sửa

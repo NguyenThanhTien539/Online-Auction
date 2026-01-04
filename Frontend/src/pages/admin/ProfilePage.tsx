@@ -4,7 +4,7 @@ import { useAuth } from "@/routes/ProtectedRouter";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
-  const { auth: user } = useAuth();
+  const { auth: user, setAuth } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,27 +49,20 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     try {
-      // const formDataToSend = new FormData();
-      // formDataToSend.append("full_name", formData.full_name);
-      // formDataToSend.append("email", formData.email);
 
-      // // if (selectedFile) {
-      // //   formDataToSend.append("avatar", selectedFile);
-      // // }
-      const finalData: any = {
-        full_name: formData.full_name,
-        username: user.username,
-        email: formData.email,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("full_name", formData.full_name);
+      formDataToSend.append("username", user.username);
+      formDataToSend.append("email", formData.email);
+      if (selectedFile) {
+        formDataToSend.append("avatar", selectedFile);
+      }
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/profile/edit`,
         {
           method: "PATCH",
           credentials: "include",
-          body: JSON.stringify(finalData),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          body: formDataToSend,
         }
       );
 
@@ -77,6 +70,7 @@ export default function ProfilePage() {
 
       if (data.status === "success") {
         toast.success("Cập nhật thông tin thành công!");
+        setAuth(data.data); // Update auth context with new user data
         setIsEditing(false);
         setSelectedFile(null);
         setPreviewUrl(null);

@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom";
-import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
+
 import { useEffect, useRef, useState } from "react";
 import { formatToVN } from "@/utils/format_time";
 import Loading from "@/components/common/Loading";
+import { ChevronDown, ChevronUp } from "lucide-react";
 type ProductDetail = {
   product_id: number;
   product_name: string;
@@ -27,6 +28,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -222,11 +224,43 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <TinyMCEEditor
-            editorRef={editorRef}
-            value={product.description || ""}
-            isReadOnly={true}
-          />
+          {/* Mô tả sản phẩm */}
+          <div className="space-y-2">
+            <label className="mb-4 block text-sm font-medium text-gray-700">
+              Mô tả sản phẩm
+            </label>
+            <div className="border rounded-2xl bg-gray-50 p-4">
+              <div 
+                className={`relative transition-all duration-300 ${
+                  isDescriptionExpanded ? '' : 'overflow-hidden'
+                }`}
+                style={{
+                  maxHeight: isDescriptionExpanded ? 'none' : '200px'
+                }}
+              >
+                <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
+                {!isDescriptionExpanded && product.description && product.description.length > 300 && (
+                  <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                )}
+              </div>
+              {product.description && product.description.length > 300 && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-all duration-200"
+                >
+                  {isDescriptionExpanded ? (
+                    <>
+                      Thu gọn <ChevronUp className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      Xem thêm <ChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* Nút quay lại */}
           <div className="flex flex-col items-center justify-center gap-5 pt-2">

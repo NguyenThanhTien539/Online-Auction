@@ -8,7 +8,7 @@ import { useFilters } from "@/hooks/useFilters";
 import { toast } from "sonner";
 import Loading from "@/components/common/Loading";
 const LIMIT = 10;
-
+import PaginationComponent from "@/components/common/Pagination";
 type ProductItem = {
   product_id: number;
   product_name: string;
@@ -26,7 +26,7 @@ export default function ProductListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   const {
     creatorFilter,
@@ -396,11 +396,7 @@ export default function ProductListPage() {
         )}
       </div>
 
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        isPageLoading={isPageLoading}
-      />
+      <PaginationComponent numberOfPages = {totalPages} currentPage = {currentPage} controlPage = {setCurrentPage}></PaginationComponent>
     </div>
   );
 }

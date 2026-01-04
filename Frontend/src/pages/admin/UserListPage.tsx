@@ -16,7 +16,7 @@ type UserItem = {
 };
 
 const LIMIT = 5;
-
+import PaginationComponent from "@/components/common/Pagination";
 export default function UserListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,7 +24,7 @@ export default function UserListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1", 10));
   const {
     search,
     handleSearchChange,
@@ -323,11 +323,7 @@ export default function UserListPage() {
           )}
         </div>
 
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          isPageLoading={isPageLoading}
-        />
+        <PaginationComponent numberOfPages = {totalPages} currentPage = {currentPage} controlPage = {setCurrentPage}></PaginationComponent>
       </div>
     </div>
   );

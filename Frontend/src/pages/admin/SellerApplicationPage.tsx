@@ -8,6 +8,7 @@ import { useFilters } from "@/hooks/useFilters";
 import { formatToVN } from "@/utils/format_time";
 import { slugify } from "@/utils/make_slug";
 import Loading from "@/components/common/Loading";
+import PaginationComponent from "@/components/common/Pagination";
 type BidderForm = {
   id: number;
   full_name: string;
@@ -24,7 +25,7 @@ export default function BidderFormListPage() {
   const [list, setList] = useState<BidderForm[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalPages, setTotalPages] = useState(1);
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   const {
     statusFilter,
@@ -300,11 +301,7 @@ export default function BidderFormListPage() {
           </>
         )}
 
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          isPageLoading={isLoading}
-        />
+        <PaginationComponent numberOfPages = {totalPages} currentPage = {currentPage} controlPage = {setCurrentPage}/>
       </div>
     </div>
   );
