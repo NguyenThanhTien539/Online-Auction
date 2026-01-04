@@ -374,12 +374,26 @@ function DetailProductPage() {
 
           {/* Highest Bidder Info */}
           {products?.price_owner_username && (
-            <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <div className={`bg-white rounded-lg border p-5 shadow-sm ${
+              products.price_owner_id === auth?.user_id 
+                ? 'border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50' 
+                : 'border-gray-200'
+            }`}>
               <div className="flex items-center gap-2 mb-4">
-                <Award className="w-5 h-5 text-amber-600" />
+                <Award className={`w-5 h-5 ${
+                  products.price_owner_id === auth?.user_id 
+                    ? 'text-amber-600' 
+                    : 'text-amber-600'
+                }`} />
                 <h4 className="text-lg font-semibold text-gray-900">
                   Người dẫn đầu
                 </h4>
+                {products.price_owner_id === auth?.user_id && (
+                  <div className="ml-auto flex items-center gap-2 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg animate-pulse">
+                    <Award className="w-4 h-4" />
+                    <span>Bạn đang dẫn đầu!</span>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -392,7 +406,7 @@ function DetailProductPage() {
                           src={products.price_owner_avatar}
                           alt={products.price_owner_username}
                           className="w-12 h-12 rounded-full object-cover"
-                        />
+                        />  
                       ) : (
                         <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-lg">
@@ -416,7 +430,9 @@ function DetailProductPage() {
                 </div>
                 <div className="flex-1">
                   <h5 className="text-base font-semibold text-gray-900 mb-1">
-                    {maskName(products.price_owner_username)}
+                    {products.price_owner_id === auth?.user_id 
+                      ? products.price_owner_username 
+                      : maskName(products.price_owner_username)}
                   </h5>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
@@ -437,6 +453,14 @@ function DetailProductPage() {
                   </div>
                 </div>
               </div>
+              {products.price_owner_id === auth?.user_id && (
+                <div className="mt-3 p-3 bg-amber-100 border border-amber-300 rounded-lg">
+                  <p className="text-sm text-amber-900 font-medium text-center flex items-center justify-center gap-2">
+                    <Award className="w-4 h-4" />
+                    Bạn đang giữ giá cao nhất hiện tại
+                  </p>
+                </div>
+              )}
               {products.price_owner_id === auth?.user_id &&
                 new Date(products.end_time).getTime() < Date.now() && (
                   <div className="mt-4 pt-4 border-t border-gray-200">

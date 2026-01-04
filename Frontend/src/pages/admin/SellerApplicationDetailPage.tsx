@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 import { formatToVN } from "@/utils/format_time";
-
+import Loading from "@/components/common/Loading";
 interface ApplicationInfo {
   full_name: string;
   username: string;
@@ -90,9 +90,7 @@ export default function SellerApplicationDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
+      <Loading className = "ml-[240px] bg-transparent"></Loading>
     );
   }
 

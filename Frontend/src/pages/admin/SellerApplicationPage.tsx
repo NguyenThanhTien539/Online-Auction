@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFilters } from "@/hooks/useFilters";
 import { formatToVN } from "@/utils/format_time";
 import { slugify } from "@/utils/make_slug";
-
+import Loading from "@/components/common/Loading";
 type BidderForm = {
   id: number;
   full_name: string;
@@ -128,9 +128,7 @@ export default function BidderFormListPage() {
         />
 
         {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          </div>
+          <Loading className = "ml-[240px] bg-transparent"></Loading>
         ) : (
           <>
             {/* Desktop Table View */}

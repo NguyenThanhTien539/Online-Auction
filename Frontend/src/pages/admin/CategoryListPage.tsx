@@ -8,6 +8,7 @@ import type { CategoryItem } from "@/interface/category.interface";
 import { useFilters } from "@/hooks/useFilters";
 import { slugify } from "@/utils/make_slug";
 import { toast } from "sonner";
+import Loading from "@/components/common/Loading";
 const LIMIT = 5;
 
 export default function CategoryList() {
@@ -188,9 +189,7 @@ export default function CategoryList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
+      <Loading className = "ml-[240px] bg-transparent"></Loading>
     );
   }
 

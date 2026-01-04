@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 import { useEffect, useRef, useState } from "react";
 import { formatToVN } from "@/utils/format_time";
-
+import Loading from "@/components/common/Loading";
 type ProductDetail = {
   product_id: number;
   product_name: string;
@@ -51,9 +51,7 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
+      <Loading className = "ml-[240px] bg-transparent"></Loading>
     );
   }
 

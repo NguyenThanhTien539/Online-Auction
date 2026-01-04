@@ -6,7 +6,7 @@ import Pagination from "@/components/admin/Pagination";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFilters } from "@/hooks/useFilters";
 import { slugify } from "@/utils/make_slug";
-
+import Loading from "@/components/common/Loading";
 type UserItem = {
   user_id: number;
   full_name: string;
@@ -244,9 +244,7 @@ export default function UserListPage() {
         {/* Tablet/Mobile Card View - Show on screens < 1280px */}
         <div className="mt-4 sm:mt-5 grid grid-row-1 sm:grid-row-2 gap-3 sm:gap-4 xl:hidden">
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
+           <Loading className = "ml-[240px] bg-transparent"></Loading>
           ) : (
             items.map((user) => {
               return (

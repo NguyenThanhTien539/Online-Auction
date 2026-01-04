@@ -157,7 +157,7 @@ export async function playBid (user_id: number, product_id: number, max_price: n
 
 export async function getBidHistoryByProductId (product_id: number){
    const bidHistory = await db.raw(`
-        select bh.*, u1.username as username,
+        select bh.*, u1.username as username, u1.user_id as user_id,
                u2.username as price_owner_username
         from bidding_history as bh
         left join users u1 on bh.user_id = u1.user_id

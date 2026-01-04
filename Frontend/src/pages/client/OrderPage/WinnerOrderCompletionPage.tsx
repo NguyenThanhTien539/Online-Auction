@@ -566,10 +566,10 @@ export default function WinnerOrderCompletionPage() {
                 </div>
 
                 <button
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate(-1)}
                   className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Quay về trang chủ
+                  Quay lại
                 </button>
               </div>
             )}
@@ -595,10 +595,10 @@ export default function WinnerOrderCompletionPage() {
                 </div>
 
                 <button
-                  onClick={() => navigate("/")}
-                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  onClick={() => navigate(-1)}
+                  className="w-full px-6 py-3 bg-blue-300 text-white rounded-lg hover:bg-blue-400 cursor-pointer transition-colors duration-300"
                 >
-                  Quay về trang chủ
+                  Quay lại
                 </button>
               </div>
             )}

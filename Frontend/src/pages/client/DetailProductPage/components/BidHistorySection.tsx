@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {toast} from "sonner"
-
+import {Link} from "react-router-dom";
 type ProductType = {
   product_id: number,
 }
@@ -98,7 +98,7 @@ export default function BidHistorySection({product, isSeller} : {product?: Produ
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                    {maskName(bid.username)}
+                    {isSeller ? (<Link to = {`/profile/${bid.username}_${bid.user_id}`}>{maskName(bid.username)}</Link>) : (maskName(bid.username))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-600 font-semibold">
                     {bid.max_price.toLocaleString('vi-VN')} VNĐ
