@@ -34,7 +34,7 @@ function Navbar() {
                 alt="logo"
                 className="flex  h-[90%] my-auto object-cover rounded-[50%] hover:rotate-30 transition-all duration-300"
               ></img>
-              <span className="text-xl mx-2 font-bold w-full text-blue-500 hover:text-blue-300 transition-all duration-300">
+              <span className="text-2xl mx-2 font-[1000] w-full text-blue-500 hover:text-blue-300 transition-all duration-300 ">
                 Miracle
               </span>
             </div>

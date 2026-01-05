@@ -934,3 +934,102 @@ export function sendSellerAnswerTemplate ({
             </html>
   `
 }
+
+// ========================================== Product Description Changed Template =========================================
+
+interface ProductDescriptionChangedParams {
+  bidderUsername: string;
+  productName: string;
+  currentPrice: number;
+  productUrl: string;
+  changeDate: string;
+}
+
+export function getProductDescriptionChangedTemplate(params: ProductDescriptionChangedParams): string {
+  const {
+    bidderUsername,
+    productName,
+    currentPrice,
+    productUrl,
+    changeDate
+  } = params;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: #fff; margin: 0; font-size: 28px; }
+    .content { background: #fff; padding: 40px 30px; border: 1px solid #e5e5e5; }
+    .badge { display: inline-block; background: #f59e0b; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+    .product-info { background: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }
+    .product-name { font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 10px; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #fde68a; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #92400e; font-weight: 500; }
+    .info-value { color: #78350f; font-weight: bold; }
+    .price { font-size: 28px; color: #f59e0b; }
+    .button { display: inline-block; background: #f59e0b; color: #fff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+    .button:hover { background: #d97706; }
+    .info-text { color: #6b7280; font-size: 14px; margin: 15px 0; line-height: 1.8; }
+    .warning-box { background: #fef3c7; border: 1px solid #fcd34d; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .warning-box p { margin: 0; color: #92400e; font-size: 14px; line-height: 1.6; }
+    .footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Thông báo cập nhật sản phẩm</h1>
+    </div>
+    <div class="content">
+      <div class="badge">CẬP NHẬT MÔ TẢ</div>
+      <p>Xin chào <strong>${bidderUsername}</strong>,</p>
+      <p>Người bán đã cập nhật mô tả cho sản phẩm mà bạn đang giữ giá cao nhất.</p>
+      
+      <div class="product-info">
+        <div class="product-name">${productName}</div>
+        <div class="info-row">
+          <span class="info-label">Giá hiện tại</span>
+          <span class="info-value price">${currentPrice.toLocaleString('vi-VN')} VNĐ</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Trạng thái</span>
+          <span class="info-value">Bạn đang giữ giá cao nhất</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Thời gian cập nhật</span>
+          <span class="info-value">${changeDate}</span>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <p><strong>Lưu ý quan trọng:</strong> Vui lòng xem lại mô tả sản phẩm để đảm bảo rằng các thông tin cập nhật vẫn phù hợp với mong đợi của bạn. Nếu có bất kỳ thắc mắc nào, hãy liên hệ người bán để được giải đáp.</p>
+      </div>
+
+      <a href="${productUrl}" class="button">Xem chi tiết sản phẩm</a>
+
+      <p class="info-text"><strong>Các bước tiếp theo:</strong></p>
+      <ul class="info-text">
+        <li>Đọc kỹ mô tả sản phẩm đã được cập nhật</li>
+        <li>Kiểm tra các thay đổi về thông số kỹ thuật hoặc điều kiện</li>
+        <li>Liên hệ người bán nếu cần làm rõ thông tin</li>
+        <li>Tiếp tục tham gia đấu giá nếu sản phẩm vẫn phù hợp</li>
+      </ul>
+
+      <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">Đây là thông báo tự động để giúp bạn cập nhật thông tin mới nhất về sản phẩm bạn quan tâm.</p>
+    </div>
+    <div class="footer">
+      <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
+      <p>&copy; 2026 Hệ thống đấu giá trực tuyến. Bảo lưu mọi quyền.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}

@@ -39,7 +39,7 @@ let HoverDropMenu = (handler: any) => {
 };
 
 //  Export default component
-function CatagoriesButton({ name = "Categories" }: { name?: string }) {
+function CatagoriesButton({ name = "Danh mục" }: { name?: string }) {
   const navigate = useNavigate();
   const [open, handleOpen] = useState(false);
 
@@ -58,7 +58,7 @@ function CatagoriesButton({ name = "Categories" }: { name?: string }) {
     >
       {/* trigger */}
       <div className="flex relative w-full font-semibold text-black justify-center items-center \
-                px-4 py-3 rounded-xl mb-2 hover:cursor-pointer hover:bg-gray-100/70 transition-all duration-300 text-sm shadow-lg hover:shadow-xl border border-gray-200/50 hover:border-gray-300/70 backdrop-blur-sm">
+                px-4 py-3 rounded-xl mb-2 hover:cursor-pointer hover:bg-gray-100/70 transition-all duration-300 text-sm hover:shadow-xl border-1 border-gray-200/50 hover:border-gray-300/70 backdrop-blur-sm">
         <div onClick={handleClick} className="flex items-center gap-2">
           <Grid3X3 className="w-4 h-4 text-gray-600" />
           {name}

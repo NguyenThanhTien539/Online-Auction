@@ -7,7 +7,8 @@ import fs from "fs";
 import { slugify } from "../../helpers/slug.helper.ts";
 import {
   sendBidderQuestionTemplate,
-  sendSellerAnswerTemplate
+  sendSellerAnswerTemplate,
+  getProductDescriptionChangedTemplate
 } from "../../helpers/mail.helper.ts";
 
 export async function getProductsPageList(req: Request, res: Response) {
@@ -428,6 +429,22 @@ export async function updateProductDescription(req: Request, res: Response) {
         message: promise.message,
       });
     }
+
+    // Notify winner by email if there is any bid
+    const productInfo = await productsModel.getProductById(product_id);
+    if (productInfo && productInfo.bid_turns > 0 && productInfo.price_owner_id) {
+      const emailContent = getProductDescriptionChangedTemplate({
+        bidderUsername: productInfo.price_owner_username,
+        productName: productInfo.product_name,
+        currentPrice: productInfo.current_price,
+        productUrl: `${process.env.CLIENT_URL}/product/${slugify(productInfo.product_name)}-${productInfo.product_id}`,
+        changeDate: new Date().toLocaleString(),
+      });
+      const userInfo = await usersModel.getUserById(productInfo.price_owner_id);
+      if (userInfo)
+        sendMail(userInfo.email, "Cập nhật mô tả sản phẩm bạn đang đấu giá", emailContent);
+    }
+    
     return res.status(200).json({
       status: "success",
       message: "Cập nhật mô tả sản phẩm thành công",

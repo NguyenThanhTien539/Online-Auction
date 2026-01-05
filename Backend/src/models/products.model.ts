@@ -293,7 +293,7 @@ export async function getMyBiddingProducts(user_id: string, page: number) {
             AND p.product_id IN (
                 SELECT DISTINCT product_id
                 FROM bidding_history
-                WHERE user_id = ?
+                WHERE user_id = ? AND user_id != p.seller_id
             )
         ORDER BY p.created_at DESC
         LIMIT ? OFFSET ?

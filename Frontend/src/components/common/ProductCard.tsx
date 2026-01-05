@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { slugify } from "@/utils/make_slug";
 import AddToLove from "@/components/common/AddToLove";
 import useIntersectionObserver from "@/hooks/useIntersectionObserver";
+import {useAuth} from "@/routes/ProtectedRouter"
 type Products = {
   product_id?: number;
   product_image?: string;
@@ -15,6 +16,7 @@ type Products = {
   start_time?: any;
   end_time?: any;
   price_owner_username?: string;
+  price_owner_id?: number;
   bid_turns?: string;
 };
 
@@ -27,13 +29,14 @@ function ProductCard({
   start_time,
   end_time,
   price_owner_username,
+  price_owner_id,
   bid_turns,
   ...data
 }: Products & { className?: string } & { onClick?: () => void }) {
   const navigate = useNavigate();
   let [formattedStartTime, setFormatStartTime] = useState("");
   let [timeLeft, setTimeLeft] = useState("");
-
+  const {auth} = useAuth();
   // Start time take day, month, year
   const startDate = DateTime.fromISO(start_time, { zone: "Asia/Ho_Chi_Minh" });
   const endDate = DateTime.fromISO(end_time, { zone: "Asia/Ho_Chi_Minh" });
@@ -230,7 +233,13 @@ function ProductCard({
             Người giữ giá:
           </div>
           <span className="text-gray-800 group-hover:text-gray-900 transition-colors duration-300">
-            {price_owner_username ? maskName(price_owner_username) : "..."}
+            {price_owner_username 
+              ? (price_owner_id == auth?.user_id 
+                  ? <span className="inline-flex items-center px-2 py-0.5 rounded-md text-sm bg-yellow-100 text-gray-800 border border-yellow-300">
+                      {price_owner_username}
+                    </span>
+                  : maskName(price_owner_username))
+              : "..."}
           </span>
         </div>
         <div className="text-[85%] transition-colors duration-300">

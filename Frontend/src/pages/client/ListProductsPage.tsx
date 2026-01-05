@@ -19,6 +19,7 @@ type Products = {
   start_time: any;
   end_time: any;
   price_owner_username: string;
+  price_owner_id: number;
   bid_turns: string;
 };
 
@@ -257,6 +258,7 @@ function ListProductsPage() {
                       start_time={item.start_time}
                       end_time={item.end_time}
                       price_owner_username={item.price_owner_username}
+                      price_owner_id={item.price_owner_id}
                       bid_turns={item.bid_turns}
                     />
                   </div>

@@ -90,7 +90,7 @@ export default function AddToLove({product_id, className} : {product_id: number,
     return (
         <div className={cn(`absolute w-fit  h-[42px] top-5 right-5 bg-gray-200/50 backdrop-blur-sm rounded-xl flex flex-row items-center gap-1 \
             hover:cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 transition-all duration-300 border border-white/30 ${
-                isLoved ? 'hover:bg-red-400/50 bg-red-300/50 scale-105 shadow-lg shadow-red-200/50' : 'hover:bg-red-300/50'
+                isLoved ? 'hover:bg-rose-400/50 bg-rose-300/50 scale-105 shadow-lg shadow-red-200/50' : 'hover:bg-rose-400/50'
             }`, className)}
             onClick={handleClick}
         >
