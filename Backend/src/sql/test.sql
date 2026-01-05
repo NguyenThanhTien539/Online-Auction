@@ -157,3 +157,6 @@ select count(*) from users
 
 select * from bidding_history where product_id = 178 order by created_at desc;
 
+
+
+select * from product_questions where user_id = 78

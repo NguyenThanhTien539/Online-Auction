@@ -578,7 +578,7 @@ export async function postProductQuestion({
 export async function getUserInParentQuestion(question_parent_id: number) {
   let query = await db.raw(
     `
-        SELECT u.*
+        SELECT u.*, pq.content
         FROM product_questions pq
         LEFT JOIN users u ON pq.user_id = u.user_id
         WHERE pq.question_id = ?
