@@ -9,13 +9,13 @@ import { slugify } from "@/helpers/slug.helper.ts";
 
 
 export async function buyNowProduct(req: Request, res: Response) {
-  try{
+  try {
     const user_id = (req as any).user.user_id;
     const product_id = req.body.product_id;
     const buy_price = req.body.buy_price;
     // check seller is not buyer
     const isSeller = await bidModels.checkUserIsSeller(user_id, product_id);
-    if (isSeller){
+    if (isSeller) {
       return res.status(400).json({
         status: "error",
         message: "Người bán không thể mua sản phẩm của chính họ",
@@ -23,8 +23,10 @@ export async function buyNowProduct(req: Request, res: Response) {
     }
 
     // check product is in buy now time
-    const isInBuyNowTime = await productModels.isProductInBiddingTime(product_id);
-    if (!isInBuyNowTime){
+    const isInBuyNowTime = await productModels.isProductInBiddingTime(
+      product_id
+    );
+    if (!isInBuyNowTime) {
       return res.status(400).json({
         status: "error",
         message: "Sản phẩm không trong thời gian mua ngay",
@@ -38,14 +40,13 @@ export async function buyNowProduct(req: Request, res: Response) {
     io.to(`bidding_room_${product_id}`).emit("new_bid", {
       data: productInfo,
     });
-    
-    return  res.status(200).json({
+
+    return res.status(200).json({
       status: "success",
       order_id: order.order_id,
       end_time: order.end_time,
     });
-  }
-  catch (e) {
+  } catch (e) {
     console.error(e);
     return res.status(500).json({
       status: "error",
@@ -54,16 +55,18 @@ export async function buyNowProduct(req: Request, res: Response) {
   }
 }
 
-export async function handleNewUserPlayBid(req: Request, res: Response, next: Function) {
+export async function handleNewUserPlayBid(
+  req: Request,
+  res: Response,
+  next: Function
+) {
   try {
     const user_id = (req as any).user.user_id;
     const userInfo = await userModels.getUserById(user_id);
-    if (userInfo.rating_count === 0){
-
+    if (userInfo.rating_count === 0) {
     }
     next();
-  }
-  catch (e){
+  } catch (e) {
     console.error(e);
     return res.status(500).json({
       status: "error",
@@ -72,11 +75,10 @@ export async function handleNewUserPlayBid(req: Request, res: Response, next: Fu
   }
 }
 
-export async function autoExtendBiddingTime(product_id : number) {
+export async function autoExtendBiddingTime(product_id: number) {
   try {
     await productModels.extendBiddingTimeIfNeeded(product_id);
-  }
-  catch (e){
+  } catch (e) {
     console.error(e);
   }
 }
@@ -112,15 +114,19 @@ export async function playBid(req: Request, res: Response) {
       });
     }
 
-
-
     // Check if price >= buy now price
-    const isBuyNowExceeded = await bidModels.isBidExceedBuyNowPrice(product_id, max_price);
+    const isBuyNowExceeded = await bidModels.isBidExceedBuyNowPrice(
+      product_id,
+      max_price
+    );
     if (isBuyNowExceeded.result) {
       // process buy now
-      await bidModels.buyNowProduct(user_id, product_id, isBuyNowExceeded.buy_now_price!);
-    }
-    else {
+      await bidModels.buyNowProduct(
+        user_id,
+        product_id,
+        isBuyNowExceeded.buy_now_price!
+      );
+    } else {
       // Play bid
       autoExtendBiddingTime(product_id);
       await bidModels.playBid(user_id, product_id, max_price);
@@ -167,9 +173,8 @@ export async function getBidHistoryByProductId(req: Request, res: Response) {
   }
 }
 
-
 export async function banBidder(req: Request, res: Response) {
-  try{
+  try {
     const ban_user_id = req.body.banned_user_id;
     const product_id = req.body.product_id;
     const reason = req.body.reason;
@@ -217,9 +222,7 @@ export async function banBidder(req: Request, res: Response) {
       status: "success",
       data: data,
     });
-
-  }
-  catch (e){
+  } catch (e) {
     console.error(e);
     return res.status(500).json({
       status: "error",
@@ -228,21 +231,23 @@ export async function banBidder(req: Request, res: Response) {
   }
 }
 
-
-export async function checkBannedBidder(req: Request, res: Response, next: Function){
-  try{
+export async function checkBannedBidder(
+  req: Request,
+  res: Response,
+  next: Function
+) {
+  try {
     const user_id = (req as any).user.user_id;
     const product_id = req.body.product_id;
     const isBanned = await bidModels.isBannedBidder(product_id, user_id);
-    if (isBanned){
+    if (isBanned) {
       return res.status(403).json({
         status: "error",
         message: "Bạn đã bị cấm đấu giá sản phẩm này",
       });
     }
     next();
-  }
-  catch (e){
+  } catch (e) {
     console.error(e);
     return res.status(500).json({
       status: "error",
@@ -251,8 +256,12 @@ export async function checkBannedBidder(req: Request, res: Response, next: Funct
   }
 }
 
-export async function checkRatingUser (req: Request, res: Response, next: Function){
-  try{
+export async function checkRatingUser(
+  req: Request,
+  res: Response,
+  next: Function
+) {
+  try {
     const user_id = (req as any).user.user_id;
     const currentUserRating = await bidModels.checkRatingUser(user_id, 4);
     if (!currentUserRating) {
@@ -262,8 +271,7 @@ export async function checkRatingUser (req: Request, res: Response, next: Functi
       });
     }
     next();
-  }
-  catch (e){
+  } catch (e) {
     console.error(e);
     return res.status(500).json({
       status: "error",

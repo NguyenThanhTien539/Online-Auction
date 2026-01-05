@@ -18,8 +18,6 @@ import {
 
 import { useAuth } from "@/routes/ProtectedRouter";
 
-import Rating from "@/components/common/Rating";
-
 type ProductInfo = {
   product_id: number;
   product_name: string;
@@ -598,16 +596,16 @@ export default function WinnerOrderCompletionPage() {
 
                 {/* Rating Seller Section */}
                 <div className="mb-6">
-                  <Rating
-                    productId={product_id!}
-                    targetUserId={infoUser.user_id}
-                    targetName={
-                      infoUser?.full_name ||
-                      orderInfo?.seller_name ||
-                      "Người bán"
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/rating/${infoUser?.username}_${infoUser?.user_id}`
+                      )
                     }
-                    targetType="seller"
-                  />
+                    className="w-full px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                  >
+                    Đánh giá người bán
+                  </button>
                 </div>
 
                 <button

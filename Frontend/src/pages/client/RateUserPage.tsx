@@ -87,7 +87,7 @@ export default function RateUserPage() {
       }
 
       // Success - navigate back to profile
-      navigate(`/profile/${params.username_id}`);
+      navigate(-1);
     } catch (error) {
       setError('Không thể gửi đánh giá. Vui lòng thử lại.');
       toast.error("Không thể gửi đánh giá. Vui lòng thử lại.");
