@@ -12,6 +12,8 @@ import adminRoutes from "./routes/admin/index.route.ts";
 
 import variableConfig from "./config/variable.config.ts";
 import cookieParser from "cookie-parser";
+import { startAuctionEndEmailJob } from "./jobs/auction-end.job.ts";
+
 const app = express(); // Create express app
 const httpServer = createServer(app); // Create HTTP server
 
@@ -65,5 +67,8 @@ io.on("connection", (socket) => {
 // Start the server
 httpServer.listen(port, () => {
   console.log(`Your website is running at port: http://localhost:${port}`);
+  
+  // Start auction end email cron job
+  startAuctionEndEmailJob();
 });
 //

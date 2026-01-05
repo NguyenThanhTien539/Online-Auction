@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #64748b 0%, #475569 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: #fff; margin: 0; font-size: 28px; }
+    .content { background: #fff; padding: 40px 30px; border: 1px solid #e5e5e5; }
+    .product-info { background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .product-name { font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 10px; }
+    .price { font-size: 24px; font-weight: bold; color: #64748b; margin: 10px 0; }
+    .button { display: inline-block; background: #3b82f6; color: #fff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+    .button:hover { background: #2563eb; }
+    .info-text { color: #6b7280; font-size: 14px; margin: 15px 0; }
+    .footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Auction Ended</h1>
+    </div>
+    <div class="content">
+      <p>Thank you for participating in the auction for:</p>
+      
+      <div class="product-info">
+        <div class="product-name">${params.productName}</div>
+        <p class="info-text">Final winning price:</p>
+        <div class="price">${params.finalPrice.toLocaleString('vi-VN')} VND</div>
+      </div>
+
+      <p>Unfortunately, your bid was not the highest. But don't worry, there are many other great products available!</p>
+
+      <a href="${params.productLink}" class="button">Explore Similar Products</a>
+
+      <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">Keep participating and you might win the next auction!</p>
+    </div>
+    <div class="footer">
+      <p>This is an automated email. Please do not reply.</p>
+      <p>&copy; 2026 Online Auction Platform. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
