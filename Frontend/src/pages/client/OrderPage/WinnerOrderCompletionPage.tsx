@@ -18,6 +18,8 @@ import {
 
 import { useAuth } from "@/routes/ProtectedRouter";
 
+import Rating from "@/components/common/Rating";
+
 type ProductInfo = {
   product_id: number;
   product_name: string;
@@ -592,6 +594,20 @@ export default function WinnerOrderCompletionPage() {
                   <p className="text-gray-600 mb-4">
                     Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.
                   </p>
+                </div>
+
+                {/* Rating Seller Section */}
+                <div className="mb-6">
+                  <Rating
+                    productId={product_id!}
+                    targetUserId={infoUser.user_id}
+                    targetName={
+                      infoUser?.full_name ||
+                      orderInfo?.seller_name ||
+                      "Người bán"
+                    }
+                    targetType="seller"
+                  />
                 </div>
 
                 <button

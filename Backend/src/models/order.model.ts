@@ -31,6 +31,7 @@ export async function getSellerOrderView(product_id: number) {
         p.product_images,
         p.buy_now_price,
         p.end_time,
+        u.user_id as winner_id,
         u.username as winner_name,
         u.email as winner_email,
         u.avatar as winner_avatar

@@ -18,6 +18,8 @@ import {
 import { useAuth } from "@/routes/ProtectedRouter";
 import Swal from "sweetalert2";
 
+import Rating from "@/components/common/Rating";
+
 type OrderInfo = {
   order_id: number;
   product_id: number;
@@ -29,6 +31,7 @@ type OrderInfo = {
   phone_number: string;
   shipping_address: string;
   order_status: string;
+  winner_id: number;
   winner_name: string;
   winner_email: string;
   winner_avatar?: string;
@@ -138,7 +141,9 @@ export default function SellerOrderPage() {
           }
 
           const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/order/approve?product_id=${product_id}`,
+            `${
+              import.meta.env.VITE_API_URL
+            }/api/order/approve?product_id=${product_id}`,
             {
               method: "POST",
               credentials: "include",
@@ -512,6 +517,16 @@ export default function SellerOrderPage() {
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Rating Buyer Section */}
+                <div className="mb-6">
+                  <Rating
+                    productId={product_id!}
+                    targetUserId={orderInfo.winner_id}
+                    targetName={orderInfo.winner_name}
+                    targetType="buyer"
+                  />
                 </div>
 
                 <button
