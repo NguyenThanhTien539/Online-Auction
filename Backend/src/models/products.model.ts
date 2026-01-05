@@ -428,30 +428,23 @@ export async function getLoveStatus(
   user_id: number | null,
   product_id: number
 ) {
-  let query = await db.raw(
+  // Combine both queries into one for better performance
+  const query = await db.raw(
     `
-            select (exists (
-                select 1 
-                from love_products 
-                where user_id = ? and product_id = ?
-            )) as is_loved
-            from love_products
-            where user_id = ? and product_id = ?
-        `,
-    [user_id, product_id, user_id, product_id]
-  );
-  let result = await query.rows[0];
-  let totalQuery = await db.raw(
-    `
-        select count(*) as total
-        from love_products
-        where product_id = ?
+      SELECT 
+        (SELECT COUNT(*)::int FROM love_products WHERE product_id = ?) as total_loves,
+        EXISTS(
+          SELECT 1 FROM love_products 
+          WHERE user_id = ? AND product_id = ?
+        ) as is_loved
     `,
-    [product_id]
+    [product_id, user_id, product_id]
   );
-  let totalResult = await totalQuery.rows[0];
+  
+  const result = query.rows[0];
+  
   return {
-    total_loves: totalResult.total,
+    total_loves: result.total_loves,
     is_loved: result.is_loved,
   };
 }
