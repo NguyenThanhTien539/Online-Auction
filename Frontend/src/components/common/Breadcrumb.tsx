@@ -18,10 +18,12 @@ function Breadcrumbs() {
   }, [location.pathname]);
 
   // Không hiển thị gì nếu breadcrumbs rỗng
-  if (breadcrumbs.length === 0) return null;
+  if (breadcrumbs.length === 0) return (
+    null
+  ); 
 
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b border-gray-200 animate__animated animate__fadeIn">
       <div className="max-w-7xl mx-auto px-4 pb-3 ">
         <Breadcrumb>
           <BreadcrumbList>

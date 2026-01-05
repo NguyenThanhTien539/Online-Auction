@@ -1,9 +1,7 @@
 import HorizontalBar from "@/components/common/HorizontalBar"
 import ProductCard from "@/components/common/ProductCard"
 import {useEffect, useState} from "react"
-import moneyIcon from "@/assets/icons/money.png"
-import bidIcon from "@/assets/icons/bid_turn.svg"
-import clockIcon from "@/assets/icons/clock.png"
+import { Clock, TrendingUp, DollarSign, Sparkles } from "lucide-react"
 import useIntersectionObserver from "@/hooks/useIntersectionObserver"
 
 
@@ -11,14 +9,17 @@ import useIntersectionObserver from "@/hooks/useIntersectionObserver"
 function Section2(){
 
     return(
-        <>
-          <div className="h-[50px]"></div>
-          <Section21/>
-          <div className="h-[30px]"></div>
-          <Section22/>
-          <div className="h-[30px]"></div>
-          <Section23/>
-        </>
+        <div className="relative py-16 px-4">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-400/5 to-purple-400/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-tr from-indigo-400/5 to-pink-400/5 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10 space-y-16">
+            <Section21/>
+            <Section22/>
+            <Section23/>
+          </div>
+        </div>
     );
 }
 
@@ -55,21 +56,39 @@ function Section21()
         fetchData();
     }, [])
     
-    // simulate 5 products
     const {ref, hasIntersected} = useIntersectionObserver ();
     return (
-        <div ref = {ref}>
-            {/* Top 5 sản phẩm gần kết thúc */}
-            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm sắp kết thúc
-                <span><img src= {clockIcon} className = "flex h-[35px] aspect-square ml-3"></img></span>
+        <div ref={ref} className={`transition-all duration-1000 ${hasIntersected ? 'animate__animated animate__fadeInUp' : 'opacity-0'}`}>
+            {/* Header Section */}
+            <div className="mb-8">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl blur-xl opacity-30"></div>
+                        <div className="relative bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-2xl shadow-lg">
+                            <Clock className="w-7 h-7 text-white" />
+                        </div>
+                    </div>
+                    <div>
+                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                            Sắp Kết Thúc
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Nhanh tay đấu giá trước khi hết thời gian
+                        </p>
+                    </div>
+                </div>
+                <div className="h-1 w-24 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></div>
             </div>
-            <div>
-                <HorizontalBar className = {`h-[400px] bg-linear-to-r from-blue-300 to-green-100 `}>
+
+            {/* Products Carousel */}
+            <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-50/50 via-red-50/30 to-orange-50/50 dark:from-orange-950/20 dark:via-red-950/10 dark:to-orange-950/20 rounded-3xl"></div>
+                <HorizontalBar className="relative h-[400px] rounded-3xl bg-linear-to-r from-orange-50/50 via-red-50/30 to-orange-50/50 dark:from-orange-950/20 dark:via-red-950/10 dark:to-orange-950/20 border border-orange-100/50 dark:border-orange-900/50 ">
                     {products && products.length > 0 && 
                             products.map((item, index) => (
-                                <div key={index} className="flex justify-center">
+                                <div key={index} className="flex justify-center group">
                                     <ProductCard
-                                        className = {`scale-80 hover:scale-85 `}
+                                        className="scale-80 hover:scale-85 transition-all duration-500 shadow-lg shadow-orange-500/20 hover:shadow-2xl hover:shadow-orange-500/40 backdrop-blur-sm"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}
@@ -79,12 +98,9 @@ function Section21()
                                         end_time={item.end_time}
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns}
-                                   
                                     />
                                 </div>
                             ))}
-
-                    
                 </HorizontalBar>
             </div>
         </div>
@@ -113,18 +129,37 @@ function Section22()
     }, [])
      const {ref, hasIntersected} = useIntersectionObserver ();
     return (
-        <div ref = {ref}>
-             {/* Top 5 sản phẩm có nhiều lượt ra giá nhất */}
-            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm được đấu giá nhiều nhất
-                <span><img src = {bidIcon} className = "flex w-[35px] ml-3 aspect-square"></img></span>
+        <div ref={ref} className={`transition-all duration-1000 ${hasIntersected ? 'animate__animated animate__fadeInUp' : 'opacity-0'}`}>
+            {/* Header Section */}
+            <div className="mb-8">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur-xl opacity-30"></div>
+                        <div className="relative bg-gradient-to-r from-emerald-500 to-teal-500 p-3 rounded-2xl shadow-lg">
+                            <TrendingUp className="w-7 h-7 text-white" />
+                        </div>
+                    </div>
+                    <div>
+                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                            Nhiều Lượt Ra Giá Nhất
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Sản phẩm được quan tâm nhiều nhất
+                        </p>
+                    </div>
+                </div>
+                <div className="h-1 w-24 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
             </div>
-            <div>
-                <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
+
+            {/* Products Carousel */}
+            <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/50 via-teal-50/30 to-emerald-50/50 dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-emerald-950/20 rounded-3xl"></div>
+                <HorizontalBar className="relative h-[400px] rounded-3xl bg-linear-to-r from-emerald-50/50 via-teal-50/30 to-emerald-50/50 backdrop-blur-sm rounded-3xl border border-emerald-100/50 dark:border-emerald-900/50">
                     {products && products.length > 0 && 
                             products.map((item, index) => (
-                                <div key={index} className="flex justify-center">
+                                <div key={index} className="flex justify-center group">
                                     <ProductCard
-                                        className = {`scale-80 hover:scale-85 `}
+                                        className="scale-80 hover:scale-85 transition-all duration-500 shadow-lg shadow-emerald-500/20 hover:shadow-2xl hover:shadow-emerald-500/40 backdrop-blur-sm"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}
@@ -134,7 +169,6 @@ function Section22()
                                         end_time={item.end_time}
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns}
-                                   
                                     />
                                 </div>
                             ))}
@@ -166,18 +200,37 @@ function Section23()
     }, [])
      const {ref, hasIntersected} = useIntersectionObserver ();
     return (
-        <div ref = {ref}>
-              {/* Top 5 sản phẩm có giá cao nhất */}
-            <div className = "ml-2 text-3xl font-bold flex">Top 5 sản phẩm có giá cao nhất
-                <span><img src={moneyIcon} className = "flex w-[35px] ml-3 aspect-square"></img></span>
+        <div ref={ref} className={`transition-all duration-1000 ${hasIntersected ? 'animate__animated animate__fadeInUp' : 'opacity-0'}`}>
+            {/* Header Section */}
+            <div className="mb-8">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-purple-500 rounded-2xl blur-xl opacity-30"></div>
+                        <div className="relative bg-gradient-to-r from-violet-500 to-purple-500 p-3 rounded-2xl shadow-lg">
+                            <DollarSign className="w-7 h-7 text-white" />
+                        </div>
+                    </div>
+                    <div>
+                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                            Giá Cao Nhất
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            Những món hàng giá trị cao nhất
+                        </p>
+                    </div>
+                </div>
+                <div className="h-1 w-24 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"></div>
             </div>
-            <div>
-                <HorizontalBar className = "h-[400px] bg-linear-to-r from-blue-300 to-green-100">
+
+            {/* Products Carousel */}
+            <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-50/50 via-purple-50/30 to-violet-50/50 dark:from-violet-950/20 dark:via-purple-950/10 dark:to-violet-950/20 rounded-3xl"></div>
+                <HorizontalBar className="relative h-[400px] rounded-3xl bg-linear-to-r from-violet-50/50 via-purple-50/30 to-violet-50/50 dark:from-violet-950/20 dark:via-purple-950/10 dark:to-violet-950/20 border border-violet-100/50 dark:border-violet-900/50 ">
                     {products && products.length > 0 && 
                             products.map((item, index) => (
-                                <div key={index} className="flex justify-center">
+                                <div key={index} className="flex justify-center group">
                                     <ProductCard
-                                        className = {`scale-80 hover:scale-85`}
+                                        className="scale-80 hover:scale-85 transition-all duration-500 shadow-lg shadow-violet-500/20 hover:shadow-2xl hover:shadow-violet-500/40 backdrop-blur-sm"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}
@@ -187,13 +240,12 @@ function Section23()
                                         end_time={item.end_time}
                                         price_owner_username={item.price_owner_username}
                                         bid_turns={item.bid_turns}
-                                   
                                     />
                                 </div>
                             ))}
                 </HorizontalBar>
             </div>
         </div>
-    )
+    );
 }
 export default Section2;

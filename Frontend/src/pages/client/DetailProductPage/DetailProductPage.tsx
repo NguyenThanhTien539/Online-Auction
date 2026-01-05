@@ -309,7 +309,7 @@ function DetailProductPage() {
                 <Clock className="w-5 h-5 text-red-600" />
                 <div className="flex-1">
                   <p className="text-xs text-gray-500 mb-1">Còn lại</p>
-                  {timeLeft && <p className="text-lg font-bold text-red-600 animate__animated animate__fadeIn">{timeLeft}</p>}
+                  {<p className="text-lg font-bold text-red-600">{timeLeft ?? "Waiting..."}</p>}
                 </div>
               </div>
               {products?.auto_extended && (
