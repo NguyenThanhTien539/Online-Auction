@@ -3,8 +3,8 @@ import * as bidModels from "../../models/bid.model.ts";
 import * as userModels from "../../models/users.model.ts";
 import { io } from "@/server.ts";
 import * as productModels from "@/models/products.model.ts";
-
-
+import {getBidderBannedTemplate, sendMail} from "../../helpers/mail.helper.ts"
+import { slugify } from "@/helpers/slug.helper.ts";
 
 
 
@@ -173,7 +173,9 @@ export async function banBidder(req: Request, res: Response) {
     const ban_user_id = req.body.banned_user_id;
     const product_id = req.body.product_id;
     const reason = req.body.reason;
-    // is user already banned ?
+    
+
+    
     const isAlreadyBanned = await bidModels.isBannedBidder(product_id, ban_user_id);
     if (isAlreadyBanned){
       return res.status(400).json({
@@ -182,7 +184,32 @@ export async function banBidder(req: Request, res: Response) {
       });
     }
     const data = await bidModels.banBidder(product_id, ban_user_id, reason);
+
+    // Get information of banned user and seller and product
+    const bannedUserInfo =  await userModels.getUserById(ban_user_id);
     const productInfo = await productModels.getProductById(product_id);
+    const seller_id = productInfo.seller_id; 
+    const sellerInfo =  await userModels.getUserById(seller_id);
+   
+    
+    // Send email to banned bidder
+    const product_name_slug = slugify(productInfo.product_name);
+    const productUrl = `${process.env.CLIENT_URL}/product/${product_name_slug}-${product_id}`;
+    
+    const emailContent = getBidderBannedTemplate({
+      bidder_username: bannedUserInfo.username,
+      seller_username: sellerInfo.username,
+      product_name: productInfo.product_name,
+      product_link: productUrl,
+      reason: reason,
+    });
+    sendMail(
+      bannedUserInfo.email,
+      "Bạn đã bị cấm đấu giá trên sản phẩm",
+      emailContent
+    );
+    // Socket IO notify to bidder
+    
     io.to(`bidding_room_${product_id}`).emit("new_bid", {
       data: productInfo,
     });

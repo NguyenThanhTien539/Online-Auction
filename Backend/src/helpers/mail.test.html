@@ -1,47 +1,116 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #64748b 0%, #475569 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-    .header h1 { color: #fff; margin: 0; font-size: 28px; }
-    .content { background: #fff; padding: 40px 30px; border: 1px solid #e5e5e5; }
-    .product-info { background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .product-name { font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 10px; }
-    .price { font-size: 24px; font-weight: bold; color: #64748b; margin: 10px 0; }
-    .button { display: inline-block; background: #3b82f6; color: #fff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
-    .button:hover { background: #2563eb; }
-    .info-text { color: #6b7280; font-size: 14px; margin: 15px 0; }
-    .footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Auction Ended</h1>
-    </div>
-    <div class="content">
-      <p>Thank you for participating in the auction for:</p>
-      
-      <div class="product-info">
-        <div class="product-name">${params.productName}</div>
-        <p class="info-text">Final winning price:</p>
-        <div class="price">${params.finalPrice.toLocaleString('vi-VN')} VND</div>
-      </div>
-
-      <p>Unfortunately, your bid was not the highest. But don't worry, there are many other great products available!</p>
-
-      <a href="${params.productLink}" class="button">Explore Similar Products</a>
-
-      <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">Keep participating and you might win the next auction!</p>
-    </div>
-    <div class="footer">
-      <p>This is an automated email. Please do not reply.</p>
-      <p>&copy; 2026 Online Auction Platform. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f0f4f8;">
+            <tr>
+                <td align="center" style="padding: 40px 20px;">
+                    <!-- Main Container -->
+                    <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+                        
+                        <!-- Header with gradient -->
+                        <tr>
+                            <td style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 32px 40px; text-align: center;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 600; letter-spacing: -0.5px;">
+                                    Thông báo cấm đấu giá
+                                </h1>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content Body -->
+                        <tr>
+                            <td style="padding: 40px 40px 30px;">
+                                <p style="margin: 0 0 20px; color: #2c3e50; font-size: 16px; line-height: 1.6;">
+                                    Xin chào <strong style="color: #34495e;">${bidder_username}</strong>
+                                </p>
+                                
+                                <p style="margin: 0 0 24px; color: #5a6c7d; font-size: 15px; line-height: 1.6;">
+                                    Rất tiếc thông báo rằng bạn đã bị người bán <strong style="color: #dc2626;">${seller_username}</strong> cấm tham gia đấu giá sản phẩm:
+                                </p>
+                                
+                                <!-- Product Name Badge -->
+                                <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left: 4px solid #dc2626; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;">
+                                    <p style="margin: 0; color: #7f1d1d; font-size: 15px; font-weight: 600;">
+                                        ${product_name}
+                                    </p>
+                                </div>
+                                
+                                ${
+                                  reason
+                                    ? `
+                                <!-- Reason Box -->
+                                <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 20px; margin-bottom: 28px;">
+                                    <p style="margin: 0 0 8px; color: #991b1b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                        Lý do
+                                    </p>
+                                    <p style="margin: 0; color: #7f1d1d; font-size: 15px; line-height: 1.7;">
+                                        ${reason}
+                                    </p>
+                                </div>
+                                `
+                                    : ""
+                                }
+                                
+                                <!-- Information Box -->
+                                <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
+                                    <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.7;">
+                                        <strong>Điều này có nghĩa là:</strong>
+                                    </p>
+                                    <ul style="margin: 12px 0 0 0; padding-left: 20px; color: #92400e; font-size: 14px; line-height: 1.8;">
+                                        <li>Bạn không thể đặt giá cho sản phẩm này nữa</li>
+                                        <li>Các lượt đấu giá trước đó của bạn sẽ bị hủy</li>
+                                        <li>Bạn vẫn có thể tham gia đấu giá các sản phẩm khác</li>
+                                    </ul>
+                                </div>
+                                
+                                <p style="margin: 0 0 28px; color: #5a6c7d; font-size: 15px; line-height: 1.6;">
+                                    Nếu bạn cho rằng đây là sự nhầm lẫn, vui lòng liên hệ với người bán hoặc đội ngũ hỗ trợ của chúng tôi.
+                                </p>
+                                
+                                <!-- CTA Button -->
+                                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td align="center" style="padding: 0 0 28px;">
+                                            <a href="${product_link}" style="display: inline-block; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: #ffffff; padding: 14px 36px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3); transition: all 0.3s;">
+                                                Xem chi tiết sản phẩm
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Alternative Link -->
+                                <div style="background-color: #f8f9fa; border-radius: 8px; padding: 16px; margin-bottom: 0;">
+                                    <p style="margin: 0 0 8px; color: #7f8c8d; font-size: 13px;">
+                                        Hoặc sao chép đường link sau:
+                                    </p>
+                                    <p style="margin: 0; word-break: break-all;">
+                                        <a href="${product_link}" style="color: #6b7280; font-size: 13px; text-decoration: none;">${product_link}</a>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #f8f9fa; padding: 28px 40px; border-top: 1px solid #e9ecef;">
+                                <p style="margin: 0 0 8px; color: #95a5a6; font-size: 14px; line-height: 1.5;">
+                                    Trân trọng,
+                                </p>
+                                <p style="margin: 0; color: #2c3e50; font-size: 15px; font-weight: 600;">
+                                    Đội ngũ Online Auction (Miracle)
+                                </p>
+                                <p style="margin: 16px 0 0; color: #95a5a6; font-size: 12px; line-height: 1.5;">
+                                    Email này được gửi tự động, vui lòng không trả lời trực tiếp.
+                                </p>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
