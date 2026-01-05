@@ -167,13 +167,17 @@ function DetailProductPage() {
       formatStartTime(
         DateTime.fromISO(products.start_time).setZone("Asia/Ho_Chi_Minh")
       );
+      const end = DateTime.fromISO(products.end_time).setZone(
+          "Asia/Ho_Chi_Minh"
+        );
+      formatEndTime(end);
       const interval = setInterval(() => {
         const end = DateTime.fromISO(products.end_time).setZone(
           "Asia/Ho_Chi_Minh"
         );
         formatEndTime(end);
       }, 1000);
-      return () => clearInterval(interval);
+      return () => clearInterval(interval );
     }
   }, [products]);
 

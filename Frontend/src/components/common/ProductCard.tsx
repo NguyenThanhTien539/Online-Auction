@@ -90,6 +90,7 @@ function ProductCard({
       formatEndTime();
     }, 1000);
     formatStartTime();
+    formatEndTime();
     return () => clearInterval(timer);
   });
 
