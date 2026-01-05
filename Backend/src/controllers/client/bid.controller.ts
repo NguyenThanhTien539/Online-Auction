@@ -192,11 +192,11 @@ export async function playBid(req: Request, res: Response) {
         current_price: productInfo.current_price,
       });
       
-      sendMail(
-        email,
-        "Bạn đã đặt giá thành công",
-        emailContent
-      );
+      // sendMail(
+      //   email,
+      //   "Bạn đã đặt giá thành công",
+      //   emailContent
+      // );
 
       // Emit socket with updated product info
       io.to(`bidding_room_${product_id}`).emit("new_bid", {

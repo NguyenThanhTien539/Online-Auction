@@ -94,7 +94,7 @@ select p.*, u.username as price_owner_username, count(*) over() as total_count
 ------------- Reset bidding data for a product (for testing purposes)
 DO $$
 DECLARE
-    v_product_id INT := 264;
+    v_product_id INT := 300;
 BEGIN
    
     DELETE FROM bidding_history WHERE product_id = v_product_id;
@@ -108,12 +108,13 @@ BEGIN
     SET price_owner_id = NULL, 
         current_price = start_price, 
         bid_turns = 0,
-        end_time = NOW() + INTERVAL '5 day' 
+        end_time = NOW() + INTERVAL '5 day' ,
+        auction_end_email_sent = false
     WHERE product_id = v_product_id;
     
 END $$;
 
-
+select * from bidding_history where product_id = 300;
 ------------- Reset ALL products that have bidding activity (for cleaning up after bot testing)
 DO $$
 DECLARE
@@ -139,7 +140,8 @@ BEGIN
     SET price_owner_id = NULL, 
         current_price = start_price, 
         bid_turns = 0,
-        end_time = NOW() + INTERVAL '5 day'
+        end_time = NOW() + INTERVAL '5 day',
+        auction_end_email_sent = false
     WHERE bid_turns > 0 OR price_owner_id IS NOT NULL;
     
     RAISE NOTICE 'Reset complete!';

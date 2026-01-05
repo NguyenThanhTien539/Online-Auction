@@ -116,6 +116,8 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         //  Handle product_price update
         let newProductPrice = oldProductPrice;
         let newPriceOwnerId = oldPriceOwnerId;
+        let shouldInsertOldBidderRow = false;
+        let oldBidderNewPrice = oldProductPrice;
         
         // First bid
         if (oldMaxPrice == null){
@@ -126,6 +128,20 @@ export async function playBid (user_id: number, product_id: number, max_price: n
             if (max_price <= oldMaxPrice){
                 // the first person is priority (current bidder lose)
                 newProductPrice = Number(max_price);
+                shouldInsertOldBidderRow = true;
+                
+                // Calculate old bidder's new price
+                if (max_price < oldMaxPrice) {
+                    // New bidder bid lower - old bidder's price increases by step_price
+                    const stepPrice = Number(productData.step_price);
+                    oldBidderNewPrice = Number(max_price) + stepPrice;
+                } else {
+                    // New bidder matched max price - old bidder keeps priority with same price
+                    oldBidderNewPrice = Number(max_price);
+                }
+                
+                // Old bidder remains the price owner
+                newPriceOwnerId = oldPriceOwnerId;
             }
             else {
                 // increase by step_price (current bidder win)
@@ -135,18 +151,41 @@ export async function playBid (user_id: number, product_id: number, max_price: n
             }
         }
         
-        // Insert new bid within transaction
-        await trx.raw(`
+        // Step 1: Insert new bidder's bid first
+        const insertResult1 = await trx.raw(`
             INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
             VALUES (?, ?, ?, ?, ?)
+            RETURNING bidding_id
         `, [user_id, product_id, max_price, newProductPrice, newPriceOwnerId]);
+        
+        console.log(`[STEP 1] Inserted new bidder bid: ${insertResult1.rows[0].bidding_id}`);
+
+        // Step 2: After new bid is committed, insert old bidder's automatic counter-bid if they still win
+        if (shouldInsertOldBidderRow && oldPriceOwnerId) {
+            // Add small delay to ensure different timestamp (PostgreSQL can have same timestamp for sequential inserts)
+            await new Promise(resolve => setTimeout(resolve, 10));
+            
+            const insertResult2 = await trx.raw(`
+                INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
+                VALUES (?, ?, ?, ?, ?)
+                RETURNING bidding_id
+            `, [oldPriceOwnerId, product_id, oldMaxPrice, oldBidderNewPrice, oldPriceOwnerId]);
+            
+            console.log(`[STEP 2] Inserted old bidder counter-bid: ${insertResult2.rows[0].bidding_id}`);
+            
+            // Update final product price to old bidder's new price
+            newProductPrice = oldBidderNewPrice;
+        }
+
+        // Calculate bid_turns increment: +2 if old bidder auto-bid inserted, +1 otherwise
+        const bidTurnsIncrement = shouldInsertOldBidderRow ? 2 : 1;
 
         // Update products table within transaction
         await trx.raw(`
             UPDATE products
-            SET current_price = ?, price_owner_id = ?, bid_turns = COALESCE(bid_turns, 0) + 1
+            SET current_price = ?, price_owner_id = ?, bid_turns = COALESCE(bid_turns, 0) + ?
             WHERE product_id = ?
-        `, [newProductPrice, newPriceOwnerId, product_id]);
+        `, [newProductPrice, newPriceOwnerId, bidTurnsIncrement, product_id]);
         
         // Commit transaction
         await trx.commit();
@@ -171,7 +210,7 @@ export async function getBidHistoryByProductId (product_id: number){
         left join users u1 on bh.user_id = u1.user_id
         left join users u2 on bh.price_owner_id = u2.user_id
         where bh.product_id = ?
-        order by bh.created_at desc
+        order by bh.created_at DESC, bh.bidding_id DESC
    `, [product_id]);
     
     return bidHistory.rows;
