@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
@@ -13,9 +13,9 @@
                         
                         <!-- Header with gradient -->
                         <tr>
-                            <td style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 32px 40px; text-align: center;">
+                            <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 32px 40px; text-align: center;">
                                 <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 600; letter-spacing: -0.5px;">
-                                    Thông báo cấm đấu giá
+                                    Mua hàng thành công
                                 </h1>
                             </td>
                         </tr>
@@ -24,58 +24,55 @@
                         <tr>
                             <td style="padding: 40px 40px 30px;">
                                 <p style="margin: 0 0 20px; color: #2c3e50; font-size: 16px; line-height: 1.6;">
-                                    Xin chào <strong style="color: #34495e;">${bidder_username}</strong>
+                                    Xin chào <strong style="color: #34495e;">${buyer_username}</strong>
                                 </p>
                                 
                                 <p style="margin: 0 0 24px; color: #5a6c7d; font-size: 15px; line-height: 1.6;">
-                                    Rất tiếc thông báo rằng bạn đã bị người bán <strong style="color: #dc2626;">${seller_username}</strong> cấm tham gia đấu giá sản phẩm:
+                                    Bạn đã mua thành công sản phẩm:
                                 </p>
                                 
                                 <!-- Product Name Badge -->
-                                <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-left: 4px solid #dc2626; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;">
-                                    <p style="margin: 0; color: #7f1d1d; font-size: 15px; font-weight: 600;">
+                                <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left: 4px solid #10b981; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;">
+                                    <p style="margin: 0; color: #064e3b; font-size: 15px; font-weight: 600;">
                                         ${product_name}
                                     </p>
                                 </div>
                                 
-                                ${
-                                  reason
-                                    ? `
-                                <!-- Reason Box -->
-                                <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 20px; margin-bottom: 28px;">
-                                    <p style="margin: 0 0 8px; color: #991b1b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-                                        Lý do
+                                <!-- Price Information -->
+                                <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 24px; margin-bottom: 28px; text-align: center;">
+                                    <p style="margin: 0 0 12px; color: #065f46; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                        Giá mua
                                     </p>
-                                    <p style="margin: 0; color: #7f1d1d; font-size: 15px; line-height: 1.7;">
-                                        ${reason}
+                                    <p style="margin: 0; color: #047857; font-size: 32px; font-weight: 700; line-height: 1.2;">
+                                        ${buy_now_price.toLocaleString('vi-VN')} VNĐ
                                     </p>
                                 </div>
-                                `
-                                    : ""
-                                }
                                 
                                 <!-- Information Box -->
-                                <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
-                                    <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.7;">
-                                        <strong>Điều này có nghĩa là:</strong>
+                                <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 28px;">
+                                    <p style="margin: 0 0 12px; color: #78350f; font-size: 14px; line-height: 1.7;">
+                                        <strong>Các bước tiếp theo:</strong>
                                     </p>
-                                    <ul style="margin: 12px 0 0 0; padding-left: 20px; color: #92400e; font-size: 14px; line-height: 1.8;">
-                                        <li>Bạn không thể đặt giá cho sản phẩm này nữa</li>
-                                        <li>Các lượt đấu giá trước đó của bạn sẽ bị hủy</li>
-                                        <li>Bạn vẫn có thể tham gia đấu giá các sản phẩm khác</li>
+                                    <ul style="margin: 0; padding-left: 20px; color: #92400e; font-size: 14px; line-height: 1.8;">
+                                        <li>Vui lòng hoàn tất thanh toán trong vòng 48 giờ</li>
+                                        <li>Người bán sẽ liên hệ với bạn để sắp xếp giao hàng</li>
+                                        <li>Kiểm tra kỹ sản phẩm khi nhận hàng</li>
                                     </ul>
                                 </div>
                                 
-                                <p style="margin: 0 0 28px; color: #5a6c7d; font-size: 15px; line-height: 1.6;">
-                                    Nếu bạn cho rằng đây là sự nhầm lẫn, vui lòng liên hệ với người bán hoặc đội ngũ hỗ trợ của chúng tôi.
-                                </p>
+                                <!-- Success Message -->
+                                <div style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 20px; margin-bottom: 28px;">
+                                    <p style="margin: 0; color: #166534; font-size: 14px; line-height: 1.7; text-align: center;">
+                                        Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn đã tin tùng và mua sắm tại Online Auction!
+                                    </p>
+                                </div>
                                 
                                 <!-- CTA Button -->
                                 <table role="presentation" style="width: 100%; border-collapse: collapse;">
                                     <tr>
                                         <td align="center" style="padding: 0 0 28px;">
-                                            <a href="${product_link}" style="display: inline-block; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: #ffffff; padding: 14px 36px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(107, 114, 128, 0.3); transition: all 0.3s;">
-                                                Xem chi tiết sản phẩm
+                                            <a href="${product_link}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 14px 36px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); transition: all 0.3s;">
+                                                Xem chi tiết đơn hàng
                                             </a>
                                         </td>
                                     </tr>
@@ -87,7 +84,7 @@
                                         Hoặc sao chép đường link sau:
                                     </p>
                                     <p style="margin: 0; word-break: break-all;">
-                                        <a href="${product_link}" style="color: #6b7280; font-size: 13px; text-decoration: none;">${product_link}</a>
+                                        <a href="${product_link}" style="color: #10b981; font-size: 13px; text-decoration: none;">${product_link}</a>
                                     </p>
                                 </div>
                             </td>

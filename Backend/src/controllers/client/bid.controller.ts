@@ -3,7 +3,7 @@ import * as bidModels from "../../models/bid.model.ts";
 import * as userModels from "../../models/users.model.ts";
 import { io } from "@/server.ts";
 import * as productModels from "@/models/products.model.ts";
-import {getBidderBannedTemplate, sendMail} from "../../helpers/mail.helper.ts"
+import {getBidderBannedTemplate, sendMail, getBidSuccessTemplate, getBuyNowSuccessTemplate} from "../../helpers/mail.helper.ts"
 import { slugify } from "@/helpers/slug.helper.ts";
 
 
@@ -37,6 +37,25 @@ export async function buyNowProduct(req: Request, res: Response) {
     const order = await bidModels.buyNowProduct(user_id, product_id, buy_price);
 
     const productInfo = await productModels.getProductById(product_id);
+
+    // Send email to buyer
+    const email = (req as any).user.email;
+    const username = (req as any).user.username;
+    const product_name_slug = slugify(productInfo.product_name);
+    const productUrl = `${process.env.CLIENT_URL}/product/${product_name_slug}-${product_id}`;
+    const emailContent = getBuyNowSuccessTemplate({
+      buyer_username: username,
+      product_name: productInfo.product_name,
+      product_link: productUrl,
+      buy_now_price: buy_price,
+    });
+    sendMail(
+      email,
+      "Bạn đã mua ngay thành công sản phẩm",
+      emailContent
+    );
+
+    // Emit socket with updated product info
     io.to(`bidding_room_${product_id}`).emit("new_bid", {
       data: productInfo,
     });
@@ -120,22 +139,70 @@ export async function playBid(req: Request, res: Response) {
       max_price
     );
     if (isBuyNowExceeded.result) {
-      // process buy now
+      // Process buy now
       await bidModels.buyNowProduct(
         user_id,
         product_id,
         isBuyNowExceeded.buy_now_price!
       );
+
+      // Get updated product info AFTER buyNow completes
+      const productInfo = await productModels.getProductById(product_id);
+
+      // Send email to buyer
+      const email = (req as any).user.email;
+      const username = (req as any).user.username;
+      const product_name_slug = slugify(productInfo.product_name);
+      const productUrl = `${process.env.CLIENT_URL}/product/${product_name_slug}-${product_id}`;
+      const emailContent = getBuyNowSuccessTemplate({
+        buyer_username: username,
+        product_name: productInfo.product_name,
+        product_link: productUrl,
+        buy_now_price: isBuyNowExceeded.buy_now_price!,
+      });
+      
+      sendMail(
+        email,
+        "Bạn đã mua ngay thành công sản phẩm",
+        emailContent
+      );
+
+      // Emit socket with updated product info
+      io.to(`bidding_room_${product_id}`).emit("new_bid", {
+        data: productInfo,
+      });
     } else {
       // Play bid
       autoExtendBiddingTime(product_id);
       await bidModels.playBid(user_id, product_id, max_price);
-    }
 
-    const productInfo = await productModels.getProductById(product_id);
-    io.to(`bidding_room_${product_id}`).emit("new_bid", {
-      data: productInfo,
-    });
+      // Get updated product info AFTER playBid completes
+      const productInfo = await productModels.getProductById(product_id);
+
+      // Send email to bidder
+      const email = (req as any).user.email;
+      const username = (req as any).user.username;
+      const product_name_slug = slugify(productInfo.product_name);
+      const productUrl = `${process.env.CLIENT_URL}/product/${product_name_slug}-${product_id}`;
+      const emailContent = getBidSuccessTemplate({
+        bidder_username: username,
+        product_name: productInfo.product_name,
+        product_link: productUrl,
+        max_price: max_price,
+        current_price: productInfo.current_price,
+      });
+      
+      sendMail(
+        email,
+        "Bạn đã đặt giá thành công",
+        emailContent
+      );
+
+      // Emit socket with updated product info
+      io.to(`bidding_room_${product_id}`).emit("new_bid", {
+        data: productInfo,
+      });
+    }
 
     return res.status(200).json({
       status: "success",
