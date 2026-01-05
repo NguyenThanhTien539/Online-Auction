@@ -59,7 +59,7 @@ export default function AddToLove({product_id, className} : {product_id: number,
     useEffect (() => {
         const fetchLoveStatus = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/products/love_status?product_id=${product_id}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/love_status?product_id=${product_id}`, {
                     credentials: "include",
                 });
 

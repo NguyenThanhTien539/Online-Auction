@@ -430,7 +430,7 @@ export async function getLoveStatus(
 ) {
   let query = await db.raw(
     `
-            select count(*) as total, (exists (
+            select (exists (
                 select 1 
                 from love_products 
                 where user_id = ? and product_id = ?
@@ -441,9 +441,17 @@ export async function getLoveStatus(
     [user_id, product_id, user_id, product_id]
   );
   let result = await query.rows[0];
-
+  let totalQuery = await db.raw(
+    `
+        select count(*) as total
+        from love_products
+        where product_id = ?
+    `,
+    [product_id]
+  );
+  let totalResult = await totalQuery.rows[0];
   return {
-    total_loves: result.total,
+    total_loves: totalResult.total,
     is_loved: result.is_loved,
   };
 }
