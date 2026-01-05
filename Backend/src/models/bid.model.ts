@@ -190,6 +190,14 @@ export async function playBid (user_id: number, product_id: number, max_price: n
         // Commit transaction
         await trx.commit();
         console.log(`[TRANSACTION SUCCESS] Bid placed for product ${product_id} by user ${user_id}`);
+
+        return ({
+            current_price: newProductPrice,
+            price_owner_id: newPriceOwnerId,
+            isOldBidderOutbidded: !shouldInsertOldBidderRow, // if old bidder was outbidded,
+            oldPriceOwnerId: oldPriceOwnerId,
+            oldPriceOwnerBid: oldMaxPrice
+        })
         
     } catch (error) {
         // Rollback on error

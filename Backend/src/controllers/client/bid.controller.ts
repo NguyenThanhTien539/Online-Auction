@@ -3,7 +3,12 @@ import * as bidModels from "../../models/bid.model.ts";
 import * as userModels from "../../models/users.model.ts";
 import { io } from "@/server.ts";
 import * as productModels from "@/models/products.model.ts";
-import {getBidderBannedTemplate, sendMail, getBidSuccessTemplate, getBuyNowSuccessTemplate} from "../../helpers/mail.helper.ts"
+import {getBidderBannedTemplate, 
+        sendMail, 
+        getBidSuccessTemplate, 
+        getBuyNowSuccessTemplate,
+        getOutbidNotificationTemplate
+      } from "../../helpers/mail.helper.ts"
 import { slugify } from "@/helpers/slug.helper.ts";
 
 
@@ -174,7 +179,7 @@ export async function playBid(req: Request, res: Response) {
     } else {
       // Play bid
       autoExtendBiddingTime(product_id);
-      await bidModels.playBid(user_id, product_id, max_price);
+      const result = await bidModels.playBid(user_id, product_id, max_price);
 
       // Get updated product info AFTER playBid completes
       const productInfo = await productModels.getProductById(product_id);
@@ -197,6 +202,23 @@ export async function playBid(req: Request, res: Response) {
       //   "Bạn đã đặt giá thành công",
       //   emailContent
       // );
+
+      // Send mail to outbidded old bidder if any
+      if (result && result.isOldBidderOutbidded && result.oldPriceOwnerId) {
+        const oldBidderInfo = await userModels.getUserById(result.oldPriceOwnerId);
+        const oldBidderEmailContent = getOutbidNotificationTemplate({
+          bidderUsername: oldBidderInfo.username,
+          productName: productInfo.product_name,
+          productUrl: productUrl,
+          newCurrentPrice: productInfo.current_price,
+          yourMaxBid: result?.oldPriceOwnerBid,
+        })
+        sendMail(
+          oldBidderInfo.email,
+          "Bạn đã bị vượt giá thầu",
+          oldBidderEmailContent
+        );
+      }
 
       // Emit socket with updated product info
       io.to(`bidding_room_${product_id}`).emit("new_bid", {

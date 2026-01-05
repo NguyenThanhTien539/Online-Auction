@@ -1033,3 +1033,101 @@ export function getProductDescriptionChangedTemplate(params: ProductDescriptionC
 </html>
   `;
 }
+
+// ========================================== Outbid Notification Template =========================================
+
+interface OutbidNotificationParams {
+  bidderUsername: string;
+  productName: string;
+  newCurrentPrice: number;
+  yourMaxBid: number;
+  productUrl: string;
+}
+
+export function getOutbidNotificationTemplate(params: OutbidNotificationParams): string {
+  const {
+    bidderUsername,
+    productName,
+    newCurrentPrice,
+    yourMaxBid,
+    productUrl
+  } = params;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: #fff; margin: 0; font-size: 28px; }
+    .content { background: #fff; padding: 40px 30px; border: 1px solid #e5e5e5; }
+    .badge { display: inline-block; background: #ef4444; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+    .product-info { background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444; }
+    .product-name { font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 15px; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #fecaca; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #991b1b; font-weight: 500; }
+    .info-value { color: #7f1d1d; font-weight: bold; }
+    .price { font-size: 28px; color: #ef4444; }
+    .button { display: inline-block; background: #ef4444; color: #fff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+    .button:hover { background: #dc2626; }
+    .info-text { color: #6b7280; font-size: 14px; margin: 15px 0; line-height: 1.8; }
+    .alert-box { background: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .alert-box p { margin: 0; color: #991b1b; font-size: 14px; line-height: 1.6; }
+    .footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Bạn đã bị vượt giá</h1>
+    </div>
+    <div class="content">
+      <div class="badge">BỊ VƯỢT QUA</div>
+      <p>Xin chào <strong>${bidderUsername}</strong>,</p>
+      <p>Có người đã đặt giá cao hơn bạn cho sản phẩm bạn đang quan tâm.</p>
+      
+      <div class="product-info">
+        <div class="product-name">${productName}</div>
+        <div class="info-row">
+          <span class="info-label">Giá hiện tại</span>
+          <span class="info-value price">${newCurrentPrice.toLocaleString('vi-VN')} VNĐ</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Giá đặt tối đa của bạn</span>
+          <span class="info-value">${yourMaxBid.toLocaleString('vi-VN')} VNĐ</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Trạng thái</span>
+          <span class="info-value">Bạn không còn giữ giá cao nhất</span>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <p><strong>Hành động ngay:</strong> Nếu bạn vẫn muốn sở hữu sản phẩm này, hãy đặt giá cao hơn để giành lại vị trí dẫn đầu. Phiên đấu giá có thể kết thúc bất cứ lúc nào!</p>
+      </div>
+
+      <a href="${productUrl}" class="button">Đấu giá ngay</a>
+
+      <p class="info-text"><strong>Mẹo để thắng đấu giá:</strong></p>
+      <ul class="info-text">
+        <li>Đặt giá tối đa cao hơn để hệ thống tự động đấu giá cho bạn</li>
+        <li>Theo dõi thường xuyên để không bỏ lỡ cơ hội</li>
+        <li>Hãy nhanh tay trước khi phiên đấu giá kết thúc</li>
+      </ul>
+
+      <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">Đây là thông báo tự động để giúp bạn cập nhật tình hình đấu giá. Chúc bạn may mắn!</p>
+    </div>
+    <div class="footer">
+      <p>Đây là email tự động. Vui lòng không trả lời email này.</p>
+      <p>&copy; 2026 Hệ thống đấu giá trực tuyến. Bảo lưu mọi quyền.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
