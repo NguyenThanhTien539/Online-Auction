@@ -18,8 +18,6 @@ import {
 import { useAuth } from "@/routes/ProtectedRouter";
 import Swal from "sweetalert2";
 
-import Rating from "@/components/common/Rating";
-
 type OrderInfo = {
   order_id: number;
   product_id: number;
@@ -34,6 +32,7 @@ type OrderInfo = {
   winner_id: number;
   winner_name: string;
   winner_email: string;
+  winner_username: string;
   winner_avatar?: string;
   shipping_label_image?: string;
 };
@@ -521,12 +520,16 @@ export default function SellerOrderPage() {
 
                 {/* Rating Buyer Section */}
                 <div className="mb-6">
-                  <Rating
-                    productId={product_id!}
-                    targetUserId={orderInfo.winner_id}
-                    targetName={orderInfo.winner_name}
-                    targetType="buyer"
-                  />
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/rating/${orderInfo.winner_username}_${orderInfo.winner_id}`
+                      )
+                    }
+                    className="w-full px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                  >
+                    Đánh giá người mua
+                  </button>
                 </div>
 
                 <button
