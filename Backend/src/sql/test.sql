@@ -91,11 +91,70 @@ select p.*, u.username as price_owner_username, count(*) over() as total_count
         order by p.created_at desc
 
 
+------------- Reset bidding data for a product (for testing purposes)
+DO $$
+DECLARE
+    v_product_id INT := 264;
+BEGIN
+   
+    DELETE FROM bidding_history WHERE product_id = v_product_id;
 
-delete from bidding_history where product_id = 54
-delete from bidding_ban_user where product_id = 54
-update products set price_owner_id = null where product_id = 54
+  
+    DELETE FROM bidding_ban_user WHERE product_id = v_product_id;
 
-update products set current_price = start_price where product_id = 54
+    DELETE FROM orders WHERE product_id = v_product_id;   
+
+    UPDATE products 
+    SET price_owner_id = NULL, 
+        current_price = start_price, 
+        bid_turns = 0,
+        end_time = NOW() + INTERVAL '5 day' 
+    WHERE product_id = v_product_id;
+    
+END $$;
+
+
+------------- Reset ALL products that have bidding activity (for cleaning up after bot testing)
+DO $$
+DECLARE
+    affected_products INT;
+BEGIN
+    -- Get count of products that will be reset
+    SELECT COUNT(DISTINCT product_id) INTO affected_products
+    FROM bidding_history;
+    
+    RAISE NOTICE 'Resetting % products with bidding activity', affected_products;
+    
+    -- Delete all bidding history
+    DELETE FROM bidding_history;
+    
+    -- Delete all ban records
+    DELETE FROM bidding_ban_user;
+    
+    -- Delete all orders
+    DELETE FROM orders;
+    
+    -- Reset all products that had bidding activity (bid_turns > 0 or price_owner_id is not null)
+    UPDATE products 
+    SET price_owner_id = NULL, 
+        current_price = start_price, 
+        bid_turns = 0,
+        end_time = NOW() + INTERVAL '5 day'
+    WHERE bid_turns > 0 OR price_owner_id IS NOT NULL;
+    
+    RAISE NOTICE 'Reset complete!';
+END $$;
+
+
+
+
+
 
 select * from products where product_id = 54;
+
+select count(*) from users
+
+
+select * from bidding_history where product_id = 178 order by created_at desc;
+
+

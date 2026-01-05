@@ -220,6 +220,11 @@ BEGIN
         NOW()
     );
 
+    ----------- Update bid_turns in products table -----------
+    UPDATE products
+    SET bid_turns = bid_turns + 1
+    WHERE product_id = p_product_id;
+
     RAISE NOTICE 'System correction logged in bidding_history';
 
     -- ============================================================================

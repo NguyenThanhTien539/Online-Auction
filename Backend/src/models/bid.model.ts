@@ -29,7 +29,7 @@ export async function isMaxPriceValid (product_id: number, max_price: number) {
     if (max_price < currentPrice + stepPrice){
         return false;
     }
-    if (stepPrice && (max_price - currentPrice) % stepPrice !== 0){
+    if (stepPrice && (max_price - currentPrice) % stepPrice != 0){
         return false;
     }
 
@@ -40,7 +40,7 @@ export async function getHighestBidByProductId (product_id: number) {
     const findMaxPriceHistory = await db.raw(`
         select MAX(max_price) as highest_price
         from bidding_history
-        where product_id = ?
+        where product_id = ? and status is NULL
         LIMIT 1 offset 0
     `, [product_id]);
     const maxPriceHistory = await findMaxPriceHistory.rows[0].highest_price;
@@ -59,97 +59,105 @@ export async function isCurrentPriceOwner (user_id: number, product_id: number) 
 }
 
 export async function playBid (user_id: number, product_id: number, max_price: number) {
+    // ============================================================================
+    // CRITICAL: Use transaction with row-level locking to prevent race conditions
+    // ============================================================================
     
-
+    const trx = await db.transaction();
     
-    // Update current price in products table
-    // find max_price in bidding_history (newest highest bid)
-    const isPriceOwner = await isCurrentPriceOwner(user_id, product_id);
-
-    if (isPriceOwner){
-        console.log(`Updating max_price for existing bid of user ${user_id}`);
-        //  just update max_price in bidding_history (no update timestamp)
-        await db.raw(`
-            update bidding_history
-            set max_price = ?
-            where product_id = ? and user_id = ? and created_at = 
-            (select MAX(created_at) from bidding_history where product_id = ? and user_id = ?)
-        `, [max_price, product_id, user_id, product_id, user_id]);
-        return;
-    }
-
-    const findMaxPriceHistory = await db.raw(`
-        select *
-        from bidding_history bh
-        where bh.product_id = ?
-        ORDER BY bh.max_price DESC, bh.created_at DESC
-        LIMIT 1 offset 0
-    `, [product_id]);
-    console.log("Find Max Price History: ", findMaxPriceHistory.rows);
-    const maxPriceHistoryRow = await findMaxPriceHistory.rows[0];
-    const oldMaxPrice = maxPriceHistoryRow ? maxPriceHistoryRow.max_price : null;
-    const oldProductPrice = maxPriceHistoryRow ? maxPriceHistoryRow.product_price : null;
-    const oldPriceOwnerId = maxPriceHistoryRow ? maxPriceHistoryRow.price_owner_id : null;
-
-    //  Handle product_price update
-    let newProductPrice = oldProductPrice
-    let newPriceOwnerId = oldPriceOwnerId;
-    
-    // First bid
-    if (oldMaxPrice === null){
-        // get current_price 
-        const findCurrentPrice = await db.raw(`
-            select current_price
-            from products
-            where product_id = ?
+    try {
+        // Lock the product row for update (prevents concurrent modifications)
+        const lockProduct = await trx.raw(`
+            SELECT product_id, current_price, step_price, price_owner_id
+            FROM products
+            WHERE product_id = ?
+            FOR UPDATE
         `, [product_id]);
-        const currentPrice = await findCurrentPrice.rows[0].current_price;
-        newProductPrice = Number(currentPrice);
-        newPriceOwnerId = user_id;
-  
-    }
-    else{
-        if (max_price <= oldMaxPrice){
-            // the first person is priority (current bidder lose)
-            newProductPrice = Number(max_price);
+        
+        const productData = lockProduct.rows[0];
+        if (!productData) {
+            await trx.rollback();
+            throw new Error('Product not found');
         }
-        else {
-            // increase by step_price (current bidder win)
-            const findStepPrice = await db.raw(`
-                select step_price, bid_turns
-                from products   
-                where product_id = ?
-            `, [product_id]);
-            const stepPrice = await findStepPrice.rows[0].step_price;
+        
+        // Check if user is current price owner
+        const isPriceOwner = productData.price_owner_id == user_id;
 
-            // Update bid_turns in products table
-            newProductPrice = Number(oldMaxPrice) + Number(stepPrice);
+        if (isPriceOwner){
+            console.log(`Updating max_price for existing bid of user ${user_id}`);
+            //  just update max_price in bidding_history (no update timestamp)
+            await trx.raw(`
+                UPDATE bidding_history
+                SET max_price = ?
+                WHERE product_id = ? AND user_id = ? AND status IS NULL AND created_at = 
+                (SELECT MAX(created_at) FROM bidding_history WHERE product_id = ? AND user_id = ? AND status IS NULL)
+            `, [max_price, product_id, user_id, product_id, user_id]);
+            
+            await trx.commit();
+            return;
+        }
+
+        // Get max price history with lock
+        const findMaxPriceHistory = await trx.raw(`
+            SELECT *
+            FROM bidding_history bh
+            WHERE bh.product_id = ? AND bh.status IS NULL
+            ORDER BY bh.max_price DESC, bh.created_at DESC
+            LIMIT 1
+            FOR UPDATE
+        `, [product_id]);
+        
+        console.log("Find Max Price History: ", findMaxPriceHistory.rows);
+        const maxPriceHistoryRow = findMaxPriceHistory.rows[0];
+        const oldMaxPrice = maxPriceHistoryRow ? maxPriceHistoryRow.max_price : null;
+        const oldProductPrice = maxPriceHistoryRow ? maxPriceHistoryRow.product_price : null;
+        const oldPriceOwnerId = maxPriceHistoryRow ? maxPriceHistoryRow.price_owner_id : null;
+
+        //  Handle product_price update
+        let newProductPrice = oldProductPrice;
+        let newPriceOwnerId = oldPriceOwnerId;
+        
+        // First bid
+        if (oldMaxPrice == null){
+            newProductPrice = Number(productData.current_price);
             newPriceOwnerId = user_id;
         }
+        else{
+            if (max_price <= oldMaxPrice){
+                // the first person is priority (current bidder lose)
+                newProductPrice = Number(max_price);
+            }
+            else {
+                // increase by step_price (current bidder win)
+                const stepPrice = Number(productData.step_price);
+                newProductPrice = Number(oldMaxPrice) + stepPrice;
+                newPriceOwnerId = user_id;
+            }
+        }
+        
+        // Insert new bid within transaction
+        await trx.raw(`
+            INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
+            VALUES (?, ?, ?, ?, ?)
+        `, [user_id, product_id, max_price, newProductPrice, newPriceOwnerId]);
+
+        // Update products table within transaction
+        await trx.raw(`
+            UPDATE products
+            SET current_price = ?, price_owner_id = ?, bid_turns = COALESCE(bid_turns, 0) + 1
+            WHERE product_id = ?
+        `, [newProductPrice, newPriceOwnerId, product_id]);
+        
+        // Commit transaction
+        await trx.commit();
+        console.log(`[TRANSACTION SUCCESS] Bid placed for product ${product_id} by user ${user_id}`);
+        
+    } catch (error) {
+        // Rollback on error
+        await trx.rollback();
+        console.error(`[TRANSACTION FAILED] Error in playBid:`, error);
+        throw error;
     }
-    
-
-    // Insert new bid
-    await db.raw(`
-        insert into bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
-        values (?, ?, ?, ?, ?)
-    `, [user_id, product_id, max_price, newProductPrice, newPriceOwnerId]);
-
-    // Update bid_turns in products table
-    const bidTurnsQuery = await db.raw(`
-        select count(*) as bid_turns
-        from bidding_history
-        where product_id = ?
-    `, [product_id]);
-    const bidTurns = await bidTurnsQuery.rows[0].bid_turns;
-    console.log(`Total bid turns for product ${product_id} is ${bidTurns}`);
-    // Update products table
-    await db.raw(`
-        update products
-        set current_price = ?, price_owner_id = ?, bid_turns = ?
-        where product_id = ?
-    `, [newProductPrice, newPriceOwnerId, bidTurns, product_id]);
-    
 }
 
 
@@ -178,7 +186,7 @@ export async function checkRatingUser (user_id : number, valid_rating: number){
             where user_id = ?
         `, [user_id]);
     const result = await query.rows;
-    if (result[0].rating_count === 0) // Skip new user account with no rating
+    if (result[0].rating_count == 0) // Skip new user account with no rating
         return true;
     const user_rating = result[0].rating;
     if (user_rating < valid_rating)
@@ -194,7 +202,7 @@ export async function isBidExceedBuyNowPrice (product_id: number, bid_price: num
         `, [product_id]);
     const result = await query.rows;
     const buy_now_price = result[0].buy_now_price;
-    if (buy_now_price === null)
+    if (buy_now_price == null)
         return { result: false, buy_now_price: null };
     return {
         result: bid_price >= buy_now_price,
@@ -203,49 +211,102 @@ export async function isBidExceedBuyNowPrice (product_id: number, bid_price: num
 }
 
 export async function buyNowProduct (user_id: number, product_id : number, buy_price : number) {
-    // SET endtime = now(), current_price = buy_now_price, price_owner_id = user_id, bid_turns = bid_turns + 1
-    await db.raw(`
-        update products
-        set end_time = NOW(),
-            current_price = ?,
-            price_owner_id = ?,
-            bid_turns = COALESCE(bid_turns, 0) + 1
-        where product_id = ?
-    `, [buy_price, user_id, product_id]);
+    const trx = await db.transaction();
 
-    const isPriceOwner = await isCurrentPriceOwner(user_id, product_id);
+    try {
+        // Lock product row and validate conditions
+        const productQuery = await trx.raw(`
+            SELECT 
+                product_id,
+                buy_now_price,
+                end_time,
+                price_owner_id,
+                seller_id
+            FROM products
+            WHERE product_id = ?
+            FOR UPDATE
+        `, [product_id]);
 
-    if (isPriceOwner){
-        console.log(`Updating max_price for existing bid of user ${user_id}`);
-        //  just update max_price in bidding_history (no update timestamp)
-        await db.raw(`
-            update bidding_history
-            set max_price = ?, product_price = ?
-            where product_id = ? and user_id = ? and created_at = 
-            (select MAX(created_at) from bidding_history where product_id = ? and user_id = ?)
-        `, [buy_price, buy_price, product_id, user_id, product_id, user_id]);
+        const product = productQuery.rows[0];
+
+        if (!product) {
+            await trx.rollback();
+            throw new Error('Product not found');
+        }
+
+        // Validate buy_now_price exists and matches
+        if (product.buy_now_price == null) {
+            await trx.rollback();
+            throw new Error('Product does not have buy now price');
+        }
+
+        if (buy_price < product.buy_now_price) {
+            await trx.rollback();
+            throw new Error('Buy price is less than buy now price');
+        }
+
+        // Check if auction is still active
+        if (new Date(product.end_time) < new Date()) {
+            await trx.rollback();
+            throw new Error('Auction has ended');
+        }
+
+        // Check if user is not the seller
+        if (product.seller_id == user_id) {
+            await trx.rollback();
+            throw new Error('Seller cannot buy their own product');
+        }
+
+        // Update product - end auction immediately
+        await trx.raw(`
+            UPDATE products
+            SET end_time = NOW(),
+                current_price = ?,
+                price_owner_id = ?,
+                bid_turns = COALESCE(bid_turns, 0) + 1
+            WHERE product_id = ?
+        `, [product.buy_now_price, user_id, product_id]);
+
+        // Check if user is current price owner
+        const isPriceOwner = (product.price_owner_id == user_id);
+
+        if (isPriceOwner) {
+            console.log(`Updating max_price for existing bid of user ${user_id}`);
+            // User is price owner - update their latest bid
+            await trx.raw(`
+                UPDATE bidding_history
+                SET max_price = ?, 
+                    product_price = ?
+                WHERE product_id = ? AND user_id = ? AND created_at = 
+                (SELECT MAX(created_at) FROM bidding_history WHERE product_id = ? AND user_id = ?)
+            `, [product.buy_now_price, product.buy_now_price, product_id, user_id, product_id, user_id]);
+        } else {
+            // User is not price owner - insert new bid
+            await trx.raw(`
+                INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
+                VALUES (?, ?, ?, ?, ?)
+            `, [user_id, product_id, product.buy_now_price, product.buy_now_price, user_id]);
+        }
+
+        // Create order for the user
+        const newOrderQuery = await trx.raw(`
+            INSERT INTO orders (user_id, product_id)
+            VALUES (?, ?)
+            RETURNING order_id
+        `, [user_id, product_id]);
+
+        const order_id = newOrderQuery.rows[0].order_id;
         
-    }
-    else {
-        // Insert new bid
-        await db.raw(`
-            insert into bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
-            values (?, ?, ?, ?, ?)
-        `, [user_id, product_id, buy_price, buy_price, user_id]);
-    }
+        await trx.commit();
 
+        return {
+            order_id: order_id,
+            end_time: new Date().toISOString(),
+        };
 
-
-    // Create order for the user
-    const newOrder = await db.raw(`
-        insert into orders (user_id, product_id)
-        values (?, ?)
-        RETURNING order_id
-    `, [user_id, product_id]);
-    const order_id = newOrder.rows[0].order_id;
-    return {
-        order_id: order_id,
-        end_time: new Date().toISOString(),
+    } catch (error) {
+        await trx.rollback();
+        throw error;
     }
 }
 

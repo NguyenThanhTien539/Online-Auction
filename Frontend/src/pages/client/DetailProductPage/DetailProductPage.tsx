@@ -66,7 +66,7 @@ function DetailProductPage() {
 
   const [formattedStartTime, setFormatStartTime] = useState("");
   const [timeLeft, setTimeLeft] = useState("");
-  const [isExpired, setIsExpired] = useState(false);
+  const [isExpired, setIsExpired] = useState(true);
 
   const [isLoading, setLoading] = useState(true);
   const { setBreadcrumbs } = useBreadcrumb();
@@ -305,7 +305,7 @@ function DetailProductPage() {
                 <Clock className="w-5 h-5 text-red-600" />
                 <div className="flex-1">
                   <p className="text-xs text-gray-500 mb-1">Còn lại</p>
-                  <p className="text-lg font-bold text-red-600">{timeLeft}</p>
+                  {timeLeft && <p className="text-lg font-bold text-red-600 animate__animated animate__fadeIn">{timeLeft}</p>}
                 </div>
               </div>
               {products?.auto_extended && (
@@ -498,13 +498,13 @@ function DetailProductPage() {
       </div>
 
       {/* Bid Section - Full Width */}
-      {!isExpired && !isSeller && (
-        <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+      {!isExpired && (
+        <div className="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm animate__animated animate__fadeIn">
           <PlayBidSection
             product_id={products?.product_id}
             current_price={products?.current_price}
             step_price={products?.step_price}
-            buy_now_price={products?.buy_now_price}
+            buy_now_price={products?.buy_now_price} 
           />
           {products?.buy_now_price && (
             <BuyNowSection
