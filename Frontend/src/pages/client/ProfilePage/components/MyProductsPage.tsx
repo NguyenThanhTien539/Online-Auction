@@ -39,7 +39,7 @@ export default function MyProductsPage() {
     // Tab management
     const [activeTab, setActiveTab] = useState(searchParams.get("type") || "my-favorites");
 
-    const tabs: TabItem[] = [
+    const allTabs: TabItem[] = [
         {
             id: "my-favorites",
             label: "Yêu thích",
@@ -83,6 +83,16 @@ export default function MyProductsPage() {
             bgColor: "bg-purple-50"
         }
     ];
+
+    // Filter tabs based on user role
+    const tabs = allTabs.filter(tab => {
+        // If not seller or admin, hide selling-related tabs
+        if (auth?.role !== 'seller' && auth?.role !== 'admin') {
+            const sellerOnlyTabs = ['my-selling', 'my-inventory', 'my-sold'];
+            return !sellerOnlyTabs.includes(tab.id);
+        }
+        return true;
+    });
 
     const getActiveTabInfo = () => {
         return tabs.find(tab => tab.id === activeTab) || tabs[0];

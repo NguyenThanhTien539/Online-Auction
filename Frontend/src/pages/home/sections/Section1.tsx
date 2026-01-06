@@ -12,15 +12,11 @@ const WelcomeText = () => {
   return (
     <div
       ref={ref}
-      className={`relative bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-20 px-6 rounded-3xl mx-4 my-12 overflow-hidden transition-all duration-1000 ${
-        hasIntersected ? 'animate__animated animate__fadeInUp' : ''
+      className={`relative bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-20 px-6 rounded-3xl mx-4 my-12 overflow-hidden transition-opacity duration-700 ${
+        hasIntersected ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      {/* Decorative gradient overlays */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-indigo-400/10 to-pink-400/10 rounded-full blur-3xl"></div>
-      
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-200/50 dark:border-slate-700 mb-6">
@@ -42,11 +38,10 @@ const WelcomeText = () => {
         
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className={`group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-2 ${hasIntersected ? 'animate__animated animate__fadeInLeft animate__slow' : ''}`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="group relative bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
             
-            <div className="relative">
-              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div>
+              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-md mb-6 group-hover:scale-105 transition-transform duration-200">
                 <Zap className="w-8 h-8 text-white" />
               </div>
               
@@ -60,11 +55,10 @@ const WelcomeText = () => {
             </div>
           </div>
           
-          <div className={`group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-500 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-2 delay-200 ${hasIntersected ? 'animate__animated animate__fadeInUp animate__slow' : ''}`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="group relative bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
             
-            <div className="relative">
-              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30 mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div>
+              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md mb-6 group-hover:scale-105 transition-transform duration-200">
                 <Lock className="w-8 h-8 text-white" />
               </div>
               
@@ -78,11 +72,10 @@ const WelcomeText = () => {
             </div>
           </div>
           
-          <div className={`group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-2 delay-400 ${hasIntersected ? 'animate__animated animate__fadeInRight animate__slow' : ''}`}>
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="group relative bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
             
-            <div className="relative">
-              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30 mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div>
+              <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-md mb-6 group-hover:scale-105 transition-transform duration-200">
                 <Grid3x3 className="w-8 h-8 text-white" />
               </div>
               

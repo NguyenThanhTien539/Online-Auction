@@ -164,3 +164,9 @@ select * from bidding_history where product_id = 178 order by created_at desc;
 select * from product_questions where user_id = 78
 
 
+-- update role for user id 
+update users set role = 'seller' where user_id = 18;
+
+
+
+
