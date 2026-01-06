@@ -34,7 +34,7 @@ export default function RatingHistoryPage() {
   const [selectedRating, setSelectedRating] = useState<RatingItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2);
+  const [itemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const username = params.username_id?.trim().split("_")[0];
   const user_id = params.username_id?.trim().split("_")[1];

@@ -82,7 +82,7 @@ function Section21()
                             products.map((item, index) => (
                                 <div key={index} className="flex justify-center">
                                     <ProductCard
-                                        className="scale-80 shadow-md"
+                                        className="scale-80  hover:scale-85 shadow-md"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}
@@ -151,7 +151,7 @@ function Section22()
                             products.map((item, index) => (
                                 <div key={index} className="flex justify-center">
                                     <ProductCard
-                                        className="scale-80 shadow-md"
+                                        className="scale-80  hover:scale-85 shadow-md"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}
@@ -220,7 +220,7 @@ function Section23()
                             products.map((item, index) => (
                                 <div key={index} className="flex justify-center">
                                     <ProductCard
-                                        className="scale-80 shadow-md"
+                                        className="scale-80 hover:scale-85 shadow-md"
                                         product_image={item.product_images ? item.product_images[0] : ""}
                                         product_id={item.product_id}
                                         product_name={item.product_name}

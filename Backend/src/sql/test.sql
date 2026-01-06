@@ -169,4 +169,18 @@ update users set role = 'seller' where user_id = 18;
 
 
 
+-- reset rating 
+DO $$
+DECLARE
+    v_user_id INT := 20;
+BEGIN
+    UPDATE users
+    SET rating = 0,
+        rating_count = 0
+    WHERE user_id = v_user_id;
+    
+    DELETE FROM user_rating WHERE user_id = v_user_id;
+END $$;
+
+select * from user_rating 
 
