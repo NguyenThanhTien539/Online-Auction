@@ -14,7 +14,7 @@ export async function registerSellerRequest(req: Request, res: Response) {
       message: "Bạn đã gửi yêu cầu nâng cấp lên người bán. Vui lòng chờ xử lý.",
     });
   }
-  await user.registerSellerRequest(user.user_id, reason);
+  await userModel.registerSellerRequest(user.user_id, reason);
   return res.status(200).json({
     status: "success",
     message: "Yêu cầu nâng cấp lên người bán đã được gửi thành công.",
