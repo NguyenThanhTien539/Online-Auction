@@ -523,7 +523,7 @@ export default function SellerOrderPage() {
                   <button
                     onClick={() =>
                       navigate(
-                        `/rating/${orderInfo.winner_username}_${orderInfo.winner_id}`
+                        `/rating/${orderInfo.winner_name}_${orderInfo.winner_id}`
                       )
                     }
                     className="w-full px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
