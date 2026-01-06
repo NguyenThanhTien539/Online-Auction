@@ -314,26 +314,12 @@ export async function buyNowProduct (user_id: number, product_id : number, buy_p
             WHERE product_id = ?
         `, [product.buy_now_price, user_id, product_id]);
 
-        // Check if user is current price owner
-        const isPriceOwner = (product.price_owner_id == user_id);
-
-        if (isPriceOwner) {
-            console.log(`Updating max_price for existing bid of user ${user_id}`);
-            // User is price owner - update their latest bid
-            await trx.raw(`
-                UPDATE bidding_history
-                SET max_price = ?, 
-                    product_price = ?
-                WHERE product_id = ? AND user_id = ? AND created_at = 
-                (SELECT MAX(created_at) FROM bidding_history WHERE product_id = ? AND user_id = ?)
-            `, [product.buy_now_price, product.buy_now_price, product_id, user_id, product_id, user_id]);
-        } else {
-            // User is not price owner - insert new bid
-            await trx.raw(`
-                INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
-                VALUES (?, ?, ?, ?, ?)
-            `, [user_id, product_id, product.buy_now_price, product.buy_now_price, user_id]);
-        }
+        // Always insert new bid for "Buy Now" action to maintain complete history
+        // Buy Now is a distinct action that should be recorded separately
+        await trx.raw(`
+            INSERT INTO bidding_history (user_id, product_id, max_price, product_price, price_owner_id)
+            VALUES (?, ?, ?, ?, ?)
+        `, [user_id, product_id, product.buy_now_price, product.buy_now_price, user_id]);
 
         // Create order for the user
         const newOrderQuery = await trx.raw(`
