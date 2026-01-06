@@ -279,7 +279,7 @@ export default function RatingHistoryPage() {
 
                 {/* Rating Type */}
                 <div className="flex justify-center py-2">
-                  {selectedRating.score === 1 ? (
+                  {selectedRating.score == 1 ? (
                     <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
                       <ThumbsUp className="w-5 h-5 text-green-600 fill-current" />
                       <span className="font-medium text-green-700">Đánh giá tích cực</span>
