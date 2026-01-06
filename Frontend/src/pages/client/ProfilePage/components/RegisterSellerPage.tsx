@@ -18,19 +18,18 @@ import TinyMCEEditor from "@/components/editor/TinyMCEEditor";
 interface UserInfo {
   username: string;
   email: string;
-  full_name: string;  
+  full_name: string;
 }
 
 export default function RegisterSellerPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const editor = useRef<any>(null);
   const handleEditorChange = (content: string) => {
     const reasonContent = document.getElementById("reason") as HTMLInputElement;
     reasonContent.value = content;
-
-  }
+  };
   // Sample user data - in real app, get from auth context or API
   const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
@@ -56,47 +55,44 @@ export default function RegisterSellerPage() {
           errorMessage: "Lý do không được để trống",
         },
       ])
-      .onSuccess ((e : any)=> {
+      .onSuccess((e: any) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
-        console.log("Submitting seller registration with reason:", e.target.reason.value);
-        fetch (`${import.meta.env.VITE_API_URL}/api/user/register-seller`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                reason: e.target.reason.value
-            })
 
+        console.log(
+          "Submitting seller registration with reason:",
+          e.target.reason.value
+        );
+        fetch(`${import.meta.env.VITE_API_URL}/api/user/register-seller`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            reason: e.target.reason.value,
+          }),
         })
-        .then (res => {
-            if (!res.ok){
-                return res.json().then (data => {
-                    throw new Error (data.message || "Có lỗi xảy ra");
-                });
+          .then((res) => {
+            if (!res.ok) {
+              return res.json().then((data) => {
+                throw new Error(data.message || "Có lỗi xảy ra");
+              });
             }
             return res.json();
-        })
-        .then (data => {
-            toast.success (data.message || "Gửi yêu cầu thành công");
-            navigate (-1);
-        })
-        .catch (error => {
-            toast.error (error.message || "Lỗi kết nối máy chủ");
-        })
-        .finally (() => {
+          })
+          .then((data) => {
+            toast.success(data.message || "Gửi yêu cầu thành công");
+            navigate(-1);
+          })
+          .catch((error) => {
+            toast.error(error.message || "Lỗi kết nối máy chủ");
+          })
+          .finally(() => {
             setIsSubmitting(false);
-        });
-      })
-      
-
-  }, [])
-  
-
-   
+          });
+      });
+  }, []);
 
   return (
     <div className="min-h-screen pb-5 px-4">
@@ -114,15 +110,14 @@ export default function RegisterSellerPage() {
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <div className = "text-center">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Đăng ký trở thành Seller
-              </h1>
-              <p className="text-gray-600">
-                Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá
-              </p>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Đăng ký trở thành Seller
+            </h1>
+            <p className="text-gray-600">
+              Bắt đầu hành trình kinh doanh của bạn trên nền tảng đấu giá
+            </p>
           </div>
-         
         </div>
 
         {/* Form Card */}
@@ -139,7 +134,7 @@ export default function RegisterSellerPage() {
           </div>
 
           {/* Form Content */}
-          <form id = "register-seller-form" className="p-8">
+          <form id="register-seller-form" className="p-8">
             {/* User Information Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -215,7 +210,7 @@ export default function RegisterSellerPage() {
                   editorRef={editor}
                   onEditChange={handleEditorChange}
                 />
-                <input id = "reason" name = "reason" type = "hidden"></input>
+                <input id="reason" name="reason" type="hidden"></input>
               </div>
             </div>
 
@@ -228,9 +223,7 @@ export default function RegisterSellerPage() {
                   <ul className="space-y-1">
                     <li> Yêu cầu sẽ được xem xét trong vòng 7 ngày</li>
                     <li> Bạn sẽ được làm seller trong vòng 7 ngày</li>
-                    <li>
-                      Chúng tôi sẽ liên hệ qua email để thông báo kết quả
-                    </li>
+                    <li>Chúng tôi sẽ liên hệ qua email để thông báo kết quả</li>
                     <li>Seller cần tuân thủ các quy định của nền tảng</li>
                     <li>Có thể yêu cầu xác minh thông tin bổ sung</li>
                   </ul>

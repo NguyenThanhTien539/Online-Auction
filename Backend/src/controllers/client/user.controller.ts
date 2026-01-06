@@ -3,6 +3,7 @@ import * as userModel from "../../models/users.model.ts";
 
 export async function registerSellerRequest(req: Request, res: Response) {
   const { reason } = req.body;
+  console.log("Register seller request reason:", reason);
   const user = (req as any).user;
   // check if they have already sent a request
   const existingRequest = await userModel.checkRegisterSellerRequest(
