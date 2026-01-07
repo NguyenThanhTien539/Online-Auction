@@ -184,3 +184,46 @@ END $$;
 
 select * from user_rating 
 
+
+
+-- Role back 1 bid 
+DO $$ 
+DECLARE
+    v_product_id INT := 311;
+BEGIN
+    UPDATE products
+    SET bid_turns = bid_turns - 1,
+        auction_end_email_sent = false,
+        current_price = 13000000,
+        end_time = end_time + INTERVAL '6 days'
+    WHERE product_id = v_product_id;  -- Thêm WHERE và dấu chấm phẩy
+    
+    DELETE FROM orders WHERE product_id = v_product_id;
+    
+    -- delete last row in bidding history
+    DELETE FROM bidding_history
+    WHERE bidding_id = (
+        SELECT bidding_id FROM bidding_history
+        WHERE product_id = v_product_id
+        ORDER BY created_at DESC
+        LIMIT 1
+    );
+END $$;
+
+select * from bidding_history where product_id = 311 order by created_at desc;
+
+
+select * from products where product_id = 299
+
+SELECT user_id, username, email FROM users WHERE user_id =  61;
+
+
+select * from products where product_id = 299
+
+update products set seller_id = 18 where product_id = 299;
+
+
+update products set auction_end_email_sent = false where product_id = 299;
+
+select * from products where product_id = 299;
+

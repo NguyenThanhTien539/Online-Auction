@@ -50,15 +50,15 @@ const runAuctionEndEmailJob = async () => {
           // Mark as email sent
           await markAuctionEmailSent(product.product_id);
           successCount++;
-        //   console.log(`[✓] Successfully processed product ${product.product_id}\n`);
+          console.log(`[✓] Successfully processed product ${product.product_id}`);
         } else {
           failedCount++;
-        //   console.log(`[✗] Failed to process product ${product.product_id}\n`);
+          console.log(`[✗] Failed to process product ${product.product_id}`);
         }
 
-        // Rate limiting: delay between products
+        // Rate limiting: delay between products (increased to 2 seconds)
         if (i < expiredProducts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
       } catch (error) {
@@ -94,7 +94,7 @@ export const startAuctionEndEmailJob = () => {
   // Cron format: */2 * * * * (every 2 minutes)
   // For production, adjust to: */5 * * * * (every 5 minutes)
   
-  const cronSchedule = '*/2 * * * *'; // Every 2 minutes
+  const cronSchedule = '*/1 * * * *'; // Every 1 minutes
 
   cron.schedule(cronSchedule, runAuctionEndEmailJob, {
     timezone: 'Asia/Ho_Chi_Minh'
@@ -103,7 +103,7 @@ export const startAuctionEndEmailJob = () => {
   console.log('\n' + '='.repeat(70));
   console.log('[CRON] Auction End Email Job Initialized');
   console.log('-'.repeat(70));
-  console.log(`Schedule: Every 2 minutes`);
+  console.log(`Schedule: Every 1 minutes`);
   console.log(`Timezone: Asia/Ho_Chi_Minh`);
   console.log(`Status: Active`);
   console.log('='.repeat(70) + '\n');

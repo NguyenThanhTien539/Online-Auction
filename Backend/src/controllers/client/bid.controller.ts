@@ -197,11 +197,11 @@ export async function playBid(req: Request, res: Response) {
         current_price: productInfo.current_price,
       });
       
-      // sendMail(
-      //   email,
-      //   "Bạn đã đặt giá thành công",
-      //   emailContent
-      // );
+      sendMail(
+        email,
+        "Bạn đã đặt giá thành công",
+        emailContent
+      );
 
       // Send mail to outbidded old bidder if any
       if (result && result.isOldBidderOutbidded && result.oldPriceOwnerId) {

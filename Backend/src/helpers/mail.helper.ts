@@ -1,31 +1,41 @@
 import nodemailer from "nodemailer";
 
-export const sendMail = (email: string, title: string, content: string) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // use false for STARTTLS; true for SSL on port 465
-    auth: {
-      user: process.env.GMAIL_ADDRESS,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
+// Create transporter once and reuse
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // use false for STARTTLS; true for SSL on port 465
+  auth: {
+    user: process.env.GMAIL_ADDRESS,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
-  const mailOptions = {
-    from: process.env.GMAIL_ADDRESS,
-    to: email,
-    subject: title,
-    html: content,
-  };
+export const sendMail = async (email: string, title: string, content: string): Promise<boolean> => {
+  try {
+    const mailOptions = {
+      from: {
+        name: 'Hệ Thống Đấu Giá Trực Tuyến',
+        address: process.env.GMAIL_ADDRESS || ''
+      },
+      to: email,
+      subject: title,
+      html: content,
+      text: content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(),
+      headers: {
+        'X-Priority': '3',
+        'X-Mailer': 'Online Auction Mailer',
+        'Importance': 'normal'
+      },
+    };
 
-  // Send the email
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log("Error:", error);
-    } else {
-      console.log("Email sent: ", info.response);
-    }
-  });
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[✓] Email sent to ${email}: ${info.response}`);
+    return true;
+  } catch (error) {
+    console.error(`[✗] Failed to send email to ${email}:`, error);
+    return false;
+  }
 };
 
 

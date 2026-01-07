@@ -163,17 +163,19 @@ export const sendLosersEmails = async (
         finalPrice: product.current_price,
       });
 
-      await sendMail(
+      const sent = await sendMail(
         loser.email,
         `Auction Ended: ${product.product_name}`,
         emailContent
       );
 
-      successCount++;
+      if (sent) {
+        successCount++;
+      }
 
       
       // Rate limiting: delay between emails
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.error(`[ERROR] Failed to send loser email to ${loser.email}:`, error);
     }
@@ -190,7 +192,7 @@ export const processAuctionEndNotification = async (product: Product): Promise<b
     // Get seller info
     const seller = await getUserById(product.seller_id);
     if (!seller) {
-
+      console.error(`[ERROR] Seller not found for product ${product.product_id}`);
       return false;
     }
 
@@ -199,7 +201,7 @@ export const processAuctionEndNotification = async (product: Product): Promise<b
       // Has winner
       const winner = await getUserById(product.price_owner_id);
       if (!winner) {
-
+        console.error(`[ERROR] Winner not found for product ${product.product_id}`);
         return false;
       }
 
@@ -213,17 +215,40 @@ export const processAuctionEndNotification = async (product: Product): Promise<b
         sendLosersEmails(losers, product),
       ]);
 
+      // Check results - consider success if winner and seller emails sent
+      // Loser emails are less critical
+      const winnerEmailSent = results[0].status === 'fulfilled' && results[0].value === true;
+      const sellerEmailSent = results[1].status === 'fulfilled' && results[1].value === true;
+      const loserEmailsResult = results[2];
+
+      if (!winnerEmailSent || !sellerEmailSent) {
+        console.error(`[ERROR] Critical emails failed for product ${product.product_id}`);
+        console.error(`Winner email: ${winnerEmailSent ? 'OK' : 'FAILED'}`);
+        console.error(`Seller email: ${sellerEmailSent ? 'OK' : 'FAILED'}`);
+        return false;
+      }
+
+      // Log loser emails (non-critical)
+      if (loserEmailsResult.status === 'fulfilled') {
+        const losersSent = loserEmailsResult.value as number;
+        console.log(`[INFO] Sent emails to ${losersSent}/${losers.length} losers`);
+      } else {
+        console.warn(`[WARNING] Failed to send loser emails:`, loserEmailsResult.reason);
+      }
       
       return true;
     } else {
       // No winner
-      await sendSellerNoWinnerEmail(seller, product);
+      const sent = await sendSellerNoWinnerEmail(seller, product);
       
+      if (!sent) {
+        console.error(`[ERROR] Failed to send no-winner email for product ${product.product_id}`);
+      }
 
-      return true;
+      return sent;
     }
   } catch (error) {
-
+    console.error(`[ERROR] Failed to process auction end for product ${product.product_id}:`, error);
     return false;
   }
 };
