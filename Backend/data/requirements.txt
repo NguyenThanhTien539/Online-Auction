@@ -1,1 +1,0 @@
-requests python-dotenv supabase google-cloud-translate pandas
