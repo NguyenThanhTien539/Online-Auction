@@ -11,11 +11,11 @@ const getLevelCategoriesList = async(level : number, catId? : number, catSlug? :
     let linkFetch = "";
     if (level == 1)
     {
-        linkFetch = "http://localhost:5000/api/categories/level1";
+        linkFetch = `${import.meta.env.VITE_API_URL}/api/categories/level1`;
     }
     else if (level == 2)
     {
-        linkFetch = `http://localhost:5000/api/categories/level2?cat_id=${catId}&cat_slug=${catSlug}`;
+        linkFetch = `${import.meta.env.VITE_API_URL}/api/categories/level2?cat_id=${catId}&cat_slug=${catSlug}`;
     }
     try{
         const response = await fetch(linkFetch);

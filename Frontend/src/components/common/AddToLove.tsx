@@ -23,7 +23,7 @@ export default function AddToLove({product_id, className} : {product_id: number,
         
         isLovedRef.current = newLoveStatus;
         // Send request to server
-        fetch(`http://localhost:5000/api/products/update_love_status`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/products/update_love_status`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

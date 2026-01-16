@@ -40,7 +40,7 @@ function PostProductPage(){
 
     useEffect(() => {
 
-        fetch("http://localhost:5000/api/categories/level1")
+        fetch(`${import.meta.env.VITE_API_URL}/api/categories/level1`)
         .then (res => res.json())
         .then (data=> {
             setCatlv1 (data.data);
@@ -49,7 +49,7 @@ function PostProductPage(){
 
     useEffect(() => {
         if (selectedCat1) {
-            fetch(`http://localhost:5000/api/categories/level2/noslug?cat_id=${selectedCat1}`)
+            fetch(`${import.meta.env.VITE_API_URL}/api/categories/level2/noslug?cat_id=${selectedCat1}`)
             .then(res => res.json())
             .then(data => {
                 setCatlv2(data.data);
@@ -209,7 +209,7 @@ function PostProductPage(){
             // Handle form submission here - send apiData to backend
             // console.log("Submitting data to API:", formPayLoad);
             
-            fetch("http://localhost:5000/api/products/post-product", {
+            fetch(`${import.meta.env.VITE_API_URL}/api/products/post-product`, {
                 method: "POST",
                 credentials: "include",
                 body: formPayLoad

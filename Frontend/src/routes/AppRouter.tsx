@@ -8,7 +8,6 @@ import AdminMainLayout from "@/layouts/AdminMainLayout";
 import AccountRegister from "@/pages/auth/AccountRegisterPage";
 import AccountVerify from "@/pages/auth/AccountVerifyPage";
 import AccountLogin from "@/pages/auth/AccountLoginPage";
-import Test from "@/ztest/Test";
 import ForgotPassword from "@/pages/auth/ForgotPasswordPage";
 import AllCategoriesPage from "@/pages/client/CategoriesPage";
 import ListProductsPage from "@/pages/client/ListProductsPage";
@@ -125,10 +124,6 @@ const routers = createBrowserRouter([
         element: <SellerOrderPage />,
       },
     ],
-  },
-  {
-    path: "/test",
-    element: <Test />,
   },
   {
     path: "/accounts",

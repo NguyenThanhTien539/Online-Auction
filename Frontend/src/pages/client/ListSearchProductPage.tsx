@@ -41,7 +41,7 @@ export default function ListSearchProductPage() {
         setSearchQuery(searchParams.get("query") || "");
         setCurrentPage(Number(searchParams.get("page")) || 1);
         setLoading(true);
-        fetch (`http://localhost:5000/api/products/search?query=${searchParams.get("query")}&page=${currentPage}`)
+        fetch (`${import.meta.env.VITE_API_URL}/api/products/search?query=${searchParams.get("query")}&page=${currentPage}`)
         .then (response => {
             if (!response.ok){
                 toast.error("Có lỗi khi lấy sản phẩm");
